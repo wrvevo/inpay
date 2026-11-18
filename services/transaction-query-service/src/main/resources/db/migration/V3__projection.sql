@@ -1,0 +1,1 @@
+ALTER TABLE transaction_view ADD COLUMN amount bigint NOT NULL DEFAULT 0, ADD COLUMN status text NOT NULL DEFAULT 'CREATED', ADD COLUMN version bigint NOT NULL DEFAULT 0;

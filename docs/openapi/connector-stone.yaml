@@ -1,0 +1,76 @@
+openapi: 3.1.0
+info:
+  title: connector-stone
+  version: 0.1.0
+  description: Contratos do scaffold; não representa homologação financeira.
+servers:
+- url: http://localhost:8104
+  description: Desenvolvimento local
+security:
+- bearerAuth: []
+- localBasic: []
+paths:
+  /internal/v1/module:
+    get:
+      summary: Metadados do scaffold
+      description: Requer scope connectors-stone/read
+      responses:
+        '200':
+          description: Módulo e estágio de implementação
+        '401':
+          description: Não autenticado
+        '403':
+          description: Escopo ausente
+  /internal/v1/authorizations:
+    post:
+      summary: Simulação local; AWS retorna 501
+      description: Requer scope connectors-stone/execute. Consulte README para limitações.
+      responses:
+        '200':
+          description: Resultado
+        '401':
+          description: Não autenticado
+        '403':
+          description: Escopo ou tenant não autorizado
+        '409':
+          description: Conflito de estado ou idempotência
+        '422':
+          description: Dados inválidos
+      parameters:
+      - in: header
+        name: X-Merchant-Id
+        required: false
+        schema:
+          type: string
+          format: uuid
+        description: Contexto autorizado; não autentica por si só.
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                operationId:
+                  type: string
+                  format: uuid
+                amount:
+                  type: integer
+                  minimum: 1
+                instrumentToken:
+                  type: string
+              required:
+              - operationId
+              - amount
+              - instrumentToken
+              additionalProperties: false
+components:
+  securitySchemes:
+    bearerAuth:
+      type: http
+      scheme: bearer
+      bearerFormat: JWT
+    localBasic:
+      type: http
+      scheme: basic
+      description: Somente profile local

@@ -1,0 +1,50 @@
+spring:
+  application:
+    name: connector-stone
+  profiles:
+    default: aws
+  datasource:
+    url: ${DB_URL}
+    username: ${DB_USER}
+    password: ${DB_PASSWORD}
+    hikari:
+      maximum-pool-size: 5
+  flyway:
+    locations: classpath:db/migration
+  kafka:
+    bootstrap-servers: ${KAFKA_BOOTSTRAP_SERVERS}
+    producer:
+      key-serializer: org.apache.kafka.common.serialization.StringSerializer
+      value-serializer: org.apache.kafka.common.serialization.StringSerializer
+      acks: all
+      properties:
+        enable.idempotence: true
+    consumer:
+      group-id: connector-stone
+      key-deserializer: org.apache.kafka.common.serialization.StringDeserializer
+      value-deserializer: org.apache.kafka.common.serialization.StringDeserializer
+      enable-auto-commit: false
+      auto-offset-reset: earliest
+    listener:
+      ack-mode: record
+server:
+  port: 8104
+management:
+  endpoints:
+    web:
+      exposure:
+        include: health,info,prometheus
+  endpoint:
+    health:
+      probes:
+        enabled: true
+      show-details: never
+gateway:
+  security:
+    issuer: ${COGNITO_ISSUER:}
+    allowed-clients: ${COGNITO_ALLOWED_CLIENTS:}
+    trusted-services: ${COGNITO_TRUSTED_SERVICES:}
+    client-tenants: ${COGNITO_CLIENT_TENANTS:}
+    audience: ${COGNITO_AUDIENCE:}
+  outbox:
+    delay: 2000

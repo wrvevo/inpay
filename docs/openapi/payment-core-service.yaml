@@ -1,0 +1,191 @@
+openapi: 3.1.0
+info:
+  title: payment-core-service
+  version: 0.1.0
+  description: Contratos do scaffold; não representa homologação financeira.
+servers:
+- url: http://localhost:8084
+  description: Desenvolvimento local
+security:
+- bearerAuth: []
+- localBasic: []
+paths:
+  /internal/v1/module:
+    get:
+      summary: Metadados do scaffold
+      description: Requer scope payments/read
+      responses:
+        '200':
+          description: Módulo e estágio de implementação
+        '401':
+          description: Não autenticado
+        '403':
+          description: Escopo ausente
+  /v1/payments:
+    post:
+      summary: Registrar pagamento; permanece CREATED
+      description: Requer scope payments/create. Consulte README para limitações.
+      responses:
+        '202':
+          description: Pagamento registrado, não cobrado
+        '401':
+          description: Não autenticado
+        '403':
+          description: Escopo ou tenant não autorizado
+        '409':
+          description: Conflito de estado ou idempotência
+        '422':
+          description: Dados inválidos
+      parameters:
+      - in: header
+        name: X-Merchant-Id
+        required: false
+        schema:
+          type: string
+          format: uuid
+        description: Contexto autorizado; não autentica por si só.
+      - in: header
+        name: Idempotency-Key
+        required: true
+        schema:
+          type: string
+          maxLength: 128
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                merchantOrderId:
+                  type: string
+                  maxLength: 128
+                amount:
+                  type: integer
+                  format: int64
+                  minimum: 1
+                currency:
+                  type: string
+                  enum:
+                  - BRL
+                instrumentToken:
+                  type: string
+                  pattern: ^ptok_[A-Za-z0-9_-]{20,100}$
+              required:
+              - merchantOrderId
+              - amount
+              - currency
+              - instrumentToken
+              additionalProperties: false
+  /v1/payments/{id}:
+    get:
+      summary: Consultar pagamento autoritativo
+      description: Requer scope payments/read. Consulte README para limitações.
+      responses:
+        '200':
+          description: Resultado
+        '401':
+          description: Não autenticado
+        '403':
+          description: Escopo ou tenant não autorizado
+        '409':
+          description: Conflito de estado ou idempotência
+        '422':
+          description: Dados inválidos
+      parameters:
+      - in: header
+        name: X-Merchant-Id
+        required: false
+        schema:
+          type: string
+          format: uuid
+        description: Contexto autorizado; não autentica por si só.
+      - &id001
+        in: path
+        name: id
+        required: true
+        schema:
+          type: string
+          format: uuid
+  /v1/payments/{id}/captures:
+    post:
+      summary: Operação financeira ainda não implementada
+      description: Requer scope payments/capture. Consulte README para limitações.
+      responses:
+        '501':
+          description: Adapter/saga pendente
+        '401':
+          description: Não autenticado
+        '403':
+          description: Escopo ou tenant não autorizado
+        '409':
+          description: Conflito de estado ou idempotência
+        '422':
+          description: Dados inválidos
+      parameters:
+      - in: header
+        name: X-Merchant-Id
+        required: false
+        schema:
+          type: string
+          format: uuid
+        description: Contexto autorizado; não autentica por si só.
+      - *id001
+  /v1/payments/{id}/refunds:
+    post:
+      summary: Operação financeira ainda não implementada
+      description: Requer scope payments/refund. Consulte README para limitações.
+      responses:
+        '501':
+          description: Adapter/saga pendente
+        '401':
+          description: Não autenticado
+        '403':
+          description: Escopo ou tenant não autorizado
+        '409':
+          description: Conflito de estado ou idempotência
+        '422':
+          description: Dados inválidos
+      parameters:
+      - in: header
+        name: X-Merchant-Id
+        required: false
+        schema:
+          type: string
+          format: uuid
+        description: Contexto autorizado; não autentica por si só.
+      - *id001
+  /v1/payments/{id}/voids:
+    post:
+      summary: Operação financeira ainda não implementada
+      description: Requer scope payments/void. Consulte README para limitações.
+      responses:
+        '501':
+          description: Adapter/saga pendente
+        '401':
+          description: Não autenticado
+        '403':
+          description: Escopo ou tenant não autorizado
+        '409':
+          description: Conflito de estado ou idempotência
+        '422':
+          description: Dados inválidos
+      parameters:
+      - in: header
+        name: X-Merchant-Id
+        required: false
+        schema:
+          type: string
+          format: uuid
+        description: Contexto autorizado; não autentica por si só.
+      - *id001
+components:
+  securitySchemes:
+    bearerAuth:
+      type: http
+      scheme: bearer
+      bearerFormat: JWT
+    localBasic:
+      type: http
+      scheme: basic
+      description: Somente profile local

@@ -1,0 +1,155 @@
+global:
+  scrape_interval: 15s
+scrape_configs:
+- job_name: merchant-service
+  metrics_path: /actuator/prometheus
+  basic_auth:
+    username: developer
+    password: local-only-change-me
+  static_configs:
+  - targets:
+    - merchant-service:8081
+- job_name: payment-links-service
+  metrics_path: /actuator/prometheus
+  basic_auth:
+    username: developer
+    password: local-only-change-me
+  static_configs:
+  - targets:
+    - payment-links-service:8082
+- job_name: checkout-service
+  metrics_path: /actuator/prometheus
+  basic_auth:
+    username: developer
+    password: local-only-change-me
+  static_configs:
+  - targets:
+    - checkout-service:8083
+- job_name: payment-core-service
+  metrics_path: /actuator/prometheus
+  basic_auth:
+    username: developer
+    password: local-only-change-me
+  static_configs:
+  - targets:
+    - payment-core-service:8084
+- job_name: routing-service
+  metrics_path: /actuator/prometheus
+  basic_auth:
+    username: developer
+    password: local-only-change-me
+  static_configs:
+  - targets:
+    - routing-service:8085
+- job_name: token-service
+  metrics_path: /actuator/prometheus
+  basic_auth:
+    username: developer
+    password: local-only-change-me
+  static_configs:
+  - targets:
+    - token-service:8086
+- job_name: fraud-service
+  metrics_path: /actuator/prometheus
+  basic_auth:
+    username: developer
+    password: local-only-change-me
+  static_configs:
+  - targets:
+    - fraud-service:8087
+- job_name: webhook-ingress-service
+  metrics_path: /actuator/prometheus
+  basic_auth:
+    username: developer
+    password: local-only-change-me
+  static_configs:
+  - targets:
+    - webhook-ingress-service:8088
+- job_name: reconciliation-service
+  metrics_path: /actuator/prometheus
+  basic_auth:
+    username: developer
+    password: local-only-change-me
+  static_configs:
+  - targets:
+    - reconciliation-service:8089
+- job_name: notification-service
+  metrics_path: /actuator/prometheus
+  basic_auth:
+    username: developer
+    password: local-only-change-me
+  static_configs:
+  - targets:
+    - notification-service:8090
+- job_name: transaction-query-service
+  metrics_path: /actuator/prometheus
+  basic_auth:
+    username: developer
+    password: local-only-change-me
+  static_configs:
+  - targets:
+    - transaction-query-service:8091
+- job_name: connector-cielo
+  metrics_path: /actuator/prometheus
+  basic_auth:
+    username: developer
+    password: local-only-change-me
+  static_configs:
+  - targets:
+    - connector-cielo:8101
+- job_name: connector-rede
+  metrics_path: /actuator/prometheus
+  basic_auth:
+    username: developer
+    password: local-only-change-me
+  static_configs:
+  - targets:
+    - connector-rede:8102
+- job_name: connector-getnet
+  metrics_path: /actuator/prometheus
+  basic_auth:
+    username: developer
+    password: local-only-change-me
+  static_configs:
+  - targets:
+    - connector-getnet:8103
+- job_name: connector-stone
+  metrics_path: /actuator/prometheus
+  basic_auth:
+    username: developer
+    password: local-only-change-me
+  static_configs:
+  - targets:
+    - connector-stone:8104
+- job_name: connector-bin
+  metrics_path: /actuator/prometheus
+  basic_auth:
+    username: developer
+    password: local-only-change-me
+  static_configs:
+  - targets:
+    - connector-bin:8105
+- job_name: connector-global-payments
+  metrics_path: /actuator/prometheus
+  basic_auth:
+    username: developer
+    password: local-only-change-me
+  static_configs:
+  - targets:
+    - connector-global-payments:8106
+- job_name: connector-pagbank
+  metrics_path: /actuator/prometheus
+  basic_auth:
+    username: developer
+    password: local-only-change-me
+  static_configs:
+  - targets:
+    - connector-pagbank:8107
+- job_name: connector-safrapay
+  metrics_path: /actuator/prometheus
+  basic_auth:
+    username: developer
+    password: local-only-change-me
+  static_configs:
+  - targets:
+    - connector-safrapay:8108

@@ -1,0 +1,97 @@
+{
+  "merchant-service": [
+    "merchant",
+    8081,
+    "merchants"
+  ],
+  "payment-links-service": [
+    "links",
+    8082,
+    "links"
+  ],
+  "checkout-service": [
+    "checkout",
+    8083,
+    "checkout"
+  ],
+  "payment-core-service": [
+    "payment",
+    8084,
+    "payments"
+  ],
+  "routing-service": [
+    "routing",
+    8085,
+    "routing"
+  ],
+  "token-service": [
+    "token",
+    8086,
+    "tokens"
+  ],
+  "fraud-service": [
+    "fraud",
+    8087,
+    "fraud"
+  ],
+  "webhook-ingress-service": [
+    "webhook",
+    8088,
+    "provider-events"
+  ],
+  "reconciliation-service": [
+    "reconciliation",
+    8089,
+    "reconciliation"
+  ],
+  "notification-service": [
+    "notification",
+    8090,
+    "notifications"
+  ],
+  "transaction-query-service": [
+    "query",
+    8091,
+    "transactions"
+  ],
+  "connector-cielo": [
+    "cielo",
+    8101,
+    "connectors-cielo"
+  ],
+  "connector-rede": [
+    "rede",
+    8102,
+    "connectors-rede"
+  ],
+  "connector-getnet": [
+    "getnet",
+    8103,
+    "connectors-getnet"
+  ],
+  "connector-stone": [
+    "stone",
+    8104,
+    "connectors-stone"
+  ],
+  "connector-bin": [
+    "bin",
+    8105,
+    "connectors-bin"
+  ],
+  "connector-global-payments": [
+    "globalpayments",
+    8106,
+    "connectors-global-payments"
+  ],
+  "connector-pagbank": [
+    "pagbank",
+    8107,
+    "connectors-pagbank"
+  ],
+  "connector-safrapay": [
+    "safrapay",
+    8108,
+    "connectors-safrapay"
+  ]
+}

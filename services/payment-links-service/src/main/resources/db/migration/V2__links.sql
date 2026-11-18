@@ -1,0 +1,2 @@
+CREATE TABLE payment_links(id uuid PRIMARY KEY,merchant_id uuid NOT NULL,public_code text NOT NULL UNIQUE,order_id text NOT NULL,amount bigint NOT NULL CHECK(amount>0),expires_at timestamptz NOT NULL,revoked boolean NOT NULL DEFAULT false);
+CREATE TABLE link_reservations(link_id uuid PRIMARY KEY REFERENCES payment_links(id),payment_id uuid NOT NULL,lease_until timestamptz NOT NULL,fencing_token bigint NOT NULL,state text NOT NULL);

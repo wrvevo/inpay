@@ -1,0 +1,1 @@
+CREATE TABLE provider_operations(id uuid PRIMARY KEY,merchant_id uuid NOT NULL,amount bigint NOT NULL CHECK(amount>0),instrument_token text NOT NULL,outcome text NOT NULL,created_at timestamptz NOT NULL DEFAULT now());

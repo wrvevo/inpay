@@ -1,0 +1,77 @@
+{
+  "family": "REPLACE-service-name",
+  "networkMode": "awsvpc",
+  "requiresCompatibilities": [
+    "FARGATE"
+  ],
+  "cpu": "256",
+  "memory": "512",
+  "executionRoleArn": "REPLACE-execution-role-arn",
+  "taskRoleArn": "REPLACE-minimum-privilege-task-role-arn",
+  "containerDefinitions": [
+    {
+      "name": "service",
+      "image": "REPLACE-ECR-image-with-digest",
+      "essential": true,
+      "readonlyRootFilesystem": true,
+      "portMappings": [
+        {
+          "containerPort": 8084,
+          "protocol": "tcp"
+        }
+      ],
+      "environment": [
+        {
+          "name": "SPRING_PROFILES_ACTIVE",
+          "value": "aws"
+        },
+        {
+          "name": "DB_URL",
+          "value": "jdbc:postgresql://REPLACE-RDS:5432/payment_core_service"
+        },
+        {
+          "name": "KAFKA_BOOTSTRAP_SERVERS",
+          "value": "REPLACE-MSK-IAM-bootstrap"
+        },
+        {
+          "name": "COGNITO_ISSUER",
+          "value": "REPLACE-COGNITO-ISSUER"
+        },
+        {
+          "name": "COGNITO_ALLOWED_CLIENTS",
+          "value": "REPLACE-EXPLICIT-CLIENT-IDS"
+        }
+      ],
+      "secrets": [
+        {
+          "name": "DB_USER",
+          "valueFrom": "REPLACE-DB-SECRET-ARN:username::"
+        },
+        {
+          "name": "DB_PASSWORD",
+          "valueFrom": "REPLACE-DB-SECRET-ARN:password::"
+        }
+      ],
+      "logConfiguration": {
+        "logDriver": "awslogs",
+        "options": {
+          "awslogs-group": "REPLACE-log-group",
+          "awslogs-region": "sa-east-1",
+          "awslogs-stream-prefix": "payment-core"
+        }
+      },
+      "mountPoints": [
+        {
+          "sourceVolume": "tmp",
+          "containerPath": "/tmp",
+          "readOnly": false
+        }
+      ]
+    }
+  ],
+  "volumes": [
+    {
+      "name": "tmp"
+    }
+  ]
+}

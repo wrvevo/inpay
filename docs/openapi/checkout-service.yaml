@@ -1,0 +1,33 @@
+openapi: 3.1.0
+info:
+  title: checkout-service
+  version: 0.1.0
+  description: Contratos do scaffold; não representa homologação financeira.
+servers:
+- url: http://localhost:8083
+  description: Desenvolvimento local
+security:
+- bearerAuth: []
+- localBasic: []
+paths:
+  /internal/v1/module:
+    get:
+      summary: Metadados do scaffold
+      description: Requer scope checkout/read
+      responses:
+        '200':
+          description: Módulo e estágio de implementação
+        '401':
+          description: Não autenticado
+        '403':
+          description: Escopo ausente
+components:
+  securitySchemes:
+    bearerAuth:
+      type: http
+      scheme: bearer
+      bearerFormat: JWT
+    localBasic:
+      type: http
+      scheme: basic
+      description: Somente profile local

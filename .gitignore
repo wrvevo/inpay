@@ -1,0 +1,8 @@
+**/target/
+.env
+*.tfstate*
+.terraform/
+*.tfvars
+!*.tfvars.example
+*.log
+.idea/
