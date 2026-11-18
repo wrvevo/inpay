@@ -1,4 +1,4 @@
-# Gateway de pagamentos modular — arquitetura de referência v1.0
+# InPay — arquitetura de referência v1.0
 
 Preparado para William Robert • 16/11/2026
 
@@ -436,3 +436,8 @@ As decisões de arquitetura são propostas deste documento. As fontes abaixo sus
 - [S6 — AWS: validação de JWT Cognito](https://docs.aws.amazon.com/cognito/latest/developerguide/amazon-cognito-user-pools-using-tokens-verifying-a-jwt.html)
 - [S7 — Spring Security: JWT Resource Server](https://docs.spring.io/spring-security/reference/servlet/oauth2/resource-server/jwt.html)
 - [S8 — AWS: MSK e IAM](https://docs.aws.amazon.com/msk/latest/developerguide/iam-access-control.html)
+
+
+## Identidade e implementação atual
+
+Nome do produto: InPay. Em 18/11/2026, o projeto Java foi refatorado com JavaDoc, DTOs e Swagger, e recebeu Compose completo. Este documento descreve também capacidades planejadas; consultar README e VALIDATION para o estágio real do código.

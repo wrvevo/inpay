@@ -39,7 +39,7 @@ management:
       probes:
         enabled: true
       show-details: never
-gateway:
+inpay:
   security:
     issuer: ${COGNITO_ISSUER:}
     allowed-clients: ${COGNITO_ALLOWED_CLIENTS:}
@@ -48,3 +48,14 @@ gateway:
     audience: ${COGNITO_AUDIENCE:}
   outbox:
     delay: 2000
+
+springdoc:
+  api-docs:
+    enabled: false
+    version: OPENAPI_3_1
+  swagger-ui:
+    enabled: false
+    path: /swagger-ui.html
+    persist-authorization: false
+    display-request-duration: true
+  override-with-generic-response: false

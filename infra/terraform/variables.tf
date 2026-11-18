@@ -1,5 +1,5 @@
 variable "region" { default = "sa-east-1" }
-variable "project" { default = "include-gateway-dev" }
+variable "project" { default = "inpay-dev" }
 variable "vpc_id" { type = string }
 variable "private_subnet_ids" { type = list(string) }
 variable "m2m_scopes" {

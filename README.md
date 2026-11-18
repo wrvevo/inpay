@@ -1,60 +1,52 @@
-# Gateway de pagamentos — estrutura Spring Boot
+# InPay — gateway de pagamentos modular
 
-Estrutura de desenvolvimento baseada na arquitetura v1. Java 21 + Spring Boot 4.1.2, Maven multimódulo, PostgreSQL/Flyway, Kafka, Spring Security/Cognito, Lambdas Java e fundação Terraform AWS.
+Java 21 · Spring Boot 4.1.2 · PostgreSQL · Kafka · Cognito · arquitetura hexagonal
 
-**Este pacote é um scaffold compilável com componentes funcionais, não um gateway pronto para cobrar.** O Core registra pagamentos em CREATED e publica PaymentCreated; não executa a saga financeira. Os fluxos ainda não implementados falham explicitamente (501), e mocks só são ativados por `local`. Não inserir dados de cartão reais.
+O projeto foi refatorado para facilitar leitura e manutenção por desenvolvedores plenos: indentação de quatro espaços em Java, blocos explícitos, nomes descritivos nos fluxos principais, DTOs separados, JavaDoc e Swagger gerado pelos controllers.
 
-## Organização
+**Estágio real:** estrutura de desenvolvimento com componentes funcionais. O Core registra pagamentos em CREATED e publica PaymentCreated, mas ainda não executa a saga financeira completa. Os conectores locais são simulações; captura, estorno e integrações reais pendentes retornam 501. Não usar cartões reais.
 
-- `services/`: 19 deploys Spring Boot independentes; cada um tem domain, domain/port, application, adapters/in/rest, adapters/out/postgres, adapters/out/kafka e bootstrap.
-- `libs/contracts`: envelope de eventos; não contém entidades compartilhadas de banco.
-- `libs/platform-security`: validação Cognito, scopes, tenant, cliente M2M e perfil local autenticado.
-- `libs/platform-messaging`: outbox transacional, publisher e inbox, com tratamento Kafka/DLT.
-- `lambdas/`: webhook-forwarder, reconciliation-trigger e link-expiration-trigger.
-- `infra/local`: bancos/usuários isolados, OpenTelemetry Collector, Prometheus/Grafana.
-- `infra/terraform`: fundação AWS; `DEPLOYMENT.md` detalha recursos e passos restantes.
-- `docs/openapi/`: contratos OpenAPI dos endpoints existentes, incluindo respostas 501 explícitas.
-- `ARCHITECTURE.md`: modelo completo que orienta a evolução; contém funcionalidades planejadas além do scaffold.
+## Subir o ambiente completo com Docker
 
-## Compilar e testar
-
-Requer **JDK 21 completo** e Maven 3.9+. O JRE sozinho não basta.
+Requer Docker Engine/Desktop com Compose v2 e acesso aos registries Maven, Docker Hub e ECR público. Para todos os módulos, reservar aproximadamente 16 GB de RAM e pelo menos 4 CPUs para Docker. O consumo varia durante build e inicialização.
 
 ```bash
-mvn -B verify
+# Opcional: copie .env.example para .env e ajuste as senhas locais.
+docker compose up --build -d
+
+docker compose ps
+docker compose logs -f payment-core-service
 ```
 
-Testes padrão incluem regras financeiras, token por tenant/provedor, risco, roteamento, claims Cognito e ArchUnit. Integração real PostgreSQL fica no perfil explícito `mvn -B verify -Pintegration`, usando embedded-postgres (sem Docker). Esse teste baixa binário de teste, requer usuário não root e permissão para abrir sockets locais. Execução Kafka/AWS fica fora dessas suítes.
+No Windows/PowerShell, a cópia opcional é `Copy-Item .env.example .env`; no Linux/macOS, `cp .env.example .env`. O Compose já fornece valores de desenvolvimento quando .env não existe.
 
-Para abrir no IntelliJ, VS Code ou Cursor, importar o `pom.xml` da raiz. Não criar um workspace separado por serviço.
+O `docker-compose.yml` sobe, sem precisar ativar profiles:
 
-## Rodar localmente
+- 19 serviços Spring Boot, cada um com banco/usuário próprio no PostgreSQL;
+- 3 containers de emulação das Lambdas Java;
+- PostgreSQL, Kafka e criação explícita dos tópicos/DLT;
+- OpenTelemetry Collector, Prometheus e Grafana;
+- um job auxiliar que prepara a credencial local de coleta de métricas.
 
-Requer Docker Compose. Senhas locais são deliberadamente de desenvolvimento; portas publicadas somente em loopback.
+São 29 containers definidos, incluindo 2 jobs de inicialização que terminam com sucesso. As portas publicadas ficam somente em `127.0.0.1`. A compilação usa uma etapa Docker compartilhada entre os módulos. O primeiro build baixa dependências e pode demorar; o Docker reutiliza cache nas próximas execuções.
 
-```bash
-docker compose up -d postgres kafka
-mvn -B install -DskipTests
-```
+**Subir todos os processos não completa as funcionalidades pendentes.** Checkout ainda não possui interface pública; callbacks reais e conciliação ainda não foram implementados. Nenhum container local realiza cobrança real.
 
-Em terminais separados, executar os JARs desejados:
+## Swagger e autenticação
 
-```bash
-java -jar services/token-service/target/token-service-0.1.0-SNAPSHOT.jar --spring.profiles.active=local
-java -jar services/payment-core-service/target/payment-core-service-0.1.0-SNAPSHOT.jar --spring.profiles.active=local
-java -jar services/fraud-service/target/fraud-service-0.1.0-SNAPSHOT.jar --spring.profiles.active=local
-java -jar services/transaction-query-service/target/transaction-query-service-0.1.0-SNAPSHOT.jar --spring.profiles.active=local
-```
+Abra o Swagger do Payment Core: **http://localhost:8084/swagger-ui/index.html**.
 
-`./scripts/smoke.sh` cria token simulado, registra pagamento e avalia risco separadamente. A avaliação não dispara cobrança. Usuário HTTP Basic `developer`; senha padrão `local-only-change-me` (sobrescreva LOCAL_PASSWORD). Tenant fixo de desenvolvimento: `11111111-1111-1111-1111-111111111111`. Basic é restrito ao perfil local; não publicar essas portas.
+Cada serviço disponibiliza documentação em sua própria porta:
 
-Para rodar serviços em containers:
+- `/swagger-ui/index.html`: interface navegável;
+- `/v3/api-docs`: contrato OpenAPI JSON;
+- `/v3/api-docs.yaml`: contrato OpenAPI YAML.
 
-```bash
-docker compose --profile apps up --build -d payment-core-service token-service fraud-service transaction-query-service
-```
+No perfil `local`, a documentação é pública na máquina local. Para executar operações pelo botão **Authorize**, use HTTP Basic: usuário `developer`, senha `local-only-change-me` ou o valor configurado em LOCAL_PASSWORD. Acesso à documentação não libera as APIs de negócio. O tenant local é `11111111-1111-1111-1111-111111111111`.
 
-Todos os 19 simultaneamente podem consumir mais de 10 GB de RAM. Suba apenas os necessários. Para métricas com serviços em container: `docker compose --profile observability up -d prometheus grafana`. Ao alterar LOCAL_PASSWORD, atualizar a senha de scrape no Prometheus. Grafana em localhost:3000, login admin e senha local-only-change-me.
+No perfil AWS, documentação e Swagger ficam desabilitados por padrão. Se forem habilitados explicitamente, as rotas de documentação exigem o escopo `operations/read`, além da proteção de rede. Não inserir client secret Cognito no navegador: as APIs recebem access tokens obtidos no backend.
+
+Grafana: **http://localhost:3000**, usuário `admin`, senha local definida por GRAFANA_PASSWORD. Prometheus: **http://localhost:9090**. A senha usada no scrape é sincronizada pelo job observability-init. O Collector recebe traces em 4317/4318 e os exporta para logs; este Compose não inclui armazenamento ou interface de busca de traces.
 
 ## Módulos e estágio real
 
@@ -80,29 +72,66 @@ Todos os 19 simultaneamente podem consumir mais de 10 GB de RAM. Suba apenas os 
 | connector-pagbank | 8107 | Simulador PostgreSQL local idempotente por operationId; adaptador real retorna 501. Não homologado. |
 | connector-safrapay | 8108 | Simulador PostgreSQL local idempotente por operationId; adaptador real retorna 501. Não homologado. |
 
-## Segurança e produção
 
-Default profile é `aws`, que exige configuração de banco, Kafka e Cognito. Não há fallback de AWS para Basic/mock. Cada endpoint de negócio usa scope explícito; o token deve ter token_use=access, expiração e client_id permitido, além de assinatura/issuer válidos. Aud só é exigido quando configurado para resource binding.
+## Lambdas locais
 
-`COGNITO_CLIENT_TENANTS` faz binding M2M de lojistas. `COGNITO_TRUSTED_SERVICES` permite contexto de tenant para workloads internos; restringir aos chamadores esperados por destino e conferir ownership no use case. Login humano/memberships ainda não está implementado. Secrets nunca devem ser colocados no git.
+As Lambdas usam o Runtime Interface Emulator da imagem oficial AWS. Elas são invocadas manualmente; o Compose não cria agendamentos EventBridge.
 
-Sem PAN/CVV no modelo ou eventos. Tokenização real demanda coletor contratado/verificado e bindings cifrados com KMS. Não substituir tokens simulados por números reais de cartão. Conectores reais precisam de contrato, mapeamento de códigos, consulta de UNKNOWN, regras de captura/cancelamento/estorno e testes de homologação.
+| Lambda | Porta | Comportamento |
+|---|---:|---|
+| webhook-forwarder | 9001 | Retorna 501 até implementar verificação e persistência do callback. |
+| reconciliation-trigger | 9002 | Chama o serviço de conciliação; enquanto o backend retornar 501, a invocação informa falha. |
+| link-expiration-trigger | 9003 | Chama o endpoint que revoga links locais vencidos. |
 
-Outbox/inbox implementam entrega ao menos uma vez, não exactly-once financeiro. O publisher mantém locks enquanto aguarda ACK de lote pequeno; para alto volume, implementar relay/CDC e medir contenção. PaymentCreated contém dados mínimos, não inclui token de instrumento. DLT não deve ser reproduzida sem verificar invariantes.
+Exemplo, após os serviços ficarem saudáveis:
 
-## Próxima implementação no código
+```bash
+curl -X POST http://localhost:9003/2015-03-31/functions/function/invocations -d '{}'
+```
 
-1. Merchant/afiliação e resolução real de instrumentos; não permitir operação com alias não verificado.
-2. Worker da saga: risco, rota persistida, autorização, consulta de UNKNOWN e captura com controle concorrente. Conectar os ports existentes.
-3. Finalizar adaptador Cielo sandbox e coleção de testes de contrato; depois Rede e Getnet.
-4. Checkout público, sessão, reservas de link, coleta segura e 3DS.
-5. Webhooks verificados, compensações, conciliação e entrega segura de notificações.
+No PowerShell, use `curl.exe` para executar esse exemplo. O modo local é ativado explicitamente por INPAY_RUNTIME=local e usa Basic apenas entre containers. Fora dele, as Lambdas exigem HTTPS e Cognito M2M. Nenhum fallback para credencial local ocorre após falha do Cognito.
 
-Veja `VALIDATION.md` para o que foi efetivamente testado. Nenhum recurso foi implantado na AWS, nenhuma cobrança foi feita e nenhuma adquirente foi homologada.
+## Compilar e testar sem Docker
 
-## Referências
+Requer JDK 21 completo e Maven 3.9+:
 
-- Spring Boot: https://docs.spring.io/spring-boot/system-requirements.html
-- JWT Resource Server: https://docs.spring.io/spring-security/reference/servlet/oauth2/resource-server/jwt.html
-- Cognito M2M: https://docs.aws.amazon.com/cognito/latest/developerguide/cognito-user-pools-define-resource-servers.html
-- Cielo: https://docs.cielo.com.br/ecommerce-cielo/docs/caracteristicas-api-ecommerce
+```bash
+mvn -B verify
+mvn -B spotless:check
+# Após alterar Java, aplicar a mesma formatação:
+mvn -B spotless:apply
+```
+
+Para testes PostgreSQL com processos locais liberados: `mvn -B verify -Pintegration`. Docker não é necessário para esse perfil, mas o teste requer usuário não root e permissão para abrir sockets locais.
+
+Importe o `pom.xml` raiz no IntelliJ, VS Code ou Cursor. Pacote base: `br.com.includelabs.inpay`. Artefato pai: `inpay`, versão `0.2.0-SNAPSHOT`.
+
+## Navegação no código
+
+- `services/`: 19 módulos independentes, organizados em domain, application, adapters e bootstrap.
+- `libs/contracts`: envelope de eventos, sem entidades compartilhadas entre bancos.
+- `libs/platform-security`: Cognito, escopos, tenant e cliente M2M.
+- `libs/platform-messaging`: outbox, inbox e tratamento Kafka/DLT.
+- `libs/platform-openapi`: metadados InPay e segurança do Swagger.
+- `lambdas/`: funções Java e modos de execução local/AWS.
+- `docs/CODE_GUIDE.md`: roteiro de leitura das regras e convenções.
+- `docs/LOCAL_ENVIRONMENT.md`: operação do Compose, persistência e diagnóstico.
+- `docs/openapi/`: exemplos estáticos de contratos; o contrato gerado em `/v3/api-docs` é a referência do código atual.
+- `DEPLOYMENT.md` e `infra/terraform/`: fundação AWS e passos ainda necessários.
+- `VALIDATION.md`: verificações realmente executadas nesta versão.
+
+## Parar sem apagar dados
+
+```bash
+docker compose down
+```
+
+Os volumes preservam PostgreSQL, Kafka, Prometheus e Grafana. `docker compose down -v` apaga esses dados locais; use somente para reiniciar deliberadamente o ambiente.
+
+## Segurança e continuidade
+
+Tokens simulados não substituem tokenização real. Não há PAN/CVV no modelo. Bindings reais, checkout/3DS, saga, tratamento de UNKNOWN, callbacks, conciliação e entrega de notificações continuam como próximas implementações. Os detalhes de cada módulo estão na tabela acima.
+
+Default profile das aplicações é `aws`; somente o Compose local ativa `local`. Cada API mantém seu scope e ownership. Alterar o nome Java não renomeou tabelas, bancos nem tópicos para evitar perda de compatibilidade de dados existentes.
+
+Referências oficiais: [Springdoc](https://springdoc.org/), [Cognito M2M](https://docs.aws.amazon.com/cognito/latest/developerguide/cognito-user-pools-define-resource-servers.html), [Lambda Java em containers](https://docs.aws.amazon.com/lambda/latest/dg/java-image.html).

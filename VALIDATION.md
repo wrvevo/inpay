@@ -1,28 +1,34 @@
-# Validação — 16/11/2026
+# Validação do InPay 0.2.0 — 18/11/2026
 
-## Executado
+## Executado nesta revisão
 
-- Reactor Maven completo: **BUILD SUCCESS** em Java 21.0.13 e Maven 3.9.11, Spring Boot 4.1.2.
-- 26 projetos Maven no reactor: raiz, 3 bibliotecas, 19 serviços e 3 Lambdas.
-- **39 testes aprovados, 0 falhas, 0 erros, 0 ignorados**: 19 verificações ArchUnit, 5 testes de claims Cognito, 6 de regras financeiras, 4 antifraude, 3 de token/tenant e 2 de roteamento.
-- Compilação das fontes de integração PostgreSQL; execução reservada ao perfil integration.
-- Parse de XML/POM, YAML/Compose e 19 contratos OpenAPI.
-- `terraform fmt -check -recursive`: aprovado; inicialização do provider realizada sem backend e sem apply.
+- Reactor Maven completo: **BUILD SUCCESS**, com JDK 21.0.13, Maven 3.9.11 e Spring Boot 4.1.2.
+- 27 projetos Maven: raiz, 4 bibliotecas, 19 serviços Spring Boot e 3 Lambdas Java.
+- **42 testes aprovados, 0 falhas, 0 erros, 0 ignorados**.
+- A suíte preserva os 39 testes anteriores e adiciona 3 testes MockMvc para contrato OpenAPI, recursos Swagger UI e autenticação das APIs de negócio.
+- O teste de Swagger inicializa o contexto Spring e consulta a documentação gerada; não usa um arquivo JSON previamente preparado.
+- Springdoc 3.2.0 integrado e compatível com a linha Spring Boot 4.1.x conforme documentação oficial.
+- Auditoria AST: **248 métodos/construtores explícitos de produção possuem JavaDoc**, sem ausências. Construtores compactos e accessors implícitos de records são contados separadamente pelo modelo Java e não fazem parte desse total.
+- **42 operações HTTP anotadas** com documentação Swagger. DTOs de entrada e resposta recebem descrições e exemplos.
+- `mvn spotless:apply spotless:check`: **BUILD SUCCESS**, estilo Java AOSP de quatro espaços.
+- `docker-compose v2.39.4 config --quiet`: aprovado para os 29 containers definidos.
+- Verificação estrutural de POM/XML, YAML e inventário de serviços.
 
-## Não executado / limites
+## Limites da validação
 
-- `terraform validate` não concluiu: provider AWS tentou abrir socket Unix e recebeu `operation not permitted` no ambiente. A formatação passou, mas isso NÃO comprova validação completa de schema ou implantação.
-- PostgreSQL integrado: 4 cenários preparados em PostgresIdempotencyIT (concorrência, conflito de payload, isolamento de tenant e rollback/outbox). Não executados aqui; usar `mvn verify -Pintegration` em ambiente com sockets locais liberados.
-- Não havia Docker para execução de Compose e testes de ponta a ponta com Kafka/PostgreSQL.
-- Cognito real, Lambda/AWS, checkout público e endpoints de adquirentes não foram executados ou homologados.
-- Serviços possuem estruturas e estágios diferentes, descritos no README. O Core registra CREATED; não processa cobranças. Conectores são simulações locais e falham com 501 fora desse perfil.
+- Não há Docker Engine disponível neste ambiente: as imagens não foram construídas nem os containers iniciados aqui. A validação do Compose verifica configuração, não execução ponta a ponta.
+- Testes PostgreSQL do perfil integration continuam preparados, mas não executados nesta revisão. Kafka, Lambdas emuladas e observabilidade devem ser verificados no ambiente Docker do desenvolvedor.
+- AWS, Cognito real e adquirentes não foram acessados ou homologados. Terraform não foi aplicado nem revalidado nesta revisão.
+- Operações financeiras completas continuam pendentes. Endpoints marcados como 501 não foram convertidos em respostas de sucesso.
 
 ## Reproduzir
 
 ```bash
-mvn -B verify
+mvn -B spotless:check verify
 mvn -B verify -Pintegration
-docker compose up -d postgres kafka
+docker compose config --quiet
+docker compose up --build -d
+python3 scripts/check-services.py
 ```
 
-Os testes padrão não dependem da AWS. Revise README e DEPLOYMENT antes de provisionar recursos ou adicionar credenciais reais.
+Os testes padrão não dependem da AWS. O perfil integration requer processos PostgreSQL locais e sockets permitidos. Consulte README para credenciais de desenvolvimento, URLs e limitações de cada módulo.

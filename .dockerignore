@@ -1,4 +1,6 @@
 **/target
 .git
 .env
-infra/terraform/.terraform
+**/.terraform
+**/*.tfstate*
+**/*.log

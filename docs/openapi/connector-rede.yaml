@@ -1,8 +1,9 @@
 openapi: 3.1.0
 info:
-  title: connector-rede
-  version: 0.1.0
-  description: Contratos do scaffold; não representa homologação financeira.
+  title: InPay | connector-rede
+  version: 0.2.0
+  description: Exemplo estático. Consulte /v3/api-docs da aplicação para o contrato
+    gerado pelos controllers.
 servers:
 - url: http://localhost:8102
   description: Desenvolvimento local
