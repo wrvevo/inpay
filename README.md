@@ -6,6 +6,12 @@ O projeto foi refatorado para facilitar leitura e manutenção por desenvolvedor
 
 **Estágio real:** estrutura de desenvolvimento com componentes funcionais. O Core registra pagamentos em CREATED e publica PaymentCreated, mas ainda não executa a saga financeira completa. Os connectors agora incluem chamadas HTTP externas de autorização, captura, cancelamento/estorno e consulta, desabilitadas por padrão e ainda dependentes de homologação com suas credenciais. O perfil local preserva os simuladores. Consulte [CONNECTORS.md](docs/CONNECTORS.md).
 
+## Painel gerencial
+
+O frontend em `frontend/` oferece visão geral, transações, links, financeiro, antifraude, clientes, recebedores, assinaturas, split, contestações e configuração assistida dos oito connectors.
+
+Após `docker compose up --build -d`, acesse **http://localhost:3080**. A interface inicia em demonstração, com dados fictícios identificados. O modo conectado permite consultar transações, criar/consultar/revogar registros de links e avaliar risco. Demais áreas são demonstrações ou templates até existirem APIs administrativas. Consulte [frontend/README.md](frontend/README.md) para execução, segurança e limites.
+
 ## Subir o ambiente completo com Docker
 
 Requer Docker Engine/Desktop com Compose v2 e acesso aos registries Maven, Docker Hub e ECR público. Para todos os módulos, reservar aproximadamente 16 GB de RAM e pelo menos 4 CPUs para Docker. O consumo varia durante build e inicialização.
@@ -28,7 +34,7 @@ O `docker-compose.yml` sobe, sem precisar ativar profiles:
 - OpenTelemetry Collector, Prometheus e Grafana;
 - um job auxiliar que prepara a credencial local de coleta de métricas.
 
-São 29 containers definidos, incluindo 2 jobs de inicialização que terminam com sucesso. As portas publicadas ficam somente em `127.0.0.1`. A compilação usa uma etapa Docker compartilhada entre os módulos. O primeiro build baixa dependências e pode demorar; o Docker reutiliza cache nas próximas execuções.
+São 30 containers definidos, incluindo 2 jobs de inicialização que terminam com sucesso. As portas publicadas ficam somente em `127.0.0.1`. A compilação usa uma etapa Docker compartilhada entre os módulos. O primeiro build baixa dependências e pode demorar; o Docker reutiliza cache nas próximas execuções.
 
 **Subir todos os processos não completa as funcionalidades pendentes.** Checkout ainda não possui interface pública; callbacks reais e conciliação ainda não foram implementados. Sem habilitação explícita, nenhum container local realiza cobrança real. Os novos endpoints externos podem ser habilitados por configuração para testes em sandbox.
 

@@ -1,3 +1,17 @@
+# Validação do painel gerencial — 19/11/2026
+
+- Frontend React/TypeScript: build de produção com Vite e verificação de tipos.
+- 7 testes Node de domínio/transporte: valores monetários, CSV, split, antifraude, rotas, credenciais e proxy HTTP.
+- 6 cenários Playwright: dashboard, filtros, detalhes, downloads, links, oito formulários de provedores, isolamento demo/conectado, contrato de links, erros de autorização, navegação desktop/móvel e simuladores.
+- Revisão visual em desktop (1440px) e celular (390px).
+- Compose validado estruturalmente, agora com 30 serviços/containers definidos incluindo o painel.
+- `npm audit --omit=dev`: nenhuma vulnerabilidade reportada nas dependências de produção na execução desta revisão.
+- Job frontend adicionado ao workflow de verificação com instalação reproduzível via lockfile.
+
+Limites: o Docker Engine não está disponível e os serviços Java não estão rodando. O script `check-services.py` retornou conexão recusada, portanto não há validação ponta a ponta com serviços reais nesta entrega. Os testes de integração do painel usam upstreams controlados. Credenciais Cognito/adquirentes não foram usadas; homologação financeira e login interativo permanecem pendentes. Nenhum código Java foi alterado nesta mudança.
+
+---
+
 # Validação dos connectors — 19/11/2026
 
 - Reactor Maven completo: **BUILD SUCCESS**, JDK 21.0.13, Maven 3.9.11, Spring Boot 4.1.2.

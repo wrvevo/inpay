@@ -1,5 +1,18 @@
 name: inpay
 services:
+  inpay-panel:
+    build:
+      context: ./frontend
+    ports:
+    - 127.0.0.1:3080:8080
+    environment:
+      PANEL_AUTH_MODE: local
+      LOCAL_PASSWORD: ${LOCAL_PASSWORD:-local-only-change-me}
+      PANEL_ORIGINS: http://localhost:3080,http://127.0.0.1:3080
+      LINKS_URL: http://payment-links-service:8082
+      QUERY_URL: http://transaction-query-service:8091
+      FRAUD_URL: http://fraud-service:8087
+    restart: unless-stopped
   postgres:
     image: postgres:17.6
     environment:

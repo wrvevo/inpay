@@ -1,0 +1,663 @@
+[
+  {
+    "id": "cielo",
+    "name": "Cielo",
+    "product": "API E-commerce 3.0",
+    "auth": "MerchantId + MerchantKey",
+    "note": "Consultas usam uma URL separada. Token de cartão deve pertencer à afiliação Cielo.",
+    "docs": "https://docs.cielo.com.br/ecommerce-cielo/reference/sobre-a-api",
+    "fields": [
+      {
+        "property": "tenant-id",
+        "key": "CIELO_TENANT_ID",
+        "value": "",
+        "secret": false
+      },
+      {
+        "property": "base-url",
+        "key": "CIELO_BASE_URL",
+        "value": "https://apisandbox.cieloecommerce.cielo.com.br",
+        "secret": false
+      },
+      {
+        "property": "query-url",
+        "key": "CIELO_QUERY_URL",
+        "value": "https://apiquerysandbox.cieloecommerce.cielo.com.br",
+        "secret": false
+      },
+      {
+        "property": "merchant-id",
+        "key": "CIELO_MERCHANT_ID",
+        "value": "",
+        "secret": false
+      },
+      {
+        "property": "merchant-key",
+        "key": "CIELO_MERCHANT_KEY",
+        "value": "",
+        "secret": true
+      },
+      {
+        "property": "connect-timeout",
+        "key": "CIELO_CONNECT_TIMEOUT",
+        "value": "5s",
+        "secret": false
+      },
+      {
+        "property": "read-timeout",
+        "key": "CIELO_READ_TIMEOUT",
+        "value": "30s",
+        "secret": false
+      },
+      {
+        "property": "allow-sensitive-card-data",
+        "key": "CIELO_ALLOW_SENSITIVE_CARD_DATA",
+        "value": "false",
+        "secret": false
+      }
+    ],
+    "production": {
+      "base-url": "https://api.cieloecommerce.cielo.com.br",
+      "query-url": "https://apiquery.cieloecommerce.cielo.com.br"
+    },
+    "example": {
+      "operationId": "22222222-2222-2222-2222-222222222222",
+      "payload": {
+        "MerchantOrderId": "order-100",
+        "Customer": {
+          "Name": "Cliente de teste"
+        },
+        "Payment": {
+          "Type": "CreditCard",
+          "Amount": 1000,
+          "Installments": 1,
+          "Capture": false,
+          "CreditCard": {
+            "CardToken": "TOKEN_CIELO",
+            "Brand": "Visa"
+          }
+        }
+      }
+    }
+  },
+  {
+    "id": "rede",
+    "name": "Rede",
+    "product": "e.Rede v2",
+    "auth": "OAuth2 client_credentials",
+    "note": "Em produção, confirme a URL OAuth no onboarding. PAN/DPAN e criptogramas exigem ambiente PCI.",
+    "docs": "https://developer.userede.com.br/files/erede/oauth-faq.pdf",
+    "fields": [
+      {
+        "property": "tenant-id",
+        "key": "REDE_TENANT_ID",
+        "value": "",
+        "secret": false
+      },
+      {
+        "property": "base-url",
+        "key": "REDE_BASE_URL",
+        "value": "https://sandbox-erede.useredecloud.com.br",
+        "secret": false
+      },
+      {
+        "property": "client-id",
+        "key": "REDE_CLIENT_ID",
+        "value": "",
+        "secret": false
+      },
+      {
+        "property": "client-secret",
+        "key": "REDE_CLIENT_SECRET",
+        "value": "",
+        "secret": true
+      },
+      {
+        "property": "token-url",
+        "key": "REDE_TOKEN_URL",
+        "value": "https://rl7-sandbox-api.useredecloud.com.br/oauth2/token",
+        "secret": false
+      },
+      {
+        "property": "connect-timeout",
+        "key": "REDE_CONNECT_TIMEOUT",
+        "value": "5s",
+        "secret": false
+      },
+      {
+        "property": "read-timeout",
+        "key": "REDE_READ_TIMEOUT",
+        "value": "30s",
+        "secret": false
+      },
+      {
+        "property": "allow-sensitive-card-data",
+        "key": "REDE_ALLOW_SENSITIVE_CARD_DATA",
+        "value": "false",
+        "secret": false
+      }
+    ],
+    "production": {
+      "base-url": "https://api.userede.com.br/erede",
+      "query-url": "https://api.userede.com.br/erede",
+      "token-url": ""
+    },
+    "example": {
+      "operationId": "22222222-2222-2222-2222-222222222222",
+      "payload": {
+        "reference": "order-100",
+        "kind": "credit",
+        "amount": 1000,
+        "capture": false,
+        "installments": 1,
+        "cardNumber": "NETWORK_TOKEN_DPAN",
+        "expirationMonth": 12,
+        "expirationYear": 2030,
+        "tokenCryptogram": "NETWORK_CRYPTOGRAM",
+        "storageCard": "1",
+        "cardholderName": "Cliente de teste"
+      }
+    }
+  },
+  {
+    "id": "getnet",
+    "name": "Getnet",
+    "product": "Global / Regional API SEP",
+    "auth": "OAuth2 + seller + channel",
+    "note": "Seller e canal devem corresponder ao contrato SEP. Não é a integração legada v1.",
+    "docs": "https://docs.globalgetnet.com/en/products/online-payments/regional-api?doc=create-pre-authorized-payment",
+    "fields": [
+      {
+        "property": "tenant-id",
+        "key": "GETNET_TENANT_ID",
+        "value": "",
+        "secret": false
+      },
+      {
+        "property": "base-url",
+        "key": "GETNET_BASE_URL",
+        "value": "https://api-sbx.globalgetnet.com",
+        "secret": false
+      },
+      {
+        "property": "client-id",
+        "key": "GETNET_CLIENT_ID",
+        "value": "",
+        "secret": false
+      },
+      {
+        "property": "client-secret",
+        "key": "GETNET_CLIENT_SECRET",
+        "value": "",
+        "secret": true
+      },
+      {
+        "property": "merchant-id",
+        "key": "GETNET_MERCHANT_ID",
+        "value": "",
+        "secret": false
+      },
+      {
+        "property": "channel",
+        "key": "GETNET_CHANNEL",
+        "value": "",
+        "secret": false
+      },
+      {
+        "property": "token-url",
+        "key": "GETNET_TOKEN_URL",
+        "value": "https://api-sbx.globalgetnet.com/authentication/oauth2/access_token",
+        "secret": false
+      },
+      {
+        "property": "connect-timeout",
+        "key": "GETNET_CONNECT_TIMEOUT",
+        "value": "5s",
+        "secret": false
+      },
+      {
+        "property": "read-timeout",
+        "key": "GETNET_READ_TIMEOUT",
+        "value": "30s",
+        "secret": false
+      },
+      {
+        "property": "allow-sensitive-card-data",
+        "key": "GETNET_ALLOW_SENSITIVE_CARD_DATA",
+        "value": "false",
+        "secret": false
+      }
+    ],
+    "production": {
+      "base-url": "https://api.globalgetnet.com",
+      "query-url": "https://api.globalgetnet.com",
+      "token-url": "https://api.globalgetnet.com/authentication/oauth2/access_token"
+    },
+    "example": {
+      "operationId": "22222222-2222-2222-2222-222222222222",
+      "payload": {
+        "order_id": "order-100",
+        "data": {
+          "amount": 1000,
+          "currency": "BRL",
+          "payment": {
+            "payment_method": "CREDIT_PRE_AUTHORIZATION",
+            "transaction_type": "FULL",
+            "number_installments": 1,
+            "card": {
+              "card_id": "PROVIDER_CARD_ID"
+            }
+          },
+          "customer": {
+            "email": "test@example.com"
+          }
+        }
+      }
+    }
+  },
+  {
+    "id": "stone",
+    "name": "Stone",
+    "product": "Stone Online 4.0",
+    "auth": "Basic SecretKey + Host",
+    "note": "Modalidade gateway. O Host distingue os ambientes; requer opção JVM allowRestrictedHeaders=host.",
+    "docs": "https://online.stone.com.br/reference/overview-da-api",
+    "fields": [
+      {
+        "property": "tenant-id",
+        "key": "STONE_TENANT_ID",
+        "value": "",
+        "secret": false
+      },
+      {
+        "property": "base-url",
+        "key": "STONE_BASE_URL",
+        "value": "https://payments.stone.com.br",
+        "secret": false
+      },
+      {
+        "property": "secret-key",
+        "key": "STONE_SECRET_KEY",
+        "value": "",
+        "secret": true
+      },
+      {
+        "property": "host",
+        "key": "STONE_HOST",
+        "value": "sdx-ecommerce-payments.stone.com.br",
+        "secret": false
+      },
+      {
+        "property": "connect-timeout",
+        "key": "STONE_CONNECT_TIMEOUT",
+        "value": "5s",
+        "secret": false
+      },
+      {
+        "property": "read-timeout",
+        "key": "STONE_READ_TIMEOUT",
+        "value": "30s",
+        "secret": false
+      },
+      {
+        "property": "allow-sensitive-card-data",
+        "key": "STONE_ALLOW_SENSITIVE_CARD_DATA",
+        "value": "false",
+        "secret": false
+      }
+    ],
+    "production": {
+      "base-url": "https://payments.stone.com.br",
+      "query-url": "https://payments.stone.com.br",
+      "host": "ecommerce-payments.stone.com.br"
+    },
+    "example": {
+      "operationId": "22222222-2222-2222-2222-222222222222",
+      "payload": {
+        "payment_method": "card",
+        "amount": 1000,
+        "initiator_id": "operation-100",
+        "local_datetime": "2026-11-19T10:00:00",
+        "channel": "website",
+        "card_transaction": {
+          "card": {
+            "entry_mode": "manual",
+            "number": "NETWORK_DPAN_OR_PAN_IN_PCI_ENVIRONMENT",
+            "expiration_date": "3012",
+            "holder_name": "Cliente de teste"
+          },
+          "installments": 1,
+          "type": "credit",
+          "operation_type": "auth_only",
+          "installments_type": "none"
+        }
+      }
+    }
+  },
+  {
+    "id": "bin",
+    "name": "Bin / Fiserv",
+    "product": "Carat / e-SiTef",
+    "auth": "Merchant + mTLS",
+    "note": "Certificado PKCS12 obrigatório nesta implementação; monte-o somente leitura no connector.",
+    "docs": "https://dev.ecomm-bin.fiserv.com.br/docs/e-sitef/pre-autorizacao/",
+    "fields": [
+      {
+        "property": "tenant-id",
+        "key": "BIN_TENANT_ID",
+        "value": "",
+        "secret": false
+      },
+      {
+        "property": "base-url",
+        "key": "BIN_BASE_URL",
+        "value": "https://esitef-homologacao.softwareexpress.com.br/e-sitef/api",
+        "secret": false
+      },
+      {
+        "property": "merchant-id",
+        "key": "BIN_MERCHANT_ID",
+        "value": "",
+        "secret": false
+      },
+      {
+        "property": "merchant-key",
+        "key": "BIN_MERCHANT_KEY",
+        "value": "",
+        "secret": true
+      },
+      {
+        "property": "key-store",
+        "key": "BIN_KEY_STORE",
+        "value": "",
+        "secret": false
+      },
+      {
+        "property": "key-store-password",
+        "key": "BIN_KEY_STORE_PASSWORD",
+        "value": "",
+        "secret": true
+      },
+      {
+        "property": "connect-timeout",
+        "key": "BIN_CONNECT_TIMEOUT",
+        "value": "5s",
+        "secret": false
+      },
+      {
+        "property": "read-timeout",
+        "key": "BIN_READ_TIMEOUT",
+        "value": "30s",
+        "secret": false
+      },
+      {
+        "property": "allow-sensitive-card-data",
+        "key": "BIN_ALLOW_SENSITIVE_CARD_DATA",
+        "value": "false",
+        "secret": false
+      }
+    ],
+    "production": {
+      "base-url": "https://esitef-ec.softwareexpress.com.br/e-sitef/api",
+      "query-url": "https://esitef-ec.softwareexpress.com.br/e-sitef/api"
+    },
+    "example": {
+      "operationId": "22222222-2222-2222-2222-222222222222",
+      "payload": {
+        "order_id": "order-100",
+        "merchant_usn": "100",
+        "amount": "1000",
+        "authorizer_id": "2",
+        "installments": "1",
+        "installment_type": "4",
+        "card": {
+          "token": "TOKEN_CARAT"
+        }
+      }
+    }
+  },
+  {
+    "id": "global-payments",
+    "name": "Global Payments",
+    "product": "Unified Payments / GP-API",
+    "auth": "App ID + nonce + SHA512",
+    "note": "Exige confirmação comercial de suporte à sua afiliação brasileira. Não implementa WS Brasil legado.",
+    "docs": "https://developer.globalpayments.com/api/transactions",
+    "fields": [
+      {
+        "property": "tenant-id",
+        "key": "GLOBAL_PAYMENTS_TENANT_ID",
+        "value": "",
+        "secret": false
+      },
+      {
+        "property": "base-url",
+        "key": "GLOBAL_PAYMENTS_BASE_URL",
+        "value": "https://apis.sandbox.globalpay.com/ucp",
+        "secret": false
+      },
+      {
+        "property": "app-id",
+        "key": "GLOBAL_PAYMENTS_APP_ID",
+        "value": "",
+        "secret": false
+      },
+      {
+        "property": "app-key",
+        "key": "GLOBAL_PAYMENTS_APP_KEY",
+        "value": "",
+        "secret": true
+      },
+      {
+        "property": "api-version",
+        "key": "GLOBAL_PAYMENTS_API_VERSION",
+        "value": "2021-03-22",
+        "secret": false
+      },
+      {
+        "property": "brazil-enabled",
+        "key": "GLOBAL_PAYMENTS_BRAZIL_ENABLED",
+        "value": "false",
+        "secret": false
+      },
+      {
+        "property": "connect-timeout",
+        "key": "GLOBAL_PAYMENTS_CONNECT_TIMEOUT",
+        "value": "5s",
+        "secret": false
+      },
+      {
+        "property": "read-timeout",
+        "key": "GLOBAL_PAYMENTS_READ_TIMEOUT",
+        "value": "30s",
+        "secret": false
+      },
+      {
+        "property": "allow-sensitive-card-data",
+        "key": "GLOBAL_PAYMENTS_ALLOW_SENSITIVE_CARD_DATA",
+        "value": "false",
+        "secret": false
+      }
+    ],
+    "production": {
+      "base-url": "https://apis.globalpay.com/ucp",
+      "query-url": "https://apis.globalpay.com/ucp",
+      "token-url": "https://apis.globalpay.com/ucp/accesstoken"
+    },
+    "example": {
+      "operationId": "22222222-2222-2222-2222-222222222222",
+      "payload": {
+        "account_name": "transaction_processing",
+        "type": "SALE",
+        "channel": "CNP",
+        "country": "BR",
+        "amount": "1000",
+        "currency": "BRL",
+        "reference": "order-100",
+        "capture_mode": "LATER",
+        "payment_method": {
+          "id": "PMT_PROVIDER_TOKEN"
+        }
+      }
+    }
+  },
+  {
+    "id": "pagbank",
+    "name": "PagBank",
+    "product": "Orders / Charges",
+    "auth": "Bearer token",
+    "note": "Uma charge por operação. Consultas usam o identificador CHAR, e não ORDE.",
+    "docs": "https://developer.pagbank.com.br/reference/criar-pedido",
+    "fields": [
+      {
+        "property": "tenant-id",
+        "key": "PAGBANK_TENANT_ID",
+        "value": "",
+        "secret": false
+      },
+      {
+        "property": "base-url",
+        "key": "PAGBANK_BASE_URL",
+        "value": "https://sandbox.api.pagseguro.com",
+        "secret": false
+      },
+      {
+        "property": "access-token",
+        "key": "PAGBANK_ACCESS_TOKEN",
+        "value": "",
+        "secret": true
+      },
+      {
+        "property": "connect-timeout",
+        "key": "PAGBANK_CONNECT_TIMEOUT",
+        "value": "5s",
+        "secret": false
+      },
+      {
+        "property": "read-timeout",
+        "key": "PAGBANK_READ_TIMEOUT",
+        "value": "30s",
+        "secret": false
+      },
+      {
+        "property": "allow-sensitive-card-data",
+        "key": "PAGBANK_ALLOW_SENSITIVE_CARD_DATA",
+        "value": "false",
+        "secret": false
+      }
+    ],
+    "production": {
+      "base-url": "https://api.pagseguro.com",
+      "query-url": "https://api.pagseguro.com"
+    },
+    "example": {
+      "operationId": "22222222-2222-2222-2222-222222222222",
+      "payload": {
+        "reference_id": "order-100",
+        "customer": {
+          "name": "Cliente de teste",
+          "email": "test@example.com",
+          "tax_id": "DOCUMENTO_TESTE"
+        },
+        "items": [
+          {
+            "reference_id": "item-100",
+            "name": "Pedido",
+            "quantity": 1,
+            "unit_amount": 1000
+          }
+        ],
+        "charges": [
+          {
+            "reference_id": "charge-100",
+            "amount": {
+              "value": 1000,
+              "currency": "BRL"
+            },
+            "payment_method": {
+              "type": "CREDIT_CARD",
+              "installments": 1,
+              "capture": false,
+              "card": {
+                "id": "CARD_PROVIDER_TOKEN"
+              }
+            }
+          }
+        ]
+      }
+    }
+  },
+  {
+    "id": "safrapay",
+    "name": "Safrapay",
+    "product": "Gateway v2",
+    "auth": "MerchantToken → JWT",
+    "note": "MerchantToken na autenticação; o connector obtém o JWT. Cancelamento usa a rota cancelation.",
+    "docs": "https://developers.safrapay.com.br/autenticacao",
+    "fields": [
+      {
+        "property": "tenant-id",
+        "key": "SAFRAPAY_TENANT_ID",
+        "value": "",
+        "secret": false
+      },
+      {
+        "property": "base-url",
+        "key": "SAFRAPAY_BASE_URL",
+        "value": "https://payment-hml.safrapay.com.br",
+        "secret": false
+      },
+      {
+        "property": "access-token",
+        "key": "SAFRAPAY_ACCESS_TOKEN",
+        "value": "",
+        "secret": true
+      },
+      {
+        "property": "connect-timeout",
+        "key": "SAFRAPAY_CONNECT_TIMEOUT",
+        "value": "5s",
+        "secret": false
+      },
+      {
+        "property": "read-timeout",
+        "key": "SAFRAPAY_READ_TIMEOUT",
+        "value": "30s",
+        "secret": false
+      },
+      {
+        "property": "allow-sensitive-card-data",
+        "key": "SAFRAPAY_ALLOW_SENSITIVE_CARD_DATA",
+        "value": "false",
+        "secret": false
+      }
+    ],
+    "production": {
+      "base-url": "https://payment.safrapay.com.br",
+      "query-url": "https://payment.safrapay.com.br",
+      "token-url": "https://payment.safrapay.com.br/v2/merchant/auth"
+    },
+    "example": {
+      "operationId": "22222222-2222-2222-2222-222222222222",
+      "payload": {
+        "charge": {
+          "merchantChargeId": "order-100",
+          "transactions": [
+            {
+              "amount": 1000,
+              "installmentNumber": 1,
+              "paymentType": 2,
+              "card": {
+                "id": "CARD_PROVIDER_UUID"
+              }
+            }
+          ],
+          "source": 1,
+          "customer": {
+            "id": "PROVIDER_CUSTOMER_UUID"
+          }
+        }
+      }
+    }
+  }
+]
