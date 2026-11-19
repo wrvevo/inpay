@@ -67,3 +67,20 @@ O padrão é sandbox/homologação, com integração desabilitada. Para produç�
 `SPRING_PROFILES_ACTIVE=aws,provider-production`, credenciais correspondentes e
 URLs de produção do arquivo `application-provider-production.yml`. Não reutilize
 variáveis BASE_URL/QUERY_URL/TOKEN_URL do sandbox. O Docker Compose principal é para desenvolvimento.
+
+## Coleção oficial completa
+
+As operações adicionais usam `/internal/v1/cielo/operations/{operation}`: POST para comandos
+(com `operationId`, `resourceId`, `amount`, `payload`, conforme a operação) e GET para consultas
+(com `resourceId` na query). O enum e os parâmetros estão documentados no Swagger.
+O arquivo `cielo-collection/catalog.json` contém os 40 exemplos sanitizados da coleção oficial,
+mapeados para 20 operações. A URL externa é escolhida pelo adaptador, nunca pelo consumidor.
+
+Todas as operações usam as mesmas propriedades de `provider.yml`, o mesmo escopo Cognito e
+a mesma segregação de tenant. Comandos compartilham o journal PostgreSQL; replays devolvem um
+resumo, sem dados de cliente ou CardToken. Guarde o CardToken recebido com segurança antes
+que a resposta seja descartada.
+
+Execute `python3 scripts/test-cielo-sandbox.py` na raiz do projeto para testar pelo HTTP InPay
+com PostgreSQL temporário e chamadas reais à Cielo sandbox. Consulte
+`docs/CIELO_COLLECTION_COVERAGE.md` na raiz para resultados e limitações por produto.

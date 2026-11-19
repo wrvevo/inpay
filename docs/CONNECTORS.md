@@ -47,6 +47,10 @@ PAN/DPAN e criptogramas: esses campos são bloqueados por padrão. O sinalizador
 `*_ALLOW_SENSITIVE_CARD_DATA=true` é apenas uma opção técnica, não certificação PCI.
 Não ative captura de corpos em proxies, APM, traces ou logs do ambiente PCI.
 
+## Coleção completa Cielo
+
+O módulo Cielo também expõe as 20 operações distintas da coleção oficial: vendas, consultas, captura/cancelamento, recorrência, tokenização, Zero Auth e BIN. Consulte [cobertura, exemplos e resultados de sandbox](CIELO_COLLECTION_COVERAGE.md).
+
 ## Testar em sandbox
 
 O Docker Compose mantém todos os connectors externos desabilitados por padrão. Para Cielo,

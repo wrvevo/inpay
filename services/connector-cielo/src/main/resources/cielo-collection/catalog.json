@@ -1,0 +1,1148 @@
+{
+    "sourceUrl": "https://www.postman.com/collections/7313fe78130211f5f009",
+    "sourceSha256": "ad5c99f513ae6354de478f07b02456768234068d55b601ddb260f9ce40c09dca",
+    "retrievedAt": "2026-11-19",
+    "collectionName": "API Cielo e-Commerce - Manual",
+    "requestCount": 40,
+    "operationCount": 20,
+    "requests": [
+        {
+            "name": "Authorize - CreditCard - Mínimo",
+            "group": "MP - Cartão de crédito",
+            "operation": "CREATE_SALE",
+            "externalMethod": "POST",
+            "externalPath": "/1/sales",
+            "host": "transaction",
+            "inpayMethod": "POST",
+            "inpayPath": "/internal/v1/cielo/operations/CREATE_SALE",
+            "example": {
+                "operationId": "<NOVO_UUID_POR_COMANDO>",
+                "payload": {
+                    "MerchantOrderId": "2014111703",
+                    "Payment": {
+                        "Type": "CreditCard",
+                        "Amount": 15700,
+                        "Installments": 1,
+                        "SoftDescriptor": "123456789ABCD",
+                        "CreditCard": {
+                            "CardNumber": "4024007153763191",
+                            "Holder": "Cliente Teste InPay",
+                            "ExpirationDate": "12/2030",
+                            "SecurityCode": "123",
+                            "Brand": "Visa"
+                        }
+                    }
+                }
+            },
+            "sourceExampleSyntaxCorrected": false
+        },
+        {
+            "name": "Authorize - CreditCard - Autenticated",
+            "group": "MP - Cartão de crédito",
+            "operation": "CREATE_SALE",
+            "externalMethod": "POST",
+            "externalPath": "/1/sales",
+            "host": "transaction",
+            "inpayMethod": "POST",
+            "inpayPath": "/internal/v1/cielo/operations/CREATE_SALE",
+            "example": {
+                "operationId": "<NOVO_UUID_POR_COMANDO>",
+                "payload": {
+                    "MerchantOrderId": "2014111903",
+                    "Customer": {
+                        "Name": "Cliente Teste InPay"
+                    },
+                    "Payment": {
+                        "Type": "CreditCard",
+                        "Amount": 15700,
+                        "Provider": "Cielo",
+                        "ReturnUrl": "https://www.google.com.br",
+                        "Installments": 1,
+                        "Authenticate": true,
+                        "CreditCard": {
+                            "CardNumber": "4024007153763191",
+                            "Holder": "Cliente Teste InPay",
+                            "ExpirationDate": "12/2030",
+                            "SecurityCode": "123",
+                            "Brand": "Visa"
+                        }
+                    }
+                }
+            },
+            "sourceExampleSyntaxCorrected": false
+        },
+        {
+            "name": "Authorize - CreditCard - Completo",
+            "group": "MP - Cartão de crédito",
+            "operation": "CREATE_SALE",
+            "externalMethod": "POST",
+            "externalPath": "/1/sales",
+            "host": "transaction",
+            "inpayMethod": "POST",
+            "inpayPath": "/internal/v1/cielo/operations/CREATE_SALE",
+            "example": {
+                "operationId": "<NOVO_UUID_POR_COMANDO>",
+                "payload": {
+                    "MerchantOrderId": "2014111701",
+                    "Customer": {
+                        "Name": "Cliente Teste InPay",
+                        "Identity": "<DOCUMENTO_DE_TESTE>",
+                        "IdentityType": "CPF",
+                        "Email": "teste@example.com",
+                        "Birthdate": "1991-01-02",
+                        "Address": {
+                            "Street": "Rua Teste",
+                            "Number": "123",
+                            "Complement": "AP 123",
+                            "ZipCode": "12345987",
+                            "City": "Rio de Janeiro",
+                            "State": "RJ",
+                            "Country": "BRA"
+                        },
+                        "DeliveryAddress": {
+                            "Street": "Rua Teste",
+                            "Number": "123",
+                            "Complement": "AP 123",
+                            "ZipCode": "12345987",
+                            "City": "Rio de Janeiro",
+                            "State": "RJ",
+                            "Country": "BRA"
+                        }
+                    },
+                    "Payment": {
+                        "Type": "CreditCard",
+                        "Amount": 15700,
+                        "Currency": "BRL",
+                        "Country": "BRA",
+                        "Provider": "Simulado",
+                        "ServiceTaxAmount": 0,
+                        "Installments": 1,
+                        "Interest": "ByMerchant",
+                        "Capture": false,
+                        "Authenticate": false,
+                        "Recurrent": false,
+                        "SoftDescriptor": "123456789ABCD",
+                        "CreditCard": {
+                            "CardNumber": "4024007153763191",
+                            "Holder": "Cliente Teste InPay",
+                            "ExpirationDate": "12/2030",
+                            "SecurityCode": "123",
+                            "SaveCard": "false",
+                            "Brand": "Visa"
+                        }
+                    }
+                }
+            },
+            "sourceExampleSyntaxCorrected": false
+        },
+        {
+            "name": "Authorize - DebitCard",
+            "group": "MP - Cartão de débito",
+            "operation": "CREATE_SALE",
+            "externalMethod": "POST",
+            "externalPath": "/1/sales",
+            "host": "transaction",
+            "inpayMethod": "POST",
+            "inpayPath": "/internal/v1/cielo/operations/CREATE_SALE",
+            "example": {
+                "operationId": "<NOVO_UUID_POR_COMANDO>",
+                "payload": {
+                    "MerchantOrderId": "2014121201",
+                    "Customer": {
+                        "Name": "Cliente Teste InPay"
+                    },
+                    "Payment": {
+                        "Type": "DebitCard",
+                        "Amount": 15700,
+                        "Provider": "Simulado",
+                        "ReturnUrl": "http://www.google.com.br",
+                        "DebitCard": {
+                            "CardNumber": "4024007153763191",
+                            "Holder": "Cliente Teste InPay",
+                            "ExpirationDate": "12/2030",
+                            "SecurityCode": "023",
+                            "Brand": "Visa"
+                        }
+                    }
+                }
+            },
+            "sourceExampleSyntaxCorrected": false
+        },
+        {
+            "name": "Authorize - Boleto - Sem Registro e Registrado",
+            "group": "MP - Boleto",
+            "operation": "CREATE_SALE",
+            "externalMethod": "POST",
+            "externalPath": "/1/sales",
+            "host": "transaction",
+            "inpayMethod": "POST",
+            "inpayPath": "/internal/v1/cielo/operations/CREATE_SALE",
+            "example": {
+                "operationId": "<NOVO_UUID_POR_COMANDO>",
+                "payload": {
+                    "MerchantOrderId": "2014111706",
+                    "Customer": {
+                        "Name": "Cliente Teste InPay",
+                        "Identity": "<DOCUMENTO_DE_TESTE>",
+                        "Address": {
+                            "Street": "Avenida Marechal Câmara",
+                            "Number": "160",
+                            "Complement": "Sala 934",
+                            "ZipCode": "22750012",
+                            "District": "Centro",
+                            "City": "Rio de Janeiro",
+                            "State": "RJ",
+                            "Country": "BRA"
+                        }
+                    },
+                    "Payment": {
+                        "Type": "Boleto",
+                        "Amount": 15700,
+                        "Provider": "bradesco2",
+                        "Address": "Rua Teste",
+                        "BoletoNumber": "123",
+                        "Assignor": "Empresa Teste",
+                        "Demonstrative": "Desmonstrative Teste",
+                        "ExpirationDate": "12/2030",
+                        "Identification": "11884926754",
+                        "Instructions": "Aceitar somente até a data de vencimento, após essa data juros de 1% dia."
+                    }
+                }
+            },
+            "sourceExampleSyntaxCorrected": false
+        },
+        {
+            "name": "Authorize - ElectronicTransfer",
+            "group": "MP - Transferência Eletrônica",
+            "operation": "CREATE_SALE",
+            "externalMethod": "POST",
+            "externalPath": "/1/sales",
+            "host": "transaction",
+            "inpayMethod": "POST",
+            "inpayPath": "/internal/v1/cielo/operations/CREATE_SALE",
+            "example": {
+                "operationId": "<NOVO_UUID_POR_COMANDO>",
+                "payload": {
+                    "MerchantOrderId": "2014111706",
+                    "Customer": {
+                        "Name": "Cliente Teste InPay"
+                    },
+                    "Payment": {
+                        "Type": "EletronicTransfer",
+                        "Amount": 15700,
+                        "Provider": "Bradesco",
+                        "ReturnUrl": "http://www.google.com.br"
+                    }
+                }
+            },
+            "sourceExampleSyntaxCorrected": false
+        },
+        {
+            "name": "Authorize - CreditCard - FraudAnalysis",
+            "group": "Antifraud Gateway",
+            "operation": "CREATE_SALE",
+            "externalMethod": "POST",
+            "externalPath": "/1/sales",
+            "host": "transaction",
+            "inpayMethod": "POST",
+            "inpayPath": "/internal/v1/cielo/operations/CREATE_SALE",
+            "example": {
+                "operationId": "<NOVO_UUID_POR_COMANDO>",
+                "payload": {
+                    "MerchantOrderId": "2014111457673454307",
+                    "Customer": {
+                        "Name": "Cliente Teste InPay",
+                        "Identity": "<DOCUMENTO_DE_TESTE>",
+                        "IdentityType": "CPF",
+                        "Email": "teste@example.com",
+                        "Birthdate": "1991-01-02",
+                        "Address": {
+                            "Street": "Rua Júpter",
+                            "Number": "174",
+                            "Complement": "AP 201",
+                            "ZipCode": "21241140",
+                            "City": "Rio de Janeiro",
+                            "State": "RJ",
+                            "Country": "BRA"
+                        },
+                        "DeliveryAddress": {
+                            "Street": "Rua Júpter",
+                            "Number": "174",
+                            "Complement": "AP 201",
+                            "ZipCode": "21241140",
+                            "City": "Rio de Janeiro",
+                            "State": "RJ",
+                            "Country": "BRA"
+                        }
+                    },
+                    "Payment": {
+                        "Type": "CreditCard",
+                        "Amount": 100,
+                        "Currency": "BRL",
+                        "Country": "BRA",
+                        "Provider": "Simulado",
+                        "ServiceTaxAmount": 0,
+                        "Installments": 1,
+                        "Interest": "ByMerchant",
+                        "Capture": false,
+                        "Authenticate": false,
+                        "CreditCard": {
+                            "CardNumber": "4024007153763191",
+                            "Holder": "Cliente Teste InPay",
+                            "ExpirationDate": "12/2030",
+                            "SecurityCode": "023",
+                            "Brand": "Visa"
+                        },
+                        "FraudAnalysis": {
+                            "Sequence": "AuthorizeFirst",
+                            "SequenceCriteria": "OnSuccess",
+                            "Provider": "CyberSource",
+                            "FingerPrintId": "074c1ee676ed4998ab66491013c565e2",
+                            "CaptureOnLowRisk": true,
+                            "VoidOnHighRisk": false,
+                            "Browser": {
+                                "CookiesAccepted": false,
+                                "Email": "teste@example.com",
+                                "HostName": "Teste",
+                                "IpAddress": "200.190.150.350",
+                                "Type": "Chrome"
+                            },
+                            "Cart": {
+                                "IsGift": false,
+                                "ReturnsAccepted": true,
+                                "Items": [
+                                    {
+                                        "GiftCategory": "Undefined",
+                                        "HostHedge": "Off",
+                                        "NonSensicalHedge": "Off",
+                                        "ObscenitiesHedge": "Off",
+                                        "PhoneHedge": "Off",
+                                        "Name": "Cliente Teste InPay",
+                                        "Quantity": 1,
+                                        "Sku": "201411170235134521346",
+                                        "UnitPrice": 123,
+                                        "Risk": "High",
+                                        "TimeHedge": "Normal",
+                                        "Type": "AdultContent",
+                                        "VelocityHedge": "High",
+                                        "Passenger": {
+                                            "Email": "teste@example.com",
+                                            "Identity": "<DOCUMENTO_DE_TESTE>",
+                                            "Name": "Cliente Teste InPay",
+                                            "Rating": "Adult",
+                                            "Phone": "999994444",
+                                            "Status": "Accepted"
+                                        }
+                                    }
+                                ]
+                            },
+                            "MerchantDefinedFields": [
+                                {
+                                    "Id": 95,
+                                    "Value": "Eu defini isso"
+                                }
+                            ],
+                            "Shipping": {
+                                "Addressee": "Sr Comprador Teste",
+                                "Method": "LowCost",
+                                "Phone": "21114740"
+                            },
+                            "Travel": {
+                                "DepartureTime": "2010-01-02",
+                                "JourneyType": "Ida",
+                                "Route": "MAO-RJO",
+                                "Legs": [
+                                    {
+                                        "Destination": "GYN",
+                                        "Origin": "VCP"
+                                    }
+                                ]
+                            }
+                        }
+                    }
+                }
+            },
+            "sourceExampleSyntaxCorrected": false
+        },
+        {
+            "name": "Void - By PaymentID",
+            "group": "Consulta - Captura - Cancelamento/Cancelamento de transações",
+            "operation": "VOID_PAYMENT",
+            "externalMethod": "PUT",
+            "externalPath": "/1/sales/{resourceId}/void",
+            "host": "transaction",
+            "inpayMethod": "POST",
+            "inpayPath": "/internal/v1/cielo/operations/VOID_PAYMENT",
+            "example": {
+                "operationId": "<NOVO_UUID_POR_COMANDO>",
+                "resourceId": "<UUID_DO_RECURSO>"
+            },
+            "sourceExampleSyntaxCorrected": false
+        },
+        {
+            "name": "Void - By MerchantOrderId",
+            "group": "Consulta - Captura - Cancelamento/Cancelamento de transações",
+            "operation": "VOID_ORDER",
+            "externalMethod": "PUT",
+            "externalPath": "/1/sales/orderId/{resourceId}/void",
+            "host": "transaction",
+            "inpayMethod": "POST",
+            "inpayPath": "/internal/v1/cielo/operations/VOID_ORDER",
+            "example": {
+                "operationId": "<NOVO_UUID_POR_COMANDO>",
+                "resourceId": "<MERCHANT_ORDER_ID>"
+            },
+            "sourceExampleSyntaxCorrected": false
+        },
+        {
+            "name": "Void - By PaymentID - Parcial",
+            "group": "Consulta - Captura - Cancelamento/Cancelamento de transações",
+            "operation": "VOID_PAYMENT",
+            "externalMethod": "PUT",
+            "externalPath": "/1/sales/{resourceId}/void?amount={amount}",
+            "host": "transaction",
+            "inpayMethod": "POST",
+            "inpayPath": "/internal/v1/cielo/operations/VOID_PAYMENT",
+            "example": {
+                "operationId": "<NOVO_UUID_POR_COMANDO>",
+                "resourceId": "<UUID_DO_RECURSO>",
+                "amount": 100
+            },
+            "sourceExampleSyntaxCorrected": false
+        },
+        {
+            "name": "Capture - By PaymentID",
+            "group": "Consulta - Captura - Cancelamento/Captura de transações",
+            "operation": "CAPTURE_PAYMENT",
+            "externalMethod": "PUT",
+            "externalPath": "/1/sales/{resourceId}/capture",
+            "host": "transaction",
+            "inpayMethod": "POST",
+            "inpayPath": "/internal/v1/cielo/operations/CAPTURE_PAYMENT",
+            "example": {
+                "operationId": "<NOVO_UUID_POR_COMANDO>",
+                "resourceId": "<UUID_DO_RECURSO>"
+            },
+            "sourceExampleSyntaxCorrected": false
+        },
+        {
+            "name": "Capture - By PaymentID - Parcial",
+            "group": "Consulta - Captura - Cancelamento/Captura de transações",
+            "operation": "CAPTURE_PAYMENT",
+            "externalMethod": "PUT",
+            "externalPath": "/1/sales/{resourceId}/capture?amount={amount}",
+            "host": "transaction",
+            "inpayMethod": "POST",
+            "inpayPath": "/internal/v1/cielo/operations/CAPTURE_PAYMENT",
+            "example": {
+                "operationId": "<NOVO_UUID_POR_COMANDO>",
+                "resourceId": "<UUID_DO_RECURSO>",
+                "amount": 100
+            },
+            "sourceExampleSyntaxCorrected": false
+        },
+        {
+            "name": "Get",
+            "group": "Consulta - Captura - Cancelamento/Consulta de Transações",
+            "operation": "GET_PAYMENT",
+            "externalMethod": "GET",
+            "externalPath": "/1/sales/{resourceId}",
+            "host": "query",
+            "inpayMethod": "GET",
+            "inpayPath": "/internal/v1/cielo/operations/GET_PAYMENT",
+            "example": {
+                "resourceId": "<UUID_DO_RECURSO>"
+            },
+            "sourceExampleSyntaxCorrected": false
+        },
+        {
+            "name": "Authorize - Recurrent - CreditCard",
+            "group": "Recorrência",
+            "operation": "CREATE_SALE",
+            "externalMethod": "POST",
+            "externalPath": "/1/sales",
+            "host": "transaction",
+            "inpayMethod": "POST",
+            "inpayPath": "/internal/v1/cielo/operations/CREATE_SALE",
+            "example": {
+                "operationId": "<NOVO_UUID_POR_COMANDO>",
+                "payload": {
+                    "MerchantOrderId": "559042024",
+                    "Customer": {
+                        "Name": "Cliente Teste InPay"
+                    },
+                    "Payment": {
+                        "Installments": 1,
+                        "RecurrentPayment": {
+                            "AuthorizeNow": true,
+                            "EndDate": "2030-12-01",
+                            "Interval": "Bimonthly"
+                        },
+                        "CreditCard": {
+                            "CardNumber": "4024007153763191",
+                            "Holder": "Cliente Teste InPay",
+                            "ExpirationDate": "12/2030",
+                            "SecurityCode": "123",
+                            "SaveCard": true,
+                            "Brand": "Visa"
+                        },
+                        "SoftDescriptor": ".Net Tes",
+                        "Type": "CreditCard",
+                        "Amount": 15000,
+                        "Currency": "BRL",
+                        "Country": "BRA"
+                    }
+                }
+            },
+            "sourceExampleSyntaxCorrected": false
+        },
+        {
+            "name": "Get - RecurrentPayment",
+            "group": "Recorrência",
+            "operation": "GET_RECURRENT",
+            "externalMethod": "GET",
+            "externalPath": "/1/RecurrentPayment/{resourceId}",
+            "host": "query",
+            "inpayMethod": "GET",
+            "inpayPath": "/internal/v1/cielo/operations/GET_RECURRENT",
+            "example": {
+                "resourceId": "<UUID_DO_RECURSO>"
+            },
+            "sourceExampleSyntaxCorrected": false
+        },
+        {
+            "name": "Update - Recurrent - Customer",
+            "group": "Recorrência",
+            "operation": "UPDATE_RECURRENT_CUSTOMER",
+            "externalMethod": "PUT",
+            "externalPath": "/1/RecurrentPayment/{resourceId}/Customer",
+            "host": "transaction",
+            "inpayMethod": "POST",
+            "inpayPath": "/internal/v1/cielo/operations/UPDATE_RECURRENT_CUSTOMER",
+            "example": {
+                "operationId": "<NOVO_UUID_POR_COMANDO>",
+                "resourceId": "<UUID_DO_RECURSO>",
+                "payload": {
+                    "Name": "Cliente Teste InPay",
+                    "Email": "teste@example.com",
+                    "Birthdate": "1999-12-12",
+                    "Identity": "<DOCUMENTO_DE_TESTE>",
+                    "IdentityType": "CPF",
+                    "Address": {
+                        "Street": "Rua Teste",
+                        "Number": "174",
+                        "Complement": "AP 201",
+                        "ZipCode": "21241140",
+                        "City": "Rio de Janeiro",
+                        "State": "RJ",
+                        "Country": "BRA"
+                    },
+                    "DeliveryAddress": {
+                        "Street": "Outra Rua Teste",
+                        "Number": "123",
+                        "Complement": "AP 111",
+                        "ZipCode": "21241111",
+                        "City": "Qualquer Lugar",
+                        "State": "QL",
+                        "Country": "BRA",
+                        "District": "Teste"
+                    }
+                }
+            },
+            "sourceExampleSyntaxCorrected": false
+        },
+        {
+            "name": "Update - Recurrent - Interval",
+            "group": "Recorrência",
+            "operation": "UPDATE_RECURRENT_INTERVAL",
+            "externalMethod": "PUT",
+            "externalPath": "/1/RecurrentPayment/{resourceId}/Interval",
+            "host": "transaction",
+            "inpayMethod": "POST",
+            "inpayPath": "/internal/v1/cielo/operations/UPDATE_RECURRENT_INTERVAL",
+            "example": {
+                "operationId": "<NOVO_UUID_POR_COMANDO>",
+                "resourceId": "<UUID_DO_RECURSO>",
+                "payload": 6
+            },
+            "sourceExampleSyntaxCorrected": false
+        },
+        {
+            "name": "Update - Recurrent - EndDate",
+            "group": "Recorrência",
+            "operation": "UPDATE_RECURRENT_END_DATE",
+            "externalMethod": "PUT",
+            "externalPath": "/1/RecurrentPayment/{resourceId}/EndDate",
+            "host": "transaction",
+            "inpayMethod": "POST",
+            "inpayPath": "/internal/v1/cielo/operations/UPDATE_RECURRENT_END_DATE",
+            "example": {
+                "operationId": "<NOVO_UUID_POR_COMANDO>",
+                "resourceId": "<UUID_DO_RECURSO>",
+                "payload": "2030-12-01"
+            },
+            "sourceExampleSyntaxCorrected": false
+        },
+        {
+            "name": "Update - Recurrent - RecurrencyDay",
+            "group": "Recorrência",
+            "operation": "UPDATE_RECURRENT_DAY",
+            "externalMethod": "PUT",
+            "externalPath": "/1/RecurrentPayment/{resourceId}/RecurrencyDay",
+            "host": "transaction",
+            "inpayMethod": "POST",
+            "inpayPath": "/internal/v1/cielo/operations/UPDATE_RECURRENT_DAY",
+            "example": {
+                "operationId": "<NOVO_UUID_POR_COMANDO>",
+                "resourceId": "<UUID_DO_RECURSO>",
+                "payload": 23
+            },
+            "sourceExampleSyntaxCorrected": false
+        },
+        {
+            "name": "Update - Recurrent - Reactivate",
+            "group": "Recorrência",
+            "operation": "REACTIVATE_RECURRENT",
+            "externalMethod": "PUT",
+            "externalPath": "/1/RecurrentPayment/{resourceId}/Reactivate",
+            "host": "transaction",
+            "inpayMethod": "POST",
+            "inpayPath": "/internal/v1/cielo/operations/REACTIVATE_RECURRENT",
+            "example": {
+                "operationId": "<NOVO_UUID_POR_COMANDO>",
+                "resourceId": "<UUID_DO_RECURSO>"
+            },
+            "sourceExampleSyntaxCorrected": false
+        },
+        {
+            "name": "Update - Recurrent - Deactivate",
+            "group": "Recorrência",
+            "operation": "DEACTIVATE_RECURRENT",
+            "externalMethod": "PUT",
+            "externalPath": "/1/RecurrentPayment/{resourceId}/Deactivate",
+            "host": "transaction",
+            "inpayMethod": "POST",
+            "inpayPath": "/internal/v1/cielo/operations/DEACTIVATE_RECURRENT",
+            "example": {
+                "operationId": "<NOVO_UUID_POR_COMANDO>",
+                "resourceId": "<UUID_DO_RECURSO>"
+            },
+            "sourceExampleSyntaxCorrected": false
+        },
+        {
+            "name": "Update - Recurrent - Installments",
+            "group": "Recorrência",
+            "operation": "UPDATE_RECURRENT_INSTALLMENTS",
+            "externalMethod": "PUT",
+            "externalPath": "/1/RecurrentPayment/{resourceId}/Installments",
+            "host": "transaction",
+            "inpayMethod": "POST",
+            "inpayPath": "/internal/v1/cielo/operations/UPDATE_RECURRENT_INSTALLMENTS",
+            "example": {
+                "operationId": "<NOVO_UUID_POR_COMANDO>",
+                "resourceId": "<UUID_DO_RECURSO>",
+                "payload": 6
+            },
+            "sourceExampleSyntaxCorrected": false
+        },
+        {
+            "name": "Update - Recurrent - Payment",
+            "group": "Recorrência",
+            "operation": "UPDATE_RECURRENT_PAYMENT",
+            "externalMethod": "PUT",
+            "externalPath": "/1/RecurrentPayment/{resourceId}/Payment",
+            "host": "transaction",
+            "inpayMethod": "POST",
+            "inpayPath": "/internal/v1/cielo/operations/UPDATE_RECURRENT_PAYMENT",
+            "example": {
+                "operationId": "<NOVO_UUID_POR_COMANDO>",
+                "resourceId": "<UUID_DO_RECURSO>",
+                "payload": {
+                    "Type": "CreditCard",
+                    "Amount": "123",
+                    "Installments": 1,
+                    "CreditCard": {
+                        "Brand": "Master",
+                        "Holder": "Cliente Teste InPay",
+                        "CardNumber": "4024007153763191",
+                        "ExpirationDate": "12/2030"
+                    },
+                    "Country": "USA",
+                    "Currency": "USD",
+                    "SoftDescriptor": "test",
+                    "Provider": "Simulado"
+                }
+            },
+            "sourceExampleSyntaxCorrected": false
+        },
+        {
+            "name": "Update - Recurrent - NextPaymentDate",
+            "group": "Recorrência",
+            "operation": "UPDATE_RECURRENT_NEXT_DATE",
+            "externalMethod": "PUT",
+            "externalPath": "/1/RecurrentPayment/{resourceId}/NextPaymentDate",
+            "host": "transaction",
+            "inpayMethod": "POST",
+            "inpayPath": "/internal/v1/cielo/operations/UPDATE_RECURRENT_NEXT_DATE",
+            "example": {
+                "operationId": "<NOVO_UUID_POR_COMANDO>",
+                "resourceId": "<UUID_DO_RECURSO>",
+                "payload": "2030-12-01"
+            },
+            "sourceExampleSyntaxCorrected": false
+        },
+        {
+            "name": "Update - Recurrent - Amount",
+            "group": "Recorrência",
+            "operation": "UPDATE_RECURRENT_AMOUNT",
+            "externalMethod": "PUT",
+            "externalPath": "/1/RecurrentPayment/{resourceId}/Amount",
+            "host": "transaction",
+            "inpayMethod": "POST",
+            "inpayPath": "/internal/v1/cielo/operations/UPDATE_RECURRENT_AMOUNT",
+            "example": {
+                "operationId": "<NOVO_UUID_POR_COMANDO>",
+                "resourceId": "<UUID_DO_RECURSO>",
+                "payload": 156
+            },
+            "sourceExampleSyntaxCorrected": false
+        },
+        {
+            "name": "Authorize - CreditCard - Saving Card",
+            "group": "Tokenização",
+            "operation": "CREATE_SALE",
+            "externalMethod": "POST",
+            "externalPath": "/1/sales",
+            "host": "transaction",
+            "inpayMethod": "POST",
+            "inpayPath": "/internal/v1/cielo/operations/CREATE_SALE",
+            "example": {
+                "operationId": "<NOVO_UUID_POR_COMANDO>",
+                "payload": {
+                    "MerchantOrderId": "2014111706",
+                    "Customer": {
+                        "Name": "Cliente Teste InPay"
+                    },
+                    "Payment": {
+                        "Type": "CreditCard",
+                        "Amount": 100,
+                        "Provider": "Simulado",
+                        "Installments": 1,
+                        "CreditCard": {
+                            "CardNumber": "4024007153763191",
+                            "Holder": "Cliente Teste InPay",
+                            "ExpirationDate": "12/2030",
+                            "SecurityCode": "262",
+                            "SaveCard": "true",
+                            "Brand": "Visa"
+                        }
+                    }
+                }
+            },
+            "sourceExampleSyntaxCorrected": false
+        },
+        {
+            "name": "Authorize - CreditCard - Using Token 1.5",
+            "group": "Tokenização",
+            "operation": "CREATE_SALE",
+            "externalMethod": "POST",
+            "externalPath": "/1/sales",
+            "host": "transaction",
+            "inpayMethod": "POST",
+            "inpayPath": "/internal/v1/cielo/operations/CREATE_SALE",
+            "example": {
+                "operationId": "<NOVO_UUID_POR_COMANDO>",
+                "payload": {
+                    "MerchantOrderId": "2014111706",
+                    "Customer": {
+                        "Name": "Cliente Teste InPay"
+                    },
+                    "Payment": {
+                        "Type": "CreditCard",
+                        "Amount": 100,
+                        "Installments": 1,
+                        "CreditCard": {
+                            "CardToken": "<OBTER_NO_SANDBOX_DO_PROVEDOR>",
+                            "Brand": "Amex"
+                        }
+                    }
+                }
+            },
+            "sourceExampleSyntaxCorrected": false
+        },
+        {
+            "name": "Authorize - CreditCard - Using Token",
+            "group": "Tokenização",
+            "operation": "CREATE_SALE",
+            "externalMethod": "POST",
+            "externalPath": "/1/sales",
+            "host": "transaction",
+            "inpayMethod": "POST",
+            "inpayPath": "/internal/v1/cielo/operations/CREATE_SALE",
+            "example": {
+                "operationId": "<NOVO_UUID_POR_COMANDO>",
+                "payload": {
+                    "MerchantOrderId": "2014111706",
+                    "Customer": {
+                        "Name": "Cliente Teste InPay"
+                    },
+                    "Payment": {
+                        "Type": "CreditCard",
+                        "Amount": 100,
+                        "Installments": 1,
+                        "CreditCard": {
+                            "CardToken": "<OBTER_NO_SANDBOX_DO_PROVEDOR>",
+                            "Brand": "Visa",
+                            "SaveCard": "true"
+                        }
+                    }
+                }
+            },
+            "sourceExampleSyntaxCorrected": true
+        },
+        {
+            "name": "Card - Create",
+            "group": "Tokenização",
+            "operation": "CREATE_CARD",
+            "externalMethod": "POST",
+            "externalPath": "/1/card",
+            "host": "transaction",
+            "inpayMethod": "POST",
+            "inpayPath": "/internal/v1/cielo/operations/CREATE_CARD",
+            "example": {
+                "operationId": "<NOVO_UUID_POR_COMANDO>",
+                "payload": {
+                    "CustomerName": "Cliente Teste InPay",
+                    "CardNumber": "4024007153763191",
+                    "Holder": "Cliente Teste InPay",
+                    "ExpirationDate": "12/2030",
+                    "Brand": "Visa"
+                }
+            },
+            "sourceExampleSyntaxCorrected": false
+        },
+        {
+            "name": "Card - Get",
+            "group": "Tokenização",
+            "operation": "GET_CARD",
+            "externalMethod": "GET",
+            "externalPath": "/1/card/{resourceId}",
+            "host": "query",
+            "inpayMethod": "GET",
+            "inpayPath": "/internal/v1/cielo/operations/GET_CARD",
+            "example": {
+                "resourceId": "<UUID_DO_RECURSO>"
+            },
+            "sourceExampleSyntaxCorrected": false
+        },
+        {
+            "name": "Authorize - CreditCard - VisaCheckout - Descriptografia",
+            "group": "Wallet",
+            "operation": "CREATE_SALE",
+            "externalMethod": "POST",
+            "externalPath": "/1/sales",
+            "host": "transaction",
+            "inpayMethod": "POST",
+            "inpayPath": "/internal/v1/cielo/operations/CREATE_SALE",
+            "example": {
+                "operationId": "<NOVO_UUID_POR_COMANDO>",
+                "payload": {
+                    "MerchantOrderId": "2014111703",
+                    "Customer": {
+                        "Name": "Cliente Teste InPay"
+                    },
+                    "Payment": {
+                        "Type": "CreditCard",
+                        "Amount": 15700,
+                        "Installments": 1,
+                        "SoftDescriptor": "123456789ABCD",
+                        "CreditCard": {
+                            "SecurityCode": "123"
+                        },
+                        "Wallet": {
+                            "Type": "VisaCheckout",
+                            "WalletKey": "<OBTER_NO_SANDBOX_DO_PROVEDOR>"
+                        }
+                    }
+                }
+            },
+            "sourceExampleSyntaxCorrected": false
+        },
+        {
+            "name": "Authorize - CreditCard - VisaCheckout - Envio de cartão",
+            "group": "Wallet",
+            "operation": "CREATE_SALE",
+            "externalMethod": "POST",
+            "externalPath": "/1/sales",
+            "host": "transaction",
+            "inpayMethod": "POST",
+            "inpayPath": "/internal/v1/cielo/operations/CREATE_SALE",
+            "example": {
+                "operationId": "<NOVO_UUID_POR_COMANDO>",
+                "payload": {
+                    "MerchantOrderId": "2014111703",
+                    "Customer": {
+                        "Name": "Cliente Teste InPay"
+                    },
+                    "Payment": {
+                        "Type": "CreditCard",
+                        "Amount": 15700,
+                        "Installments": 1,
+                        "SoftDescriptor": "123456789ABCD",
+                        "Wallet": {
+                            "Type": "VisaCheckout",
+                            "Eci": 0
+                        },
+                        "CreditCard": {
+                            "CardNumber": "4024007153763191",
+                            "Holder": "Cliente Teste InPay",
+                            "ExpirationDate": "12/2030",
+                            "Brand": "Visa"
+                        }
+                    }
+                }
+            },
+            "sourceExampleSyntaxCorrected": true
+        },
+        {
+            "name": "Authorize - CreditCard - ApplePay - Descriptografia",
+            "group": "Wallet",
+            "operation": "CREATE_SALE",
+            "externalMethod": "POST",
+            "externalPath": "/1/sales",
+            "host": "transaction",
+            "inpayMethod": "POST",
+            "inpayPath": "/internal/v1/cielo/operations/CREATE_SALE",
+            "example": {
+                "operationId": "<NOVO_UUID_POR_COMANDO>",
+                "payload": {
+                    "MerchantOrderId": "6242-642-723",
+                    "Customer": {
+                        "Name": "Cliente Teste InPay",
+                        "Identity": "<DOCUMENTO_DE_TESTE>",
+                        "IdentityType": "CPF"
+                    },
+                    "Payment": {
+                        "Type": "CreditCard",
+                        "Amount": 1100,
+                        "Provider": "Cielo",
+                        "Installments": 1,
+                        "Currency": "BRL",
+                        "Wallet": {
+                            "Type": "ApplePay",
+                            "WalletKey": "<OBTER_NO_SANDBOX_DO_PROVEDOR>",
+                            "AdditionalData": {
+                                "EphemeralPublicKey": "<OBTER_NO_SANDBOX_DO_PROVEDOR>"
+                            }
+                        }
+                    }
+                }
+            },
+            "sourceExampleSyntaxCorrected": false
+        },
+        {
+            "name": "Authorize - CreditCard - ApplePay - Envio de cartão",
+            "group": "Wallet",
+            "operation": "CREATE_SALE",
+            "externalMethod": "POST",
+            "externalPath": "/1/sales",
+            "host": "transaction",
+            "inpayMethod": "POST",
+            "inpayPath": "/internal/v1/cielo/operations/CREATE_SALE",
+            "example": {
+                "operationId": "<NOVO_UUID_POR_COMANDO>",
+                "payload": {
+                    "MerchantOrderId": "6242-642-723",
+                    "Customer": {
+                        "Name": "Cliente Teste InPay",
+                        "Identity": "<DOCUMENTO_DE_TESTE>",
+                        "IdentityType": "CPF"
+                    },
+                    "Payment": {
+                        "Type": "CreditCard",
+                        "Amount": 1100,
+                        "Provider": "Cielo",
+                        "Installments": 1,
+                        "CreditCard": {
+                            "CardNumber": "4024007153763191",
+                            "Holder": "Cliente Teste InPay",
+                            "ExpirationDate": "12/2030",
+                            "SecurityCode": "123",
+                            "Brand": "Master"
+                        },
+                        "Currency": "BRL",
+                        "Wallet": {
+                            "Type": "ApplePay",
+                            "Eci": "7",
+                            "Cavv": "<OBTER_NO_SANDBOX_DO_PROVEDOR>"
+                        }
+                    }
+                }
+            },
+            "sourceExampleSyntaxCorrected": true
+        },
+        {
+            "name": "Authorize - CreditCard - MasterPass - Envio de cartão",
+            "group": "Wallet",
+            "operation": "CREATE_SALE",
+            "externalMethod": "POST",
+            "externalPath": "/1/sales",
+            "host": "transaction",
+            "inpayMethod": "POST",
+            "inpayPath": "/internal/v1/cielo/operations/CREATE_SALE",
+            "example": {
+                "operationId": "<NOVO_UUID_POR_COMANDO>",
+                "payload": {
+                    "MerchantOrderId": "2014111708",
+                    "Customer": {
+                        "Name": "Cliente Teste InPay"
+                    },
+                    "Payment": {
+                        "Type": "CreditCard",
+                        "Amount": 15700,
+                        "Installments": 1,
+                        "CreditCard": {
+                            "CardNumber": "4024007153763191",
+                            "Brand": "Visa",
+                            "SecurityCode": "023"
+                        },
+                        "Wallet": {
+                            "Type": "MasterPass",
+                            "Eci": "7",
+                            "Cavv": "<OBTER_NO_SANDBOX_DO_PROVEDOR>",
+                            "AdditionalData": {
+                                "CaptureCode": "103"
+                            }
+                        }
+                    }
+                }
+            },
+            "sourceExampleSyntaxCorrected": true
+        },
+        {
+            "name": "Authorize - CreditCard - With AVS",
+            "group": "AVS",
+            "operation": "CREATE_SALE",
+            "externalMethod": "POST",
+            "externalPath": "/1/sales",
+            "host": "transaction",
+            "inpayMethod": "POST",
+            "inpayPath": "/internal/v1/cielo/operations/CREATE_SALE",
+            "example": {
+                "operationId": "<NOVO_UUID_POR_COMANDO>",
+                "payload": {
+                    "MerchantOrderId": "2014111703",
+                    "Payment": {
+                        "Type": "CreditCard",
+                        "Amount": 15700,
+                        "Installments": 1,
+                        "SoftDescriptor": "123456789ABCD",
+                        "CreditCard": {
+                            "CardNumber": "4024007153763191",
+                            "Holder": "Cliente Teste InPay",
+                            "ExpirationDate": "12/2030",
+                            "SecurityCode": "123",
+                            "Brand": "Visa",
+                            "Avs": {
+                                "Cpf": "<DOCUMENTO_DE_TESTE>",
+                                "ZipCode": "24320570",
+                                "Street": "Estrada Caetano Monteiro",
+                                "Number": "391",
+                                "Complement": "Bl",
+                                "District": "Niteroi"
+                            }
+                        }
+                    }
+                }
+            },
+            "sourceExampleSyntaxCorrected": false
+        },
+        {
+            "name": "ZeroAuth - CardToken",
+            "group": "Zero Auth",
+            "operation": "ZERO_AUTH",
+            "externalMethod": "POST",
+            "externalPath": "/1/zeroauth",
+            "host": "transaction",
+            "inpayMethod": "POST",
+            "inpayPath": "/internal/v1/cielo/operations/ZERO_AUTH",
+            "example": {
+                "operationId": "<NOVO_UUID_POR_COMANDO>",
+                "payload": {
+                    "CardToken": "<OBTER_NO_SANDBOX_DO_PROVEDOR>",
+                    "SaveCard": "false",
+                    "Brand": "Visa"
+                }
+            },
+            "sourceExampleSyntaxCorrected": false
+        },
+        {
+            "name": "ZeroAuth - Validate With AVS",
+            "group": "Zero Auth",
+            "operation": "ZERO_AUTH",
+            "externalMethod": "POST",
+            "externalPath": "/1/zeroauth",
+            "host": "transaction",
+            "inpayMethod": "POST",
+            "inpayPath": "/internal/v1/cielo/operations/ZERO_AUTH",
+            "example": {
+                "operationId": "<NOVO_UUID_POR_COMANDO>",
+                "payload": {
+                    "CardType": "Credit",
+                    "CardNumber": "4024007153763191",
+                    "Holder": "Cliente Teste InPay",
+                    "ExpirationDate": "12/2030",
+                    "SecurityCode": "333",
+                    "SaveCard": "false",
+                    "Brand": "Visa",
+                    "Avs": {
+                        "Cpf": "<DOCUMENTO_DE_TESTE>",
+                        "ZipCode": "24320570",
+                        "Street": "Estrada Caetano Monteiro",
+                        "Number": "391",
+                        "Complement": "Bl",
+                        "District": "Niteroi"
+                    }
+                }
+            },
+            "sourceExampleSyntaxCorrected": false
+        },
+        {
+            "name": "ZeroAuth - Validate",
+            "group": "Zero Auth",
+            "operation": "ZERO_AUTH",
+            "externalMethod": "POST",
+            "externalPath": "/1/zeroauth",
+            "host": "transaction",
+            "inpayMethod": "POST",
+            "inpayPath": "/internal/v1/cielo/operations/ZERO_AUTH",
+            "example": {
+                "operationId": "<NOVO_UUID_POR_COMANDO>",
+                "payload": {
+                    "CardType": "DebitCard",
+                    "CardNumber": "4024007153763191",
+                    "Holder": "Cliente Teste InPay",
+                    "ExpirationDate": "12/2030",
+                    "SecurityCode": "123",
+                    "SaveCard": "false",
+                    "Brand": "Visa"
+                }
+            },
+            "sourceExampleSyntaxCorrected": false
+        },
+        {
+            "name": "Bin Query",
+            "group": "Consulta Bins",
+            "operation": "QUERY_BIN",
+            "externalMethod": "GET",
+            "externalPath": "/1/cardBin/{resourceId}",
+            "host": "query",
+            "inpayMethod": "GET",
+            "inpayPath": "/internal/v1/cielo/operations/QUERY_BIN",
+            "example": {
+                "resourceId": "402400"
+            },
+            "sourceExampleSyntaxCorrected": false
+        }
+    ]
+}

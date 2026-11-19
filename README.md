@@ -4,7 +4,7 @@ Java 21 · Spring Boot 4.1.2 · PostgreSQL · Kafka · Cognito · arquitetura he
 
 O projeto foi refatorado para facilitar leitura e manutenção por desenvolvedores plenos: indentação de quatro espaços em Java, blocos explícitos, nomes descritivos nos fluxos principais, DTOs separados, JavaDoc e Swagger gerado pelos controllers.
 
-**Estágio real:** estrutura de desenvolvimento com componentes funcionais. O Core registra pagamentos em CREATED e publica PaymentCreated, mas ainda não executa a saga financeira completa. Os connectors agora incluem chamadas HTTP externas de autorização, captura, cancelamento/estorno e consulta, desabilitadas por padrão e ainda dependentes de homologação com suas credenciais. O perfil local preserva os simuladores. Consulte [CONNECTORS.md](docs/CONNECTORS.md).
+**Estágio real:** estrutura de desenvolvimento com componentes funcionais. O Core registra pagamentos em CREATED e publica PaymentCreated, mas ainda não executa a saga financeira completa. Os connectors agora incluem chamadas HTTP externas de autorização, captura, cancelamento/estorno e consulta, desabilitadas por padrão e ainda dependentes de homologação com suas credenciais. O perfil local preserva os simuladores. Consulte [CONNECTORS.md](docs/CONNECTORS.md). O ciclo de crédito Cielo foi exercitado em sandbox pelas APIs internas do InPay; cobertura e limitações estão em [CIELO_COLLECTION_COVERAGE.md](docs/CIELO_COLLECTION_COVERAGE.md).
 
 ## Painel gerencial
 
@@ -69,7 +69,7 @@ Grafana: **http://localhost:3000**, usuário `admin`, senha local definida por G
 | reconciliation-service | 8089 | Ports e domínio; job retorna 501 até implementar importação/consulta e comparação. |
 | notification-service | 8090 | Domínio/port e assinatura HMAC; entrega/retry/SSRF/DLQ ainda pendentes. |
 | transaction-query-service | 8091 | Projeção PaymentCreated via Kafka, inbox deduplicada e GET por tenant. Demais eventos ainda pendentes. |
-| connector-cielo | 8101 | Simulador PostgreSQL local idempotente por operationId; adaptador HTTP externo configurável, com journal de idempotência. Não homologado. |
+| connector-cielo | 8101 | 20 operações REST da coleção oficial, journal PostgreSQL e Swagger. Ciclo de crédito validado em sandbox; recorrência exercitada; tokenização pendente no estabelecimento. |
 | connector-rede | 8102 | Simulador PostgreSQL local idempotente por operationId; adaptador HTTP externo configurável, com journal de idempotência. Não homologado. |
 | connector-getnet | 8103 | Simulador PostgreSQL local idempotente por operationId; adaptador HTTP externo configurável, com journal de idempotência. Não homologado. |
 | connector-stone | 8104 | Simulador PostgreSQL local idempotente por operationId; adaptador HTTP externo configurável, com journal de idempotência. Não homologado. |

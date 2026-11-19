@@ -1,0 +1,257 @@
+{
+  "environment": "Cielo sandbox",
+  "executedAt": "2026-11-19T17:13:40.847902725Z",
+  "results": [
+    {
+      "operation": "LEGACY_AUTHORIZE",
+      "scenario": "credit-lifecycle",
+      "httpStatus": 201,
+      "uncertain": false,
+      "status": "1"
+    },
+    {
+      "operation": "GET_PAYMENT",
+      "scenario": "credit-lifecycle",
+      "httpStatus": 200,
+      "uncertain": false,
+      "replayed": false,
+      "Payment.Status": "1"
+    },
+    {
+      "operation": "CAPTURE_PAYMENT",
+      "scenario": "credit-lifecycle",
+      "httpStatus": 200,
+      "uncertain": false,
+      "replayed": false,
+      "Status": "2",
+      "ReturnCode": "6"
+    },
+    {
+      "operation": "VOID_PAYMENT",
+      "scenario": "credit-lifecycle",
+      "httpStatus": 200,
+      "uncertain": false,
+      "replayed": false,
+      "Status": "10",
+      "ReturnCode": "0"
+    },
+    {
+      "operation": "GET_PAYMENT",
+      "scenario": "credit-lifecycle",
+      "httpStatus": 200,
+      "uncertain": false,
+      "replayed": false,
+      "Payment.Status": "10"
+    },
+    {
+      "operation": "CREATE_CARD",
+      "scenario": "tokenization",
+      "httpStatus": 400,
+      "uncertain": true,
+      "replayed": false
+    },
+    {
+      "outcome": "BLOCKED",
+      "reason": "CardToken absent; GET_CARD and token payment not executed",
+      "scenario": "tokenization"
+    },
+    {
+      "operation": "ZERO_AUTH",
+      "scenario": "zero-auth",
+      "httpStatus": 200,
+      "uncertain": false,
+      "replayed": false,
+      "ReturnCode": "11",
+      "Valid": "false"
+    },
+    {
+      "operation": "QUERY_BIN",
+      "scenario": "bin-query",
+      "httpStatus": 200,
+      "uncertain": false,
+      "replayed": false,
+      "Status": "00"
+    },
+    {
+      "operation": "CREATE_SALE",
+      "scenario": "partial-capture-void",
+      "httpStatus": 201,
+      "uncertain": false,
+      "replayed": false,
+      "Payment.Status": "1",
+      "Payment.ReturnCode": "4"
+    },
+    {
+      "operation": "CAPTURE_PAYMENT",
+      "scenario": "partial-capture-void",
+      "httpStatus": 200,
+      "uncertain": false,
+      "replayed": false,
+      "Status": "2",
+      "ReturnCode": "6"
+    },
+    {
+      "operation": "VOID_PAYMENT",
+      "scenario": "partial-capture-void",
+      "httpStatus": 200,
+      "uncertain": false,
+      "replayed": false,
+      "Status": "10",
+      "ReturnCode": "0"
+    },
+    {
+      "operation": "CREATE_SALE",
+      "scenario": "void-by-order",
+      "httpStatus": 201,
+      "uncertain": false,
+      "replayed": false,
+      "Payment.Status": "1",
+      "Payment.ReturnCode": "4"
+    },
+    {
+      "operation": "VOID_ORDER",
+      "scenario": "void-by-order",
+      "httpStatus": 200,
+      "uncertain": false,
+      "replayed": false,
+      "Status": "10",
+      "ReturnCode": "0"
+    },
+    {
+      "operation": "CREATE_SALE",
+      "scenario": "declined-credit",
+      "httpStatus": 201,
+      "uncertain": false,
+      "replayed": false,
+      "Payment.Status": "3",
+      "Payment.ReturnCode": "05"
+    },
+    {
+      "operation": "CREATE_SALE",
+      "scenario": "recurrence",
+      "httpStatus": 201,
+      "uncertain": false,
+      "replayed": false,
+      "Payment.Status": "1",
+      "Payment.ReturnCode": "4"
+    },
+    {
+      "operation": "GET_RECURRENT",
+      "scenario": "recurrence",
+      "httpStatus": 200,
+      "uncertain": false,
+      "replayed": false
+    },
+    {
+      "operation": "UPDATE_RECURRENT_CUSTOMER",
+      "scenario": "recurrence",
+      "httpStatus": 200,
+      "uncertain": false,
+      "replayed": false
+    },
+    {
+      "operation": "UPDATE_RECURRENT_INTERVAL",
+      "scenario": "recurrence",
+      "httpStatus": 200,
+      "uncertain": false,
+      "replayed": false
+    },
+    {
+      "operation": "UPDATE_RECURRENT_END_DATE",
+      "scenario": "recurrence",
+      "httpStatus": 200,
+      "uncertain": false,
+      "replayed": false
+    },
+    {
+      "operation": "UPDATE_RECURRENT_DAY",
+      "scenario": "recurrence",
+      "httpStatus": 200,
+      "uncertain": false,
+      "replayed": false
+    },
+    {
+      "operation": "UPDATE_RECURRENT_INSTALLMENTS",
+      "scenario": "recurrence",
+      "httpStatus": 200,
+      "uncertain": false,
+      "replayed": false
+    },
+    {
+      "operation": "UPDATE_RECURRENT_AMOUNT",
+      "scenario": "recurrence",
+      "httpStatus": 200,
+      "uncertain": false,
+      "replayed": false
+    },
+    {
+      "operation": "UPDATE_RECURRENT_NEXT_DATE",
+      "scenario": "recurrence",
+      "httpStatus": 200,
+      "uncertain": false,
+      "replayed": false
+    },
+    {
+      "operation": "UPDATE_RECURRENT_PAYMENT",
+      "scenario": "recurrence",
+      "httpStatus": 200,
+      "uncertain": false,
+      "replayed": false
+    },
+    {
+      "operation": "DEACTIVATE_RECURRENT",
+      "scenario": "recurrence",
+      "httpStatus": 200,
+      "uncertain": false,
+      "replayed": false
+    },
+    {
+      "operation": "REACTIVATE_RECURRENT",
+      "scenario": "recurrence",
+      "httpStatus": 200,
+      "uncertain": false,
+      "replayed": false
+    },
+    {
+      "operation": "DEACTIVATE_RECURRENT",
+      "scenario": "recurrence",
+      "httpStatus": 200,
+      "uncertain": false,
+      "replayed": false
+    },
+    {
+      "operation": "VOID_PAYMENT",
+      "scenario": "recurrence",
+      "httpStatus": 200,
+      "uncertain": false,
+      "replayed": false,
+      "Status": "10",
+      "ReturnCode": "0"
+    },
+    {
+      "operation": "CREATE_SALE",
+      "scenario": "debit",
+      "httpStatus": 201,
+      "uncertain": false,
+      "replayed": false,
+      "Payment.Status": "2",
+      "Payment.ReturnCode": "6"
+    },
+    {
+      "operation": "CREATE_SALE",
+      "scenario": "boleto",
+      "httpStatus": 201,
+      "uncertain": false,
+      "replayed": false,
+      "Payment.Status": "1"
+    },
+    {
+      "operation": "CREATE_SALE",
+      "scenario": "electronic-transfer",
+      "httpStatus": 400,
+      "uncertain": false,
+      "replayed": false,
+      "items.0.Code": "119"
+    }
+  ]
+}
