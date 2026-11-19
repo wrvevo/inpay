@@ -4,7 +4,7 @@ Java 21 · Spring Boot 4.1.2 · PostgreSQL · Kafka · Cognito · arquitetura he
 
 O projeto foi refatorado para facilitar leitura e manutenção por desenvolvedores plenos: indentação de quatro espaços em Java, blocos explícitos, nomes descritivos nos fluxos principais, DTOs separados, JavaDoc e Swagger gerado pelos controllers.
 
-**Estágio real:** estrutura de desenvolvimento com componentes funcionais. O Core registra pagamentos em CREATED e publica PaymentCreated, mas ainda não executa a saga financeira completa. Os conectores locais são simulações; captura, estorno e integrações reais pendentes retornam 501. Não usar cartões reais.
+**Estágio real:** estrutura de desenvolvimento com componentes funcionais. O Core registra pagamentos em CREATED e publica PaymentCreated, mas ainda não executa a saga financeira completa. Os connectors agora incluem chamadas HTTP externas de autorização, captura, cancelamento/estorno e consulta, desabilitadas por padrão e ainda dependentes de homologação com suas credenciais. O perfil local preserva os simuladores. Consulte [CONNECTORS.md](docs/CONNECTORS.md).
 
 ## Subir o ambiente completo com Docker
 
@@ -30,7 +30,7 @@ O `docker-compose.yml` sobe, sem precisar ativar profiles:
 
 São 29 containers definidos, incluindo 2 jobs de inicialização que terminam com sucesso. As portas publicadas ficam somente em `127.0.0.1`. A compilação usa uma etapa Docker compartilhada entre os módulos. O primeiro build baixa dependências e pode demorar; o Docker reutiliza cache nas próximas execuções.
 
-**Subir todos os processos não completa as funcionalidades pendentes.** Checkout ainda não possui interface pública; callbacks reais e conciliação ainda não foram implementados. Nenhum container local realiza cobrança real.
+**Subir todos os processos não completa as funcionalidades pendentes.** Checkout ainda não possui interface pública; callbacks reais e conciliação ainda não foram implementados. Sem habilitação explícita, nenhum container local realiza cobrança real. Os novos endpoints externos podem ser habilitados por configuração para testes em sandbox.
 
 ## Swagger e autenticação
 
@@ -63,14 +63,14 @@ Grafana: **http://localhost:3000**, usuário `admin`, senha local definida por G
 | reconciliation-service | 8089 | Ports e domínio; job retorna 501 até implementar importação/consulta e comparação. |
 | notification-service | 8090 | Domínio/port e assinatura HMAC; entrega/retry/SSRF/DLQ ainda pendentes. |
 | transaction-query-service | 8091 | Projeção PaymentCreated via Kafka, inbox deduplicada e GET por tenant. Demais eventos ainda pendentes. |
-| connector-cielo | 8101 | Simulador PostgreSQL local idempotente por operationId; adaptador real retorna 501. Não homologado. |
-| connector-rede | 8102 | Simulador PostgreSQL local idempotente por operationId; adaptador real retorna 501. Não homologado. |
-| connector-getnet | 8103 | Simulador PostgreSQL local idempotente por operationId; adaptador real retorna 501. Não homologado. |
-| connector-stone | 8104 | Simulador PostgreSQL local idempotente por operationId; adaptador real retorna 501. Não homologado. |
-| connector-bin | 8105 | Simulador PostgreSQL local idempotente por operationId; adaptador real retorna 501. Não homologado. |
-| connector-global-payments | 8106 | Simulador PostgreSQL local idempotente por operationId; adaptador real retorna 501. Não homologado. |
-| connector-pagbank | 8107 | Simulador PostgreSQL local idempotente por operationId; adaptador real retorna 501. Não homologado. |
-| connector-safrapay | 8108 | Simulador PostgreSQL local idempotente por operationId; adaptador real retorna 501. Não homologado. |
+| connector-cielo | 8101 | Simulador PostgreSQL local idempotente por operationId; adaptador HTTP externo configurável, com journal de idempotência. Não homologado. |
+| connector-rede | 8102 | Simulador PostgreSQL local idempotente por operationId; adaptador HTTP externo configurável, com journal de idempotência. Não homologado. |
+| connector-getnet | 8103 | Simulador PostgreSQL local idempotente por operationId; adaptador HTTP externo configurável, com journal de idempotência. Não homologado. |
+| connector-stone | 8104 | Simulador PostgreSQL local idempotente por operationId; adaptador HTTP externo configurável, com journal de idempotência. Não homologado. |
+| connector-bin | 8105 | Simulador PostgreSQL local idempotente por operationId; adaptador HTTP externo configurável, com journal de idempotência. Não homologado. |
+| connector-global-payments | 8106 | Simulador PostgreSQL local idempotente por operationId; adaptador HTTP externo configurável, com journal de idempotência. Não homologado. |
+| connector-pagbank | 8107 | Simulador PostgreSQL local idempotente por operationId; adaptador HTTP externo configurável, com journal de idempotência. Não homologado. |
+| connector-safrapay | 8108 | Simulador PostgreSQL local idempotente por operationId; adaptador HTTP externo configurável, com journal de idempotência. Não homologado. |
 
 
 ## Lambdas locais
@@ -109,6 +109,7 @@ Importe o `pom.xml` raiz no IntelliJ, VS Code ou Cursor. Pacote base: `br.com.in
 ## Navegação no código
 
 - `services/`: 19 módulos independentes, organizados em domain, application, adapters e bootstrap.
+- `libs/connector-runtime`: transporte HTTP, autenticação de adquirentes e journal de operações externas.
 - `libs/contracts`: envelope de eventos, sem entidades compartilhadas entre bancos.
 - `libs/platform-security`: Cognito, escopos, tenant e cliente M2M.
 - `libs/platform-messaging`: outbox, inbox e tratamento Kafka/DLT.
@@ -130,7 +131,7 @@ Os volumes preservam PostgreSQL, Kafka, Prometheus e Grafana. `docker compose do
 
 ## Segurança e continuidade
 
-Tokens simulados não substituem tokenização real. Não há PAN/CVV no modelo. Bindings reais, checkout/3DS, saga, tratamento de UNKNOWN, callbacks, conciliação e entrega de notificações continuam como próximas implementações. Os detalhes de cada módulo estão na tabela acima.
+Tokens simulados não substituem tokenização real. O caminho padrão usa tokens; payloads nativos com dados de cartão exigem habilitação explícita em ambiente PCI e não são persistidos. Bindings reais, checkout/3DS, saga, tratamento de UNKNOWN, callbacks, conciliação e entrega de notificações continuam como próximas implementações. Os detalhes de cada módulo estão na tabela acima.
 
 Default profile das aplicações é `aws`; somente o Compose local ativa `local`. Cada API mantém seu scope e ownership. Alterar o nome Java não renomeou tabelas, bancos nem tópicos para evitar perda de compatibilidade de dados existentes.
 

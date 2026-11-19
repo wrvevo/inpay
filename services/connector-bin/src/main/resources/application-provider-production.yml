@@ -1,0 +1,5 @@
+# Ativar juntamente com aws; exige credenciais do ambiente de produção.
+inpay:
+  provider:
+    base-url: ${BIN_BASE_URL:https://esitef-ec.softwareexpress.com.br/e-sitef/api}
+    query-url: ${BIN_QUERY_URL:https://esitef-ec.softwareexpress.com.br/e-sitef/api}

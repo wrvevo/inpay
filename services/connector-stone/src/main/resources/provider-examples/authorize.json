@@ -1,0 +1,22 @@
+{
+    "operationId": "22222222-2222-2222-2222-222222222222",
+    "payload": {
+        "payment_method": "card",
+        "amount": 1000,
+        "initiator_id": "operation-100",
+        "local_datetime": "2026-11-19T10:00:00",
+        "channel": "website",
+        "card_transaction": {
+            "card": {
+                "entry_mode": "manual",
+                "number": "NETWORK_DPAN_OR_PAN_IN_PCI_ENVIRONMENT",
+                "expiration_date": "3012",
+                "holder_name": "Cliente de teste"
+            },
+            "installments": 1,
+            "type": "credit",
+            "operation_type": "auth_only",
+            "installments_type": "none"
+        }
+    }
+}

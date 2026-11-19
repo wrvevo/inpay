@@ -52,10 +52,10 @@ public class AuthorizationController {
     @PostMapping("/internal/v1/authorizations")
     @PreAuthorize("hasAuthority('SCOPE_connectors-stone/execute')")
     @Operation(
-            summary = "Autorizar no simulador local",
+            summary = "Autorizar pagamento",
             description =
                     "Encaminha a autorização ao adaptador selecionado; o perfil local é simulado e"
-                            + " o adaptador real permanece desabilitado. Escopo obrigatório:"
+                            + " o adaptador externo usa providerPayload e a configuração provider.yml. Escopo obrigatório:"
                             + " connectors-stone/execute.")
     @ApiResponses({
         @ApiResponse(
@@ -87,7 +87,7 @@ public class AuthorizationController {
                 content = @io.swagger.v3.oas.annotations.media.Content),
         @ApiResponse(
                 responseCode = "501",
-                description = "Adaptador real ainda não implementado fora do perfil local",
+                description = "Connector externo desabilitado ou sem configuração",
                 content = @io.swagger.v3.oas.annotations.media.Content)
     })
     public Authorization authorize(
@@ -104,6 +104,8 @@ public class AuthorizationController {
                         tenantContext.resolve(requestedMerchantId),
                         request.amount(),
                         request.instrumentToken(),
+                        null,
+                        request.providerPayload(),
                         null));
     }
 }

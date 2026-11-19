@@ -1,3 +1,22 @@
+# Validação dos connectors — 19/11/2026
+
+- Reactor Maven completo: **BUILD SUCCESS**, JDK 21.0.13, Maven 3.9.11, Spring Boot 4.1.2.
+- **89 testes aprovados, 0 falhas, 0 erros, 0 ignorados**: 42 existentes e 47 novos.
+- Os 32 testes dos adaptadores verificam contratos HTTP com servidor local, campos opcionais, rotas financeiras, validação e respostas incompletas.
+- Os 15 testes do runtime verificam autenticação, cache/expiração, isolamento de tenant, idempotência com journal substituto, resultados incertos, proteção de dados e ausência de retry financeiro automático.
+- `spotless:apply verify` executado no reactor completo (28 projetos, incluindo a nova biblioteca connector-runtime).
+- `docker-compose config --quiet` aprovado; `git diff --check` sem erros.
+
+## Limites desta entrega
+
+- Testes usam contratos sintéticos e HTTP local; não substituem homologação com as adquirentes.
+- Não há credenciais de homologação nem Docker Engine disponíveis. Containers, PostgreSQL real, mTLS com certificado do estabelecimento e Cognito real não foram exercitados nesta revisão.
+- O journal JDBC exige PostgreSQL e foi revisado, mas seus cenários de concorrência/crash ainda precisam de validação integrada.
+- Bin usa Carat/e-SiTef com mTLS. Global Payments usa GP-API e exige confirmação de habilitação para a afiliação brasileira.
+- O escopo é o núcleo de cartões: autorização, captura, cancelamento/estorno e consulta. Outros produtos e a saga ponta a ponta permanecem conforme [CONNECTORS.md](docs/CONNECTORS.md).
+
+---
+
 # Validação do InPay 0.2.0 — 18/11/2026
 
 ## Executado nesta revisão

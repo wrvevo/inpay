@@ -1,0 +1,27 @@
+# Configuração exclusiva desta adquirente. Não colocar segredos neste arquivo.
+# Ativar somente após configurar o estabelecimento, credenciais e homologar o contrato.
+inpay:
+  provider:
+    name: safrapay
+    enabled: ${SAFRAPAY_ENABLED:false}
+    tenant-id: ${SAFRAPAY_TENANT_ID:}
+    base-url: ${SAFRAPAY_BASE_URL:https://payment-hml.safrapay.com.br}
+    query-url: ${SAFRAPAY_QUERY_URL:https://payment-hml.safrapay.com.br}
+    token-url: ${SAFRAPAY_TOKEN_URL:https://payment-hml.safrapay.com.br/v2/merchant/auth}
+    merchant-id: ${SAFRAPAY_MERCHANT_ID:}
+    merchant-key: ${SAFRAPAY_MERCHANT_KEY:}
+    client-id: ${SAFRAPAY_CLIENT_ID:}
+    client-secret: ${SAFRAPAY_CLIENT_SECRET:}
+    access-token: ${SAFRAPAY_ACCESS_TOKEN:}
+    secret-key: ${SAFRAPAY_SECRET_KEY:}
+    app-id: ${SAFRAPAY_APP_ID:}
+    app-key: ${SAFRAPAY_APP_KEY:}
+    api-version: ${SAFRAPAY_API_VERSION:2021-03-22}
+    host: ${SAFRAPAY_HOST:}
+    channel: ${SAFRAPAY_CHANNEL:}
+    key-store: ${SAFRAPAY_KEY_STORE:}
+    key-store-password: ${SAFRAPAY_KEY_STORE_PASSWORD:}
+    connect-timeout: ${SAFRAPAY_CONNECT_TIMEOUT:5s}
+    read-timeout: ${SAFRAPAY_READ_TIMEOUT:30s}
+    allow-sensitive-card-data: ${SAFRAPAY_ALLOW_SENSITIVE_CARD_DATA:false}
+    brazil-enabled: ${SAFRAPAY_BRAZIL_ENABLED:false}

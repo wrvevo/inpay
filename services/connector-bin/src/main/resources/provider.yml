@@ -1,0 +1,27 @@
+# Configuração exclusiva desta adquirente. Não colocar segredos neste arquivo.
+# Ativar somente após configurar o estabelecimento, credenciais e homologar o contrato.
+inpay:
+  provider:
+    name: bin
+    enabled: ${BIN_ENABLED:false}
+    tenant-id: ${BIN_TENANT_ID:}
+    base-url: ${BIN_BASE_URL:https://esitef-homologacao.softwareexpress.com.br/e-sitef/api}
+    query-url: ${BIN_QUERY_URL:https://esitef-homologacao.softwareexpress.com.br/e-sitef/api}
+    token-url: ${BIN_TOKEN_URL:}
+    merchant-id: ${BIN_MERCHANT_ID:}
+    merchant-key: ${BIN_MERCHANT_KEY:}
+    client-id: ${BIN_CLIENT_ID:}
+    client-secret: ${BIN_CLIENT_SECRET:}
+    access-token: ${BIN_ACCESS_TOKEN:}
+    secret-key: ${BIN_SECRET_KEY:}
+    app-id: ${BIN_APP_ID:}
+    app-key: ${BIN_APP_KEY:}
+    api-version: ${BIN_API_VERSION:2021-03-22}
+    host: ${BIN_HOST:}
+    channel: ${BIN_CHANNEL:}
+    key-store: ${BIN_KEY_STORE:}
+    key-store-password: ${BIN_KEY_STORE_PASSWORD:}
+    connect-timeout: ${BIN_CONNECT_TIMEOUT:5s}
+    read-timeout: ${BIN_READ_TIMEOUT:30s}
+    allow-sensitive-card-data: ${BIN_ALLOW_SENSITIVE_CARD_DATA:false}
+    brazil-enabled: ${BIN_BRAZIL_ENABLED:false}

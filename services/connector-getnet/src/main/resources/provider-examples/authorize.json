@@ -1,0 +1,21 @@
+{
+    "operationId": "22222222-2222-2222-2222-222222222222",
+    "payload": {
+        "order_id": "order-100",
+        "data": {
+            "amount": 1000,
+            "currency": "BRL",
+            "payment": {
+                "payment_method": "CREDIT_PRE_AUTHORIZATION",
+                "transaction_type": "FULL",
+                "number_installments": 1,
+                "card": {
+                    "card_id": "PROVIDER_CARD_ID"
+                }
+            },
+            "customer": {
+                "email": "test@example.com"
+            }
+        }
+    }
+}

@@ -1,0 +1,27 @@
+# Configuração exclusiva desta adquirente. Não colocar segredos neste arquivo.
+# Ativar somente após configurar o estabelecimento, credenciais e homologar o contrato.
+inpay:
+  provider:
+    name: rede
+    enabled: ${REDE_ENABLED:false}
+    tenant-id: ${REDE_TENANT_ID:}
+    base-url: ${REDE_BASE_URL:https://sandbox-erede.useredecloud.com.br}
+    query-url: ${REDE_QUERY_URL:https://sandbox-erede.useredecloud.com.br}
+    token-url: ${REDE_TOKEN_URL:https://rl7-sandbox-api.useredecloud.com.br/oauth2/token}
+    merchant-id: ${REDE_MERCHANT_ID:}
+    merchant-key: ${REDE_MERCHANT_KEY:}
+    client-id: ${REDE_CLIENT_ID:}
+    client-secret: ${REDE_CLIENT_SECRET:}
+    access-token: ${REDE_ACCESS_TOKEN:}
+    secret-key: ${REDE_SECRET_KEY:}
+    app-id: ${REDE_APP_ID:}
+    app-key: ${REDE_APP_KEY:}
+    api-version: ${REDE_API_VERSION:2021-03-22}
+    host: ${REDE_HOST:}
+    channel: ${REDE_CHANNEL:}
+    key-store: ${REDE_KEY_STORE:}
+    key-store-password: ${REDE_KEY_STORE_PASSWORD:}
+    connect-timeout: ${REDE_CONNECT_TIMEOUT:5s}
+    read-timeout: ${REDE_READ_TIMEOUT:30s}
+    allow-sensitive-card-data: ${REDE_ALLOW_SENSITIVE_CARD_DATA:false}
+    brazil-enabled: ${REDE_BRAZIL_ENABLED:false}

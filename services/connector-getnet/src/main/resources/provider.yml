@@ -1,0 +1,27 @@
+# Configuração exclusiva desta adquirente. Não colocar segredos neste arquivo.
+# Ativar somente após configurar o estabelecimento, credenciais e homologar o contrato.
+inpay:
+  provider:
+    name: getnet
+    enabled: ${GETNET_ENABLED:false}
+    tenant-id: ${GETNET_TENANT_ID:}
+    base-url: ${GETNET_BASE_URL:https://api-sbx.globalgetnet.com}
+    query-url: ${GETNET_QUERY_URL:https://api-sbx.globalgetnet.com}
+    token-url: ${GETNET_TOKEN_URL:https://api-sbx.globalgetnet.com/authentication/oauth2/access_token}
+    merchant-id: ${GETNET_MERCHANT_ID:}
+    merchant-key: ${GETNET_MERCHANT_KEY:}
+    client-id: ${GETNET_CLIENT_ID:}
+    client-secret: ${GETNET_CLIENT_SECRET:}
+    access-token: ${GETNET_ACCESS_TOKEN:}
+    secret-key: ${GETNET_SECRET_KEY:}
+    app-id: ${GETNET_APP_ID:}
+    app-key: ${GETNET_APP_KEY:}
+    api-version: ${GETNET_API_VERSION:2021-03-22}
+    host: ${GETNET_HOST:}
+    channel: ${GETNET_CHANNEL:}
+    key-store: ${GETNET_KEY_STORE:}
+    key-store-password: ${GETNET_KEY_STORE_PASSWORD:}
+    connect-timeout: ${GETNET_CONNECT_TIMEOUT:5s}
+    read-timeout: ${GETNET_READ_TIMEOUT:30s}
+    allow-sensitive-card-data: ${GETNET_ALLOW_SENSITIVE_CARD_DATA:false}
+    brazil-enabled: ${GETNET_BRAZIL_ENABLED:false}

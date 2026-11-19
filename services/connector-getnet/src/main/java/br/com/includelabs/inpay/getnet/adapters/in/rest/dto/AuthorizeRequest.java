@@ -23,4 +23,14 @@ public record AuthorizeRequest(
         @Schema(
                         description = "Alias opaco ptok_; não enviar número de cartão ou CVV.",
                         example = "ptok_EXEMPLO_SIMULADO_1234567890")
-                String instrumentToken) {}
+                String instrumentToken,
+        @Schema(
+                        description =
+                                "Payload nativo obrigatório para a integração externa; consulte resources/provider-examples. Não enviar aliases simulados à adquirente.")
+                java.util.Map<String, Object> providerPayload) {
+    /** Não inclui dados sensíveis no texto do objeto. */
+    @Override
+    public String toString() {
+        return "AuthorizeRequest[operationId=" + operationId + "]";
+    }
+}

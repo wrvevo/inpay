@@ -1,0 +1,27 @@
+# Configuração exclusiva desta adquirente. Não colocar segredos neste arquivo.
+# Ativar somente após configurar o estabelecimento, credenciais e homologar o contrato.
+inpay:
+  provider:
+    name: pagbank
+    enabled: ${PAGBANK_ENABLED:false}
+    tenant-id: ${PAGBANK_TENANT_ID:}
+    base-url: ${PAGBANK_BASE_URL:https://sandbox.api.pagseguro.com}
+    query-url: ${PAGBANK_QUERY_URL:https://sandbox.api.pagseguro.com}
+    token-url: ${PAGBANK_TOKEN_URL:}
+    merchant-id: ${PAGBANK_MERCHANT_ID:}
+    merchant-key: ${PAGBANK_MERCHANT_KEY:}
+    client-id: ${PAGBANK_CLIENT_ID:}
+    client-secret: ${PAGBANK_CLIENT_SECRET:}
+    access-token: ${PAGBANK_ACCESS_TOKEN:}
+    secret-key: ${PAGBANK_SECRET_KEY:}
+    app-id: ${PAGBANK_APP_ID:}
+    app-key: ${PAGBANK_APP_KEY:}
+    api-version: ${PAGBANK_API_VERSION:2021-03-22}
+    host: ${PAGBANK_HOST:}
+    channel: ${PAGBANK_CHANNEL:}
+    key-store: ${PAGBANK_KEY_STORE:}
+    key-store-password: ${PAGBANK_KEY_STORE_PASSWORD:}
+    connect-timeout: ${PAGBANK_CONNECT_TIMEOUT:5s}
+    read-timeout: ${PAGBANK_READ_TIMEOUT:30s}
+    allow-sensitive-card-data: ${PAGBANK_ALLOW_SENSITIVE_CARD_DATA:false}
+    brazil-enabled: ${PAGBANK_BRAZIL_ENABLED:false}

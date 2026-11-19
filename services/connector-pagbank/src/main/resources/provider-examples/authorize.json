@@ -1,0 +1,36 @@
+{
+    "operationId": "22222222-2222-2222-2222-222222222222",
+    "payload": {
+        "reference_id": "order-100",
+        "customer": {
+            "name": "Cliente de teste",
+            "email": "test@example.com",
+            "tax_id": "DOCUMENTO_TESTE"
+        },
+        "items": [
+            {
+                "reference_id": "item-100",
+                "name": "Pedido",
+                "quantity": 1,
+                "unit_amount": 1000
+            }
+        ],
+        "charges": [
+            {
+                "reference_id": "charge-100",
+                "amount": {
+                    "value": 1000,
+                    "currency": "BRL"
+                },
+                "payment_method": {
+                    "type": "CREDIT_CARD",
+                    "installments": 1,
+                    "capture": false,
+                    "card": {
+                        "id": "CARD_PROVIDER_TOKEN"
+                    }
+                }
+            }
+        ]
+    }
+}

@@ -1,0 +1,5 @@
+{
+  "payment_id": "pay-100",
+  "status": "AUTHORIZED",
+  "reason_code": "00"
+}

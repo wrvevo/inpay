@@ -1,0 +1,6 @@
+# Ativar juntamente com aws; exige credenciais do ambiente de produção.
+inpay:
+  provider:
+    base-url: ${REDE_BASE_URL:https://api.userede.com.br/erede}
+    query-url: ${REDE_QUERY_URL:https://api.userede.com.br/erede}
+    token-url: ${REDE_TOKEN_URL}

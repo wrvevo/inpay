@@ -1,0 +1,6 @@
+# Ativar juntamente com aws; exige credenciais do ambiente de produção.
+inpay:
+  provider:
+    base-url: ${GETNET_BASE_URL:https://api.globalgetnet.com}
+    query-url: ${GETNET_QUERY_URL:https://api.globalgetnet.com}
+    token-url: ${GETNET_TOKEN_URL:https://api.globalgetnet.com/authentication/oauth2/access_token}

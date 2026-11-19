@@ -1,0 +1,6 @@
+# Ativar juntamente com aws; exige credenciais do ambiente de produção.
+inpay:
+  provider:
+    base-url: ${GLOBAL_PAYMENTS_BASE_URL:https://apis.globalpay.com/ucp}
+    query-url: ${GLOBAL_PAYMENTS_QUERY_URL:https://apis.globalpay.com/ucp}
+    token-url: ${GLOBAL_PAYMENTS_TOKEN_URL:https://apis.globalpay.com/ucp/accesstoken}

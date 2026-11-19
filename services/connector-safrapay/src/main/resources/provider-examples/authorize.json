@@ -1,0 +1,22 @@
+{
+    "operationId": "22222222-2222-2222-2222-222222222222",
+    "payload": {
+        "charge": {
+            "merchantChargeId": "order-100",
+            "transactions": [
+                {
+                    "amount": 1000,
+                    "installmentNumber": 1,
+                    "paymentType": 2,
+                    "card": {
+                        "id": "CARD_PROVIDER_UUID"
+                    }
+                }
+            ],
+            "source": 1,
+            "customer": {
+                "id": "PROVIDER_CUSTOMER_UUID"
+            }
+        }
+    }
+}

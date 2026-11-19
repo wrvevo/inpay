@@ -561,6 +561,28 @@ services:
         MODULE: connector-cielo
       target: spring-service
     environment:
+      CIELO_ENABLED: "${CIELO_ENABLED:-false}"
+      CIELO_TENANT_ID: "${CIELO_TENANT_ID:-}"
+      CIELO_BASE_URL: "${CIELO_BASE_URL:-https://apisandbox.cieloecommerce.cielo.com.br}"
+      CIELO_QUERY_URL: "${CIELO_QUERY_URL:-https://apiquerysandbox.cieloecommerce.cielo.com.br}"
+      CIELO_TOKEN_URL: "${CIELO_TOKEN_URL:-}"
+      CIELO_MERCHANT_ID: "${CIELO_MERCHANT_ID:-}"
+      CIELO_MERCHANT_KEY: "${CIELO_MERCHANT_KEY:-}"
+      CIELO_CLIENT_ID: "${CIELO_CLIENT_ID:-}"
+      CIELO_CLIENT_SECRET: "${CIELO_CLIENT_SECRET:-}"
+      CIELO_ACCESS_TOKEN: "${CIELO_ACCESS_TOKEN:-}"
+      CIELO_SECRET_KEY: "${CIELO_SECRET_KEY:-}"
+      CIELO_APP_ID: "${CIELO_APP_ID:-}"
+      CIELO_APP_KEY: "${CIELO_APP_KEY:-}"
+      CIELO_API_VERSION: "${CIELO_API_VERSION:-2021-03-22}"
+      CIELO_HOST: "${CIELO_HOST:-}"
+      CIELO_CHANNEL: "${CIELO_CHANNEL:-}"
+      CIELO_KEY_STORE: "${CIELO_KEY_STORE:-}"
+      CIELO_KEY_STORE_PASSWORD: "${CIELO_KEY_STORE_PASSWORD:-}"
+      CIELO_CONNECT_TIMEOUT: "${CIELO_CONNECT_TIMEOUT:-5s}"
+      CIELO_READ_TIMEOUT: "${CIELO_READ_TIMEOUT:-30s}"
+      CIELO_ALLOW_SENSITIVE_CARD_DATA: "${CIELO_ALLOW_SENSITIVE_CARD_DATA:-false}"
+      CIELO_BRAZIL_ENABLED: "${CIELO_BRAZIL_ENABLED:-false}"
       SPRING_PROFILES_ACTIVE: local
       DB_URL: jdbc:postgresql://postgres:5432/connector_cielo
       DB_USER: connector_cielo
@@ -604,6 +626,28 @@ services:
         MODULE: connector-rede
       target: spring-service
     environment:
+      REDE_ENABLED: "${REDE_ENABLED:-false}"
+      REDE_TENANT_ID: "${REDE_TENANT_ID:-}"
+      REDE_BASE_URL: "${REDE_BASE_URL:-https://sandbox-erede.useredecloud.com.br}"
+      REDE_QUERY_URL: "${REDE_QUERY_URL:-https://sandbox-erede.useredecloud.com.br}"
+      REDE_TOKEN_URL: "${REDE_TOKEN_URL:-https://rl7-sandbox-api.useredecloud.com.br/oauth2/token}"
+      REDE_MERCHANT_ID: "${REDE_MERCHANT_ID:-}"
+      REDE_MERCHANT_KEY: "${REDE_MERCHANT_KEY:-}"
+      REDE_CLIENT_ID: "${REDE_CLIENT_ID:-}"
+      REDE_CLIENT_SECRET: "${REDE_CLIENT_SECRET:-}"
+      REDE_ACCESS_TOKEN: "${REDE_ACCESS_TOKEN:-}"
+      REDE_SECRET_KEY: "${REDE_SECRET_KEY:-}"
+      REDE_APP_ID: "${REDE_APP_ID:-}"
+      REDE_APP_KEY: "${REDE_APP_KEY:-}"
+      REDE_API_VERSION: "${REDE_API_VERSION:-2021-03-22}"
+      REDE_HOST: "${REDE_HOST:-}"
+      REDE_CHANNEL: "${REDE_CHANNEL:-}"
+      REDE_KEY_STORE: "${REDE_KEY_STORE:-}"
+      REDE_KEY_STORE_PASSWORD: "${REDE_KEY_STORE_PASSWORD:-}"
+      REDE_CONNECT_TIMEOUT: "${REDE_CONNECT_TIMEOUT:-5s}"
+      REDE_READ_TIMEOUT: "${REDE_READ_TIMEOUT:-30s}"
+      REDE_ALLOW_SENSITIVE_CARD_DATA: "${REDE_ALLOW_SENSITIVE_CARD_DATA:-false}"
+      REDE_BRAZIL_ENABLED: "${REDE_BRAZIL_ENABLED:-false}"
       SPRING_PROFILES_ACTIVE: local
       DB_URL: jdbc:postgresql://postgres:5432/connector_rede
       DB_USER: connector_rede
@@ -647,6 +691,28 @@ services:
         MODULE: connector-getnet
       target: spring-service
     environment:
+      GETNET_ENABLED: "${GETNET_ENABLED:-false}"
+      GETNET_TENANT_ID: "${GETNET_TENANT_ID:-}"
+      GETNET_BASE_URL: "${GETNET_BASE_URL:-https://api-sbx.globalgetnet.com}"
+      GETNET_QUERY_URL: "${GETNET_QUERY_URL:-https://api-sbx.globalgetnet.com}"
+      GETNET_TOKEN_URL: "${GETNET_TOKEN_URL:-https://api-sbx.globalgetnet.com/authentication/oauth2/access_token}"
+      GETNET_MERCHANT_ID: "${GETNET_MERCHANT_ID:-}"
+      GETNET_MERCHANT_KEY: "${GETNET_MERCHANT_KEY:-}"
+      GETNET_CLIENT_ID: "${GETNET_CLIENT_ID:-}"
+      GETNET_CLIENT_SECRET: "${GETNET_CLIENT_SECRET:-}"
+      GETNET_ACCESS_TOKEN: "${GETNET_ACCESS_TOKEN:-}"
+      GETNET_SECRET_KEY: "${GETNET_SECRET_KEY:-}"
+      GETNET_APP_ID: "${GETNET_APP_ID:-}"
+      GETNET_APP_KEY: "${GETNET_APP_KEY:-}"
+      GETNET_API_VERSION: "${GETNET_API_VERSION:-2021-03-22}"
+      GETNET_HOST: "${GETNET_HOST:-}"
+      GETNET_CHANNEL: "${GETNET_CHANNEL:-}"
+      GETNET_KEY_STORE: "${GETNET_KEY_STORE:-}"
+      GETNET_KEY_STORE_PASSWORD: "${GETNET_KEY_STORE_PASSWORD:-}"
+      GETNET_CONNECT_TIMEOUT: "${GETNET_CONNECT_TIMEOUT:-5s}"
+      GETNET_READ_TIMEOUT: "${GETNET_READ_TIMEOUT:-30s}"
+      GETNET_ALLOW_SENSITIVE_CARD_DATA: "${GETNET_ALLOW_SENSITIVE_CARD_DATA:-false}"
+      GETNET_BRAZIL_ENABLED: "${GETNET_BRAZIL_ENABLED:-false}"
       SPRING_PROFILES_ACTIVE: local
       DB_URL: jdbc:postgresql://postgres:5432/connector_getnet
       DB_USER: connector_getnet
@@ -690,6 +756,28 @@ services:
         MODULE: connector-stone
       target: spring-service
     environment:
+      STONE_ENABLED: "${STONE_ENABLED:-false}"
+      STONE_TENANT_ID: "${STONE_TENANT_ID:-}"
+      STONE_BASE_URL: "${STONE_BASE_URL:-https://payments.stone.com.br}"
+      STONE_QUERY_URL: "${STONE_QUERY_URL:-https://payments.stone.com.br}"
+      STONE_TOKEN_URL: "${STONE_TOKEN_URL:-}"
+      STONE_MERCHANT_ID: "${STONE_MERCHANT_ID:-}"
+      STONE_MERCHANT_KEY: "${STONE_MERCHANT_KEY:-}"
+      STONE_CLIENT_ID: "${STONE_CLIENT_ID:-}"
+      STONE_CLIENT_SECRET: "${STONE_CLIENT_SECRET:-}"
+      STONE_ACCESS_TOKEN: "${STONE_ACCESS_TOKEN:-}"
+      STONE_SECRET_KEY: "${STONE_SECRET_KEY:-}"
+      STONE_APP_ID: "${STONE_APP_ID:-}"
+      STONE_APP_KEY: "${STONE_APP_KEY:-}"
+      STONE_API_VERSION: "${STONE_API_VERSION:-2021-03-22}"
+      STONE_HOST: "${STONE_HOST:-sdx-ecommerce-payments.stone.com.br}"
+      STONE_CHANNEL: "${STONE_CHANNEL:-}"
+      STONE_KEY_STORE: "${STONE_KEY_STORE:-}"
+      STONE_KEY_STORE_PASSWORD: "${STONE_KEY_STORE_PASSWORD:-}"
+      STONE_CONNECT_TIMEOUT: "${STONE_CONNECT_TIMEOUT:-5s}"
+      STONE_READ_TIMEOUT: "${STONE_READ_TIMEOUT:-30s}"
+      STONE_ALLOW_SENSITIVE_CARD_DATA: "${STONE_ALLOW_SENSITIVE_CARD_DATA:-false}"
+      STONE_BRAZIL_ENABLED: "${STONE_BRAZIL_ENABLED:-false}"
       SPRING_PROFILES_ACTIVE: local
       DB_URL: jdbc:postgresql://postgres:5432/connector_stone
       DB_USER: connector_stone
@@ -733,6 +821,28 @@ services:
         MODULE: connector-bin
       target: spring-service
     environment:
+      BIN_ENABLED: "${BIN_ENABLED:-false}"
+      BIN_TENANT_ID: "${BIN_TENANT_ID:-}"
+      BIN_BASE_URL: "${BIN_BASE_URL:-https://esitef-homologacao.softwareexpress.com.br/e-sitef/api}"
+      BIN_QUERY_URL: "${BIN_QUERY_URL:-https://esitef-homologacao.softwareexpress.com.br/e-sitef/api}"
+      BIN_TOKEN_URL: "${BIN_TOKEN_URL:-}"
+      BIN_MERCHANT_ID: "${BIN_MERCHANT_ID:-}"
+      BIN_MERCHANT_KEY: "${BIN_MERCHANT_KEY:-}"
+      BIN_CLIENT_ID: "${BIN_CLIENT_ID:-}"
+      BIN_CLIENT_SECRET: "${BIN_CLIENT_SECRET:-}"
+      BIN_ACCESS_TOKEN: "${BIN_ACCESS_TOKEN:-}"
+      BIN_SECRET_KEY: "${BIN_SECRET_KEY:-}"
+      BIN_APP_ID: "${BIN_APP_ID:-}"
+      BIN_APP_KEY: "${BIN_APP_KEY:-}"
+      BIN_API_VERSION: "${BIN_API_VERSION:-2021-03-22}"
+      BIN_HOST: "${BIN_HOST:-}"
+      BIN_CHANNEL: "${BIN_CHANNEL:-}"
+      BIN_KEY_STORE: "${BIN_KEY_STORE:-}"
+      BIN_KEY_STORE_PASSWORD: "${BIN_KEY_STORE_PASSWORD:-}"
+      BIN_CONNECT_TIMEOUT: "${BIN_CONNECT_TIMEOUT:-5s}"
+      BIN_READ_TIMEOUT: "${BIN_READ_TIMEOUT:-30s}"
+      BIN_ALLOW_SENSITIVE_CARD_DATA: "${BIN_ALLOW_SENSITIVE_CARD_DATA:-false}"
+      BIN_BRAZIL_ENABLED: "${BIN_BRAZIL_ENABLED:-false}"
       SPRING_PROFILES_ACTIVE: local
       DB_URL: jdbc:postgresql://postgres:5432/connector_bin
       DB_USER: connector_bin
@@ -776,6 +886,28 @@ services:
         MODULE: connector-global-payments
       target: spring-service
     environment:
+      GLOBAL_PAYMENTS_ENABLED: "${GLOBAL_PAYMENTS_ENABLED:-false}"
+      GLOBAL_PAYMENTS_TENANT_ID: "${GLOBAL_PAYMENTS_TENANT_ID:-}"
+      GLOBAL_PAYMENTS_BASE_URL: "${GLOBAL_PAYMENTS_BASE_URL:-https://apis.sandbox.globalpay.com/ucp}"
+      GLOBAL_PAYMENTS_QUERY_URL: "${GLOBAL_PAYMENTS_QUERY_URL:-https://apis.sandbox.globalpay.com/ucp}"
+      GLOBAL_PAYMENTS_TOKEN_URL: "${GLOBAL_PAYMENTS_TOKEN_URL:-https://apis.sandbox.globalpay.com/ucp/accesstoken}"
+      GLOBAL_PAYMENTS_MERCHANT_ID: "${GLOBAL_PAYMENTS_MERCHANT_ID:-}"
+      GLOBAL_PAYMENTS_MERCHANT_KEY: "${GLOBAL_PAYMENTS_MERCHANT_KEY:-}"
+      GLOBAL_PAYMENTS_CLIENT_ID: "${GLOBAL_PAYMENTS_CLIENT_ID:-}"
+      GLOBAL_PAYMENTS_CLIENT_SECRET: "${GLOBAL_PAYMENTS_CLIENT_SECRET:-}"
+      GLOBAL_PAYMENTS_ACCESS_TOKEN: "${GLOBAL_PAYMENTS_ACCESS_TOKEN:-}"
+      GLOBAL_PAYMENTS_SECRET_KEY: "${GLOBAL_PAYMENTS_SECRET_KEY:-}"
+      GLOBAL_PAYMENTS_APP_ID: "${GLOBAL_PAYMENTS_APP_ID:-}"
+      GLOBAL_PAYMENTS_APP_KEY: "${GLOBAL_PAYMENTS_APP_KEY:-}"
+      GLOBAL_PAYMENTS_API_VERSION: "${GLOBAL_PAYMENTS_API_VERSION:-2021-03-22}"
+      GLOBAL_PAYMENTS_HOST: "${GLOBAL_PAYMENTS_HOST:-}"
+      GLOBAL_PAYMENTS_CHANNEL: "${GLOBAL_PAYMENTS_CHANNEL:-}"
+      GLOBAL_PAYMENTS_KEY_STORE: "${GLOBAL_PAYMENTS_KEY_STORE:-}"
+      GLOBAL_PAYMENTS_KEY_STORE_PASSWORD: "${GLOBAL_PAYMENTS_KEY_STORE_PASSWORD:-}"
+      GLOBAL_PAYMENTS_CONNECT_TIMEOUT: "${GLOBAL_PAYMENTS_CONNECT_TIMEOUT:-5s}"
+      GLOBAL_PAYMENTS_READ_TIMEOUT: "${GLOBAL_PAYMENTS_READ_TIMEOUT:-30s}"
+      GLOBAL_PAYMENTS_ALLOW_SENSITIVE_CARD_DATA: "${GLOBAL_PAYMENTS_ALLOW_SENSITIVE_CARD_DATA:-false}"
+      GLOBAL_PAYMENTS_BRAZIL_ENABLED: "${GLOBAL_PAYMENTS_BRAZIL_ENABLED:-false}"
       SPRING_PROFILES_ACTIVE: local
       DB_URL: jdbc:postgresql://postgres:5432/connector_global_payments
       DB_USER: connector_global_payments
@@ -819,6 +951,28 @@ services:
         MODULE: connector-pagbank
       target: spring-service
     environment:
+      PAGBANK_ENABLED: "${PAGBANK_ENABLED:-false}"
+      PAGBANK_TENANT_ID: "${PAGBANK_TENANT_ID:-}"
+      PAGBANK_BASE_URL: "${PAGBANK_BASE_URL:-https://sandbox.api.pagseguro.com}"
+      PAGBANK_QUERY_URL: "${PAGBANK_QUERY_URL:-https://sandbox.api.pagseguro.com}"
+      PAGBANK_TOKEN_URL: "${PAGBANK_TOKEN_URL:-}"
+      PAGBANK_MERCHANT_ID: "${PAGBANK_MERCHANT_ID:-}"
+      PAGBANK_MERCHANT_KEY: "${PAGBANK_MERCHANT_KEY:-}"
+      PAGBANK_CLIENT_ID: "${PAGBANK_CLIENT_ID:-}"
+      PAGBANK_CLIENT_SECRET: "${PAGBANK_CLIENT_SECRET:-}"
+      PAGBANK_ACCESS_TOKEN: "${PAGBANK_ACCESS_TOKEN:-}"
+      PAGBANK_SECRET_KEY: "${PAGBANK_SECRET_KEY:-}"
+      PAGBANK_APP_ID: "${PAGBANK_APP_ID:-}"
+      PAGBANK_APP_KEY: "${PAGBANK_APP_KEY:-}"
+      PAGBANK_API_VERSION: "${PAGBANK_API_VERSION:-2021-03-22}"
+      PAGBANK_HOST: "${PAGBANK_HOST:-}"
+      PAGBANK_CHANNEL: "${PAGBANK_CHANNEL:-}"
+      PAGBANK_KEY_STORE: "${PAGBANK_KEY_STORE:-}"
+      PAGBANK_KEY_STORE_PASSWORD: "${PAGBANK_KEY_STORE_PASSWORD:-}"
+      PAGBANK_CONNECT_TIMEOUT: "${PAGBANK_CONNECT_TIMEOUT:-5s}"
+      PAGBANK_READ_TIMEOUT: "${PAGBANK_READ_TIMEOUT:-30s}"
+      PAGBANK_ALLOW_SENSITIVE_CARD_DATA: "${PAGBANK_ALLOW_SENSITIVE_CARD_DATA:-false}"
+      PAGBANK_BRAZIL_ENABLED: "${PAGBANK_BRAZIL_ENABLED:-false}"
       SPRING_PROFILES_ACTIVE: local
       DB_URL: jdbc:postgresql://postgres:5432/connector_pagbank
       DB_USER: connector_pagbank
@@ -862,6 +1016,28 @@ services:
         MODULE: connector-safrapay
       target: spring-service
     environment:
+      SAFRAPAY_ENABLED: "${SAFRAPAY_ENABLED:-false}"
+      SAFRAPAY_TENANT_ID: "${SAFRAPAY_TENANT_ID:-}"
+      SAFRAPAY_BASE_URL: "${SAFRAPAY_BASE_URL:-https://payment-hml.safrapay.com.br}"
+      SAFRAPAY_QUERY_URL: "${SAFRAPAY_QUERY_URL:-https://payment-hml.safrapay.com.br}"
+      SAFRAPAY_TOKEN_URL: "${SAFRAPAY_TOKEN_URL:-https://payment-hml.safrapay.com.br/v2/merchant/auth}"
+      SAFRAPAY_MERCHANT_ID: "${SAFRAPAY_MERCHANT_ID:-}"
+      SAFRAPAY_MERCHANT_KEY: "${SAFRAPAY_MERCHANT_KEY:-}"
+      SAFRAPAY_CLIENT_ID: "${SAFRAPAY_CLIENT_ID:-}"
+      SAFRAPAY_CLIENT_SECRET: "${SAFRAPAY_CLIENT_SECRET:-}"
+      SAFRAPAY_ACCESS_TOKEN: "${SAFRAPAY_ACCESS_TOKEN:-}"
+      SAFRAPAY_SECRET_KEY: "${SAFRAPAY_SECRET_KEY:-}"
+      SAFRAPAY_APP_ID: "${SAFRAPAY_APP_ID:-}"
+      SAFRAPAY_APP_KEY: "${SAFRAPAY_APP_KEY:-}"
+      SAFRAPAY_API_VERSION: "${SAFRAPAY_API_VERSION:-2021-03-22}"
+      SAFRAPAY_HOST: "${SAFRAPAY_HOST:-}"
+      SAFRAPAY_CHANNEL: "${SAFRAPAY_CHANNEL:-}"
+      SAFRAPAY_KEY_STORE: "${SAFRAPAY_KEY_STORE:-}"
+      SAFRAPAY_KEY_STORE_PASSWORD: "${SAFRAPAY_KEY_STORE_PASSWORD:-}"
+      SAFRAPAY_CONNECT_TIMEOUT: "${SAFRAPAY_CONNECT_TIMEOUT:-5s}"
+      SAFRAPAY_READ_TIMEOUT: "${SAFRAPAY_READ_TIMEOUT:-30s}"
+      SAFRAPAY_ALLOW_SENSITIVE_CARD_DATA: "${SAFRAPAY_ALLOW_SENSITIVE_CARD_DATA:-false}"
+      SAFRAPAY_BRAZIL_ENABLED: "${SAFRAPAY_BRAZIL_ENABLED:-false}"
       SPRING_PROFILES_ACTIVE: local
       DB_URL: jdbc:postgresql://postgres:5432/connector_safrapay
       DB_USER: connector_safrapay

@@ -1,0 +1,14 @@
+{
+    "operationId": "22222222-2222-2222-2222-222222222222",
+    "payload": {
+        "order_id": "order-100",
+        "merchant_usn": "100",
+        "amount": "1000",
+        "authorizer_id": "2",
+        "installments": "1",
+        "installment_type": "4",
+        "card": {
+            "token": "TOKEN_CARAT"
+        }
+    }
+}

@@ -1,0 +1,27 @@
+# Configuração exclusiva desta adquirente. Não colocar segredos neste arquivo.
+# Ativar somente após configurar o estabelecimento, credenciais e homologar o contrato.
+inpay:
+  provider:
+    name: cielo
+    enabled: ${CIELO_ENABLED:false}
+    tenant-id: ${CIELO_TENANT_ID:}
+    base-url: ${CIELO_BASE_URL:https://apisandbox.cieloecommerce.cielo.com.br}
+    query-url: ${CIELO_QUERY_URL:https://apiquerysandbox.cieloecommerce.cielo.com.br}
+    token-url: ${CIELO_TOKEN_URL:}
+    merchant-id: ${CIELO_MERCHANT_ID:}
+    merchant-key: ${CIELO_MERCHANT_KEY:}
+    client-id: ${CIELO_CLIENT_ID:}
+    client-secret: ${CIELO_CLIENT_SECRET:}
+    access-token: ${CIELO_ACCESS_TOKEN:}
+    secret-key: ${CIELO_SECRET_KEY:}
+    app-id: ${CIELO_APP_ID:}
+    app-key: ${CIELO_APP_KEY:}
+    api-version: ${CIELO_API_VERSION:2021-03-22}
+    host: ${CIELO_HOST:}
+    channel: ${CIELO_CHANNEL:}
+    key-store: ${CIELO_KEY_STORE:}
+    key-store-password: ${CIELO_KEY_STORE_PASSWORD:}
+    connect-timeout: ${CIELO_CONNECT_TIMEOUT:5s}
+    read-timeout: ${CIELO_READ_TIMEOUT:30s}
+    allow-sensitive-card-data: ${CIELO_ALLOW_SENSITIVE_CARD_DATA:false}
+    brazil-enabled: ${CIELO_BRAZIL_ENABLED:false}

@@ -1,0 +1,16 @@
+{
+    "operationId": "22222222-2222-2222-2222-222222222222",
+    "payload": {
+        "reference": "order-100",
+        "kind": "credit",
+        "amount": 1000,
+        "capture": false,
+        "installments": 1,
+        "cardNumber": "NETWORK_TOKEN_DPAN",
+        "expirationMonth": 12,
+        "expirationYear": 2030,
+        "tokenCryptogram": "NETWORK_CRYPTOGRAM",
+        "storageCard": "1",
+        "cardholderName": "Cliente de teste"
+    }
+}

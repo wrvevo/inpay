@@ -1,0 +1,19 @@
+{
+    "operationId": "22222222-2222-2222-2222-222222222222",
+    "payload": {
+        "MerchantOrderId": "order-100",
+        "Customer": {
+            "Name": "Cliente de teste"
+        },
+        "Payment": {
+            "Type": "CreditCard",
+            "Amount": 1000,
+            "Installments": 1,
+            "Capture": false,
+            "CreditCard": {
+                "CardToken": "TOKEN_CIELO",
+                "Brand": "Visa"
+            }
+        }
+    }
+}

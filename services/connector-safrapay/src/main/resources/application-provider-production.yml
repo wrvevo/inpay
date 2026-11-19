@@ -1,0 +1,6 @@
+# Ativar juntamente com aws; exige credenciais do ambiente de produção.
+inpay:
+  provider:
+    base-url: ${SAFRAPAY_BASE_URL:https://payment.safrapay.com.br}
+    query-url: ${SAFRAPAY_QUERY_URL:https://payment.safrapay.com.br}
+    token-url: ${SAFRAPAY_TOKEN_URL:https://payment.safrapay.com.br/v2/merchant/auth}

@@ -1,0 +1,7 @@
+{
+  "Payment": {
+    "PaymentId": "pay-100",
+    "Status": 1,
+    "ReturnCode": "4"
+  }
+}

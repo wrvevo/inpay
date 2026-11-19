@@ -1,4 +1,6 @@
 spring:
+  config:
+    import: classpath:provider.yml
   application:
     name: connector-stone
   profiles:

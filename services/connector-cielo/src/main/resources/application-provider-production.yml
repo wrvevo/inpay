@@ -1,0 +1,5 @@
+# Ativar juntamente com aws; exige credenciais do ambiente de produção.
+inpay:
+  provider:
+    base-url: ${CIELO_BASE_URL:https://api.cieloecommerce.cielo.com.br}
+    query-url: ${CIELO_QUERY_URL:https://apiquery.cieloecommerce.cielo.com.br}

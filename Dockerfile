@@ -21,4 +21,4 @@ COPY --from=build /build/services/${MODULE}/target/${MODULE}-0.2.0-SNAPSHOT.jar 
 COPY --from=build /otel/opentelemetry-javaagent-2.22.0.jar /app/otel.jar
 COPY --from=build /health /app/health
 USER inpay
-ENTRYPOINT ["java", "-javaagent:/app/otel.jar", "-jar", "/app/app.jar"]
+ENTRYPOINT ["java", "-Djdk.httpclient.allowRestrictedHeaders=host", "-javaagent:/app/otel.jar", "-jar", "/app/app.jar"]

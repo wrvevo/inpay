@@ -1,0 +1,27 @@
+# Configuração exclusiva desta adquirente. Não colocar segredos neste arquivo.
+# Ativar somente após configurar o estabelecimento, credenciais e homologar o contrato.
+inpay:
+  provider:
+    name: stone
+    enabled: ${STONE_ENABLED:false}
+    tenant-id: ${STONE_TENANT_ID:}
+    base-url: ${STONE_BASE_URL:https://payments.stone.com.br}
+    query-url: ${STONE_QUERY_URL:https://payments.stone.com.br}
+    token-url: ${STONE_TOKEN_URL:}
+    merchant-id: ${STONE_MERCHANT_ID:}
+    merchant-key: ${STONE_MERCHANT_KEY:}
+    client-id: ${STONE_CLIENT_ID:}
+    client-secret: ${STONE_CLIENT_SECRET:}
+    access-token: ${STONE_ACCESS_TOKEN:}
+    secret-key: ${STONE_SECRET_KEY:}
+    app-id: ${STONE_APP_ID:}
+    app-key: ${STONE_APP_KEY:}
+    api-version: ${STONE_API_VERSION:2021-03-22}
+    host: ${STONE_HOST:sdx-ecommerce-payments.stone.com.br}
+    channel: ${STONE_CHANNEL:}
+    key-store: ${STONE_KEY_STORE:}
+    key-store-password: ${STONE_KEY_STORE_PASSWORD:}
+    connect-timeout: ${STONE_CONNECT_TIMEOUT:5s}
+    read-timeout: ${STONE_READ_TIMEOUT:30s}
+    allow-sensitive-card-data: ${STONE_ALLOW_SENSITIVE_CARD_DATA:false}
+    brazil-enabled: ${STONE_BRAZIL_ENABLED:false}

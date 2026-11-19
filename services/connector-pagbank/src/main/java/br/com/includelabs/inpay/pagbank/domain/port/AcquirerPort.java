@@ -10,7 +10,7 @@ public interface AcquirerPort {
 
     /**
      * Encaminha a autorização ao adaptador selecionado; o perfil local é simulado e o adaptador
-     * real permanece desabilitado.
+     * externo utiliza o contrato nativo e exige configuração explícita.
      *
      * @param request dados de entrada da operação, sem dados sensíveis de cartão
      * @return resultado definido pelo contrato; exceções interrompem a operação sem anunciar

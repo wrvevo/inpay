@@ -1,0 +1,27 @@
+# Configuração exclusiva desta adquirente. Não colocar segredos neste arquivo.
+# Ativar somente após configurar o estabelecimento, credenciais e homologar o contrato.
+inpay:
+  provider:
+    name: global-payments
+    enabled: ${GLOBAL_PAYMENTS_ENABLED:false}
+    tenant-id: ${GLOBAL_PAYMENTS_TENANT_ID:}
+    base-url: ${GLOBAL_PAYMENTS_BASE_URL:https://apis.sandbox.globalpay.com/ucp}
+    query-url: ${GLOBAL_PAYMENTS_QUERY_URL:https://apis.sandbox.globalpay.com/ucp}
+    token-url: ${GLOBAL_PAYMENTS_TOKEN_URL:https://apis.sandbox.globalpay.com/ucp/accesstoken}
+    merchant-id: ${GLOBAL_PAYMENTS_MERCHANT_ID:}
+    merchant-key: ${GLOBAL_PAYMENTS_MERCHANT_KEY:}
+    client-id: ${GLOBAL_PAYMENTS_CLIENT_ID:}
+    client-secret: ${GLOBAL_PAYMENTS_CLIENT_SECRET:}
+    access-token: ${GLOBAL_PAYMENTS_ACCESS_TOKEN:}
+    secret-key: ${GLOBAL_PAYMENTS_SECRET_KEY:}
+    app-id: ${GLOBAL_PAYMENTS_APP_ID:}
+    app-key: ${GLOBAL_PAYMENTS_APP_KEY:}
+    api-version: ${GLOBAL_PAYMENTS_API_VERSION:2021-03-22}
+    host: ${GLOBAL_PAYMENTS_HOST:}
+    channel: ${GLOBAL_PAYMENTS_CHANNEL:}
+    key-store: ${GLOBAL_PAYMENTS_KEY_STORE:}
+    key-store-password: ${GLOBAL_PAYMENTS_KEY_STORE_PASSWORD:}
+    connect-timeout: ${GLOBAL_PAYMENTS_CONNECT_TIMEOUT:5s}
+    read-timeout: ${GLOBAL_PAYMENTS_READ_TIMEOUT:30s}
+    allow-sensitive-card-data: ${GLOBAL_PAYMENTS_ALLOW_SENSITIVE_CARD_DATA:false}
+    brazil-enabled: ${GLOBAL_PAYMENTS_BRAZIL_ENABLED:false}

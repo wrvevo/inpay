@@ -1,0 +1,16 @@
+{
+    "operationId": "22222222-2222-2222-2222-222222222222",
+    "payload": {
+        "account_name": "transaction_processing",
+        "type": "SALE",
+        "channel": "CNP",
+        "country": "BR",
+        "amount": "1000",
+        "currency": "BRL",
+        "reference": "order-100",
+        "capture_mode": "LATER",
+        "payment_method": {
+            "id": "PMT_PROVIDER_TOKEN"
+        }
+    }
+}

@@ -1,0 +1,11 @@
+{
+  "charge": {
+    "id": "pay-100",
+    "chargeStatus": "Authorized",
+    "transactions": [
+      {
+        "authorizationResponseCode": "00"
+      }
+    ]
+  }
+}

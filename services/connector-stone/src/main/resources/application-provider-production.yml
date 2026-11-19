@@ -1,0 +1,6 @@
+# Ativar juntamente com aws; exige credenciais do ambiente de produção.
+inpay:
+  provider:
+    base-url: ${STONE_BASE_URL:https://payments.stone.com.br}
+    query-url: ${STONE_QUERY_URL:https://payments.stone.com.br}
+    host: ${STONE_HOST:ecommerce-payments.stone.com.br}

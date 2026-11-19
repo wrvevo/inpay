@@ -1,0 +1,5 @@
+# Ativar juntamente com aws; exige credenciais do ambiente de produção.
+inpay:
+  provider:
+    base-url: ${PAGBANK_BASE_URL:https://api.pagseguro.com}
+    query-url: ${PAGBANK_QUERY_URL:https://api.pagseguro.com}
