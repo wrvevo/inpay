@@ -6,6 +6,15 @@ O projeto foi refatorado para facilitar leitura e manutenção por desenvolvedor
 
 **Estágio real:** estrutura de desenvolvimento com componentes funcionais. O Core registra pagamentos em CREATED e publica PaymentCreated, mas ainda não executa a saga financeira completa. Os connectors agora incluem chamadas HTTP externas de autorização, captura, cancelamento/estorno e consulta, desabilitadas por padrão e ainda dependentes de homologação com suas credenciais. O perfil local preserva os simuladores. Consulte [CONNECTORS.md](docs/CONNECTORS.md). O ciclo de crédito Cielo foi exercitado em sandbox pelas APIs internas do InPay; cobertura e limitações estão em [CIELO_COLLECTION_COVERAGE.md](docs/CIELO_COLLECTION_COVERAGE.md).
 
+## Marketplace independente
+
+O serviço opcional `marketplace-service` (8110) adiciona contas de crédito, saldos de repasses,
+vouchers, pagamento combinado com até duas fontes, aprovação independente, journal e conciliação.
+Possui banco, APIs, escopos e tópico próprios. O gateway continua atendendo os demais clientes.
+Os painéis **Créditos e saldos** e **Meu crédito e compras** consomem as novas APIs.
+Fulfillment é simulado somente em local; Nuuvem/gateway reais permanecem bloqueados até homologação.
+Consulte [arquitetura, execução, controles e limites](docs/MARKETPLACE.md).
+
 ## Painel gerencial
 
 O frontend em `frontend/` oferece visão geral, transações, links, financeiro, antifraude, clientes, recebedores, assinaturas, split, contestações e configuração assistida dos oito connectors.

@@ -36,3 +36,5 @@ CREATE USER connector_pagbank WITH PASSWORD 'local-only';
 CREATE DATABASE connector_pagbank OWNER connector_pagbank;
 CREATE USER connector_safrapay WITH PASSWORD 'local-only';
 CREATE DATABASE connector_safrapay OWNER connector_safrapay;
+CREATE USER marketplace_service WITH PASSWORD 'local-only';
+CREATE DATABASE marketplace_service OWNER marketplace_service;

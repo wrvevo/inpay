@@ -101,3 +101,10 @@ Consultadas em 19/11/2026:
 - [Cielo: ambientes e autenticação](https://docs.cielo.com.br/ecommerce-cielo/reference/sobre-a-api).
 - [PagBank: Orders](https://developer.pagbank.com.br/reference/criar-pedido).
 - Demais referências oficiais estão no catálogo de provedores e em [CONNECTORS.md](../docs/CONNECTORS.md).
+
+## Marketplace e portal do titular
+
+As rotas `#marketplace` e `#my-credit` exibem administração e portal de compras, respectivamente.
+No modo conectado, `MARKETPLACE_URL` aponta para o serviço isolado na porta 8110. APIs do gateway
+não são usadas para armazenar saldos. Consulte `docs/MARKETPLACE.md` na raiz para seed local,
+Cognito, dupla aprovação, estados de pedidos e limitações de integração real.

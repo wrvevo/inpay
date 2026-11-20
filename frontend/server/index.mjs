@@ -57,7 +57,16 @@ export function createPanelServer(env = process.env, fetchUpstream = fetch) {
           return json(response, 400, { error: "Unexpected query" });
         const target = resolveRoute(request.method, url.pathname, env);
         if (!target) return json(response, 404, { error: "Route unavailable" });
-        const authorization = upstreamAuthorization(request.headers, env);
+        let authorization = upstreamAuthorization(request.headers, env);
+        // Fixed fixture identity for the LOCAL customer portal only. JWTs are never replaced.
+        if (
+          !request.headers.authorization &&
+          env.PANEL_AUTH_MODE === "local" &&
+          env.LOCAL_PASSWORD &&
+          /^\/api\/marketplace\/me(?:\/|$)/.test(url.pathname)
+        ) {
+          authorization = `Basic ${Buffer.from(`customer:${env.LOCAL_PASSWORD}`).toString("base64")}`;
+        }
         if (!authorization)
           return json(response, 401, { error: "Authentication required" });
         const tenant = request.headers["x-merchant-id"];

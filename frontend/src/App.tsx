@@ -1,5 +1,6 @@
 import { useEffect, useState } from "react";
 import {
+  ShoppingBag,
   Activity,
   ArrowUpRight,
   Building2,
@@ -21,6 +22,7 @@ import {
   X,
   PanelLeftClose,
 } from "lucide-react";
+import Marketplace from "./pages/Marketplace";
 import Overview from "./pages/Overview";
 import Transactions from "./pages/Transactions";
 import Links from "./pages/Links";
@@ -37,6 +39,13 @@ import { Developers, Settings } from "./pages/Settings";
 import { Modal } from "./components/UI";
 import type { Session } from "./api";
 const navigation = [
+  {
+    group: "MARKETPLACE",
+    items: [
+      ["marketplace", "Créditos e saldos", Wallet],
+      ["my-credit", "Meu crédito e compras", ShoppingBag],
+    ],
+  },
   {
     group: "VISÃO DO NEGÓCIO",
     items: [
@@ -101,11 +110,26 @@ export default function App() {
     setMenu(false);
     window.scrollTo(0, 0);
   }
+  const visibleNavigation =
+    page === "my-credit"
+      ? [
+          {
+            group: "MINHA CONTA",
+            items: [
+              ["my-credit", "Meu crédito e compras", ShoppingBag],
+              ["settings", "Acesso e configurações", SettingsIcon],
+            ],
+          },
+        ]
+      : navigation;
   const activeName = navigation
     .flatMap((g) => g.items)
     .find((i) => i[0] === page)?.[1];
   let content;
-  if (page === "overview")
+  if (page === "marketplace") content = <Marketplace session={session} />;
+  else if (page === "my-credit")
+    content = <Marketplace session={session} customer />;
+  else if (page === "overview")
     content = <Overview session={session} navigate={navigate} />;
   else if (page === "transactions")
     content = <Transactions session={session} />;
@@ -163,7 +187,7 @@ export default function App() {
           <ChevronDown size={15} />
         </button>
         <nav aria-label="Menu principal">
-          {navigation.map((group) => (
+          {visibleNavigation.map((group) => (
             <div className="nav-group" key={group.group}>
               <span>{group.group}</span>
               {group.items.map(([id, label, Icon]) => {
@@ -200,7 +224,9 @@ export default function App() {
             <div>
               <strong>
                 {session.mode === "demo"
-                  ? "Administrador demo"
+                  ? page === "my-credit"
+                    ? "Cliente demo"
+                    : "Administrador demo"
                   : "Sessão técnica"}
               </strong>
               <small>Include Labs · InPay</small>
@@ -234,7 +260,7 @@ export default function App() {
               />
               {search && (
                 <div className="search-results">
-                  {navigation
+                  {visibleNavigation
                     .flatMap((g) => g.items)
                     .filter((i) =>
                       String(i[1]).toLowerCase().includes(search.toLowerCase()),
@@ -281,7 +307,7 @@ export default function App() {
         </div>
         <main
           id="main-content"
-          key={`${page}:${session.mode}:${session.tenant}`}
+          key={`${page}:${session.mode}:${session.tenant}:${session.token}`}
           tabIndex={-1}
         >
           {content}

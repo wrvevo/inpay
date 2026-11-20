@@ -12,3 +12,13 @@ variable "m2m_scopes" {
     connector-cielo         = ["tokens/resolve"]
   }
 }
+
+variable "marketplace_portals" {
+  description = "Portais OAuth opcionais. Definir URLs HTTPS reais antes de aplicar; PKCE no cliente."
+  type = map(object({ callbacks = list(string), logout_urls = list(string) }))
+  default = {}
+  validation {
+    condition = alltrue([for key, portal in var.marketplace_portals : contains(["admin", "customer"], key) && length(portal.callbacks) > 0 && alltrue([for url in concat(portal.callbacks, portal.logout_urls) : startswith(url, "https://")])])
+    error_message = "Use admin/customer e URLs HTTPS sem curingas operacionais."
+  }
+}

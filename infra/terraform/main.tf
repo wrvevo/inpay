@@ -15,6 +15,7 @@ resource "aws_cognito_user_pool_domain" "m2m" {
 locals {
   scopes = {
     payments         = ["create", "read", "capture", "void", "refund"]
+    marketplace      = ["admin", "approve", "operate", "customer"]
     links            = ["write", "read"]
     fraud            = ["evaluate", "read"]
     routing          = ["select", "read"]
@@ -186,4 +187,22 @@ data "aws_iam_policy_document" "kms" {
       values   = ["arn:aws:logs:${var.region}:${data.aws_caller_identity.current.account_id}:log-group:/ecs/${var.project}"]
     }
   }
+}
+
+# Portais de usuário não utilizam client_credentials ou segredo no navegador.
+resource "aws_cognito_user_pool_client" "marketplace_portal" {
+  for_each = var.marketplace_portals
+  name = "${var.project}-marketplace-${each.key}"
+  user_pool_id = aws_cognito_user_pool.m2m.id
+  generate_secret = false
+  allowed_oauth_flows_user_pool_client = true
+  allowed_oauth_flows = ["code"]
+  allowed_oauth_scopes = each.key == "customer" ? ["openid", "marketplace/customer"] : ["openid", "marketplace/admin", "marketplace/approve", "marketplace/operate"]
+  callback_urls = each.value.callbacks
+  logout_urls = each.value.logout_urls
+  supported_identity_providers = ["COGNITO"]
+  prevent_user_existence_errors = "ENABLED"
+  access_token_validity = 5
+  token_validity_units { access_token = "minutes" }
+  depends_on = [aws_cognito_resource_server.apis]
 }

@@ -1,0 +1,6 @@
+# Produto opcional por organização. Separado dos tenants habilitados no gateway.
+# Sem tenants configurados, o serviço nega acesso fora do perfil local.
+# Conectores financeiros reais NÃO estão habilitados: não inventar URL/credenciais Nuuvem.
+inpay:
+  marketplace:
+    enabled-tenants: ${MARKETPLACE_ENABLED_TENANTS:}
