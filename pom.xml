@@ -18,30 +18,16 @@
         <springdoc.version>3.2.0</springdoc.version>
     </properties>
     <modules>
+        <module>libs/platform-resources</module>
+        <module>modules/gateway</module>
+        <module>modules/accounts</module>
+        <module>modules/marketplace</module>
+        <module>modules/credits</module>
+
         <module>libs/connector-runtime</module>
         <module>libs/contracts</module>
         <module>libs/platform-security</module>
         <module>libs/platform-messaging</module>
-        <module>services/merchant-service</module>
-        <module>services/marketplace-service</module>
-        <module>services/payment-links-service</module>
-        <module>services/checkout-service</module>
-        <module>services/payment-core-service</module>
-        <module>services/routing-service</module>
-        <module>services/token-service</module>
-        <module>services/fraud-service</module>
-        <module>services/webhook-ingress-service</module>
-        <module>services/reconciliation-service</module>
-        <module>services/notification-service</module>
-        <module>services/transaction-query-service</module>
-        <module>services/connector-cielo</module>
-        <module>services/connector-rede</module>
-        <module>services/connector-getnet</module>
-        <module>services/connector-stone</module>
-        <module>services/connector-bin</module>
-        <module>services/connector-global-payments</module>
-        <module>services/connector-pagbank</module>
-        <module>services/connector-safrapay</module>
         <module>lambdas/webhook-forwarder</module>
         <module>lambdas/reconciliation-trigger</module>
         <module>lambdas/link-expiration-trigger</module>

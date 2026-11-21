@@ -1,6 +1,6 @@
 spring:
   config:
-    import: classpath:marketplace.yml
+    import: classpath:module.yml
   application:
     name: marketplace-service
   profiles:
@@ -30,7 +30,7 @@ spring:
     listener:
       ack-mode: record
 server:
-  port: 8110
+  port: 8112
 management:
   endpoints:
     web:

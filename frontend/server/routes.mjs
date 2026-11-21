@@ -3,19 +3,33 @@ const uuid =
 const rules = [
   [
     "GET",
-    /^\/api\/marketplace\/(admin|me)$/,
+    /^\/api\/commerce\/(recipients|split-plans|settlements)$/,
     "MARKETPLACE_URL",
-    "http://127.0.0.1:8110",
+    "http://127.0.0.1:8112",
     (path) => `/marketplace/v1/${path}`,
+  ],
+  [
+    "GET",
+    /^\/api\/accounts\/([A-Za-z0-9_-]{1,128})\/balance$/,
+    "ACCOUNTS_URL",
+    "http://127.0.0.1:8111",
+    (id) => `/accounts/v1/accounts/${id}/balance`,
+  ],
+  [
+    "GET",
+    /^\/api\/credits\/(admin|me)$/,
+    "CREDITS_URL",
+    "http://127.0.0.1:8110",
+    (path) => `/credits/v1/${path}`,
   ],
   [
     "POST",
     new RegExp(
-      `^/api/marketplace/(admin/(?:accounts|products|adjustments|accounts/block|adjustments/${uuid}/approve|orders/${uuid}/(?:process|reconcile|refund))|me/(?:orders|orders/${uuid}/cancel))$`,
+      `^/api/credits/(admin/(?:accounts|products|adjustments|accounts/block|adjustments/${uuid}/approve|orders/${uuid}/(?:process|reconcile|refund))|me/(?:orders|orders/${uuid}/cancel))$`,
     ),
-    "MARKETPLACE_URL",
+    "CREDITS_URL",
     "http://127.0.0.1:8110",
-    (path) => `/marketplace/v1/${path}`,
+    (path) => `/credits/v1/${path}`,
   ],
   [
     "GET",

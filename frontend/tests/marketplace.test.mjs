@@ -5,19 +5,19 @@ import { resolveRoute } from "../server/routes.mjs";
 import { createPanelServer } from "../server/index.mjs";
 const env = { PANEL_AUTH_MODE: "local", LOCAL_PASSWORD: "test-only" };
 const id = "11111111-1111-1111-1111-111111111111";
-test("marketplace allowlist is separate from financial provider routes", () => {
+test("credits allowlist is separate from financial provider routes", () => {
   assert.equal(
-    resolveRoute("POST", `/api/marketplace/admin/orders/${id}/reconcile`, env),
-    `http://127.0.0.1:8110/marketplace/v1/admin/orders/${id}/reconcile`,
+    resolveRoute("POST", `/api/credits/admin/orders/${id}/reconcile`, env),
+    `http://127.0.0.1:8110/credits/v1/admin/orders/${id}/reconcile`,
   );
   assert.equal(
-    resolveRoute("GET", "/api/marketplace/me", env),
-    "http://127.0.0.1:8110/marketplace/v1/me",
+    resolveRoute("GET", "/api/credits/me", env),
+    "http://127.0.0.1:8110/credits/v1/me",
   );
   for (const path of [
-    "/api/marketplace/admin/execute",
-    "/api/marketplace/me/../admin",
-    "/api/marketplace/providers/cielo",
+    "/api/credits/admin/execute",
+    "/api/credits/me/../admin",
+    "/api/credits/providers/cielo",
   ])
     assert.equal(resolveRoute("POST", path, env), null);
 });
@@ -31,9 +31,9 @@ test("local customer bridge never uses admin identity or overrides supplied JWT"
   await once(server, "listening");
   const base = `http://127.0.0.1:${server.address().port}`;
   try {
-    await fetch(base + "/api/marketplace/me");
-    await fetch(base + "/api/marketplace/admin");
-    await fetch(base + "/api/marketplace/me", {
+    await fetch(base + "/api/credits/me");
+    await fetch(base + "/api/credits/admin");
+    await fetch(base + "/api/credits/me", {
       headers: { Authorization: "Bearer supplied" },
     });
     assert.equal(

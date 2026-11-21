@@ -38,3 +38,8 @@ CREATE USER connector_safrapay WITH PASSWORD 'local-only';
 CREATE DATABASE connector_safrapay OWNER connector_safrapay;
 CREATE USER marketplace_service WITH PASSWORD 'local-only';
 CREATE DATABASE marketplace_service OWNER marketplace_service;
+
+CREATE USER accounts_service WITH PASSWORD 'local-only';
+CREATE DATABASE accounts_service OWNER accounts_service;
+CREATE USER commerce_marketplace WITH PASSWORD 'local-only';
+CREATE DATABASE commerce_marketplace OWNER commerce_marketplace;

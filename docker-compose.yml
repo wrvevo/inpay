@@ -12,7 +12,9 @@ services:
       LINKS_URL: http://payment-links-service:8082
       QUERY_URL: http://transaction-query-service:8091
       FRAUD_URL: http://fraud-service:8087
-      MARKETPLACE_URL: http://marketplace-service:8110
+      CREDITS_URL: http://credits-service:8110
+      MARKETPLACE_URL: http://marketplace-service:8112
+      ACCOUNTS_URL: http://accounts-service:8111
     restart: unless-stopped
   postgres:
     image: postgres:17.6
@@ -1168,11 +1170,11 @@ services:
     depends_on:
       payment-links-service:
         condition: service_healthy
-  marketplace-service:
+  credits-service:
     build:
       context: .
       args:
-        MODULE: marketplace-service
+        MODULE: credits-service
       target: spring-service
     environment:
       SPRING_PROFILES_ACTIVE: local
@@ -1182,15 +1184,103 @@ services:
       KAFKA_BOOTSTRAP_SERVERS: kafka:19092
       LOCAL_PASSWORD: ${LOCAL_PASSWORD:-local-only-change-me}
       SERVER_PORT: '8110'
+      OTEL_SERVICE_NAME: credits-service
+      OTEL_EXPORTER_OTLP_ENDPOINT: http://otel-collector:4318
+      OTEL_EXPORTER_OTLP_PROTOCOL: http/protobuf
+      OTEL_METRICS_EXPORTER: none
+      OTEL_LOGS_EXPORTER: none
+      JAVA_TOOL_OPTIONS: -XX:MaxRAMPercentage=60 -XX:InitialRAMPercentage=15
+      CREDITS_ENABLED_TENANTS: ${CREDITS_ENABLED_TENANTS:-11111111-1111-1111-1111-111111111111}
+    ports:
+    - 127.0.0.1:8110:8110
+    depends_on:
+      postgres:
+        condition: service_healthy
+      kafka:
+        condition: service_healthy
+      kafka-init:
+        condition: service_completed_successfully
+    mem_limit: ${SERVICE_MEMORY_LIMIT:-512m}
+    restart: unless-stopped
+    image: inpay/credits-service:0.2.0
+    healthcheck:
+      test:
+      - CMD-SHELL
+      - java -cp /app/health Healthcheck http://localhost:$$SERVER_PORT/actuator/health
+      interval: 30s
+      timeout: 10s
+      start_period: 120s
+      retries: 10
+    stop_grace_period: 30s
+    security_opt:
+    - no-new-privileges:true
+
+  accounts-service:
+    build:
+      context: .
+      args:
+        MODULE: accounts-service
+      target: spring-service
+    environment:
+      SPRING_PROFILES_ACTIVE: local
+      DB_URL: jdbc:postgresql://postgres:5432/accounts_service
+      DB_USER: accounts_service
+      DB_PASSWORD: local-only
+      KAFKA_BOOTSTRAP_SERVERS: kafka:19092
+      LOCAL_PASSWORD: ${LOCAL_PASSWORD:-local-only-change-me}
+      SERVER_PORT: '8111'
+      OTEL_SERVICE_NAME: accounts-service
+      OTEL_EXPORTER_OTLP_ENDPOINT: http://otel-collector:4318
+      OTEL_EXPORTER_OTLP_PROTOCOL: http/protobuf
+      OTEL_METRICS_EXPORTER: none
+      OTEL_LOGS_EXPORTER: none
+      JAVA_TOOL_OPTIONS: -XX:MaxRAMPercentage=60 -XX:InitialRAMPercentage=15
+    ports:
+    - 127.0.0.1:8111:8111
+    depends_on:
+      postgres:
+        condition: service_healthy
+      kafka:
+        condition: service_healthy
+      kafka-init:
+        condition: service_completed_successfully
+    mem_limit: ${SERVICE_MEMORY_LIMIT:-512m}
+    restart: unless-stopped
+    image: inpay/accounts-service:0.2.0
+    healthcheck:
+      test:
+      - CMD-SHELL
+      - java -cp /app/health Healthcheck http://localhost:$$SERVER_PORT/actuator/health
+      interval: 30s
+      timeout: 10s
+      start_period: 120s
+      retries: 10
+    stop_grace_period: 30s
+    security_opt:
+    - no-new-privileges:true
+
+  marketplace-service:
+    build:
+      context: .
+      args:
+        MODULE: marketplace-service
+      target: spring-service
+    environment:
+      SPRING_PROFILES_ACTIVE: local
+      DB_URL: jdbc:postgresql://postgres:5432/commerce_marketplace
+      DB_USER: commerce_marketplace
+      DB_PASSWORD: local-only
+      KAFKA_BOOTSTRAP_SERVERS: kafka:19092
+      LOCAL_PASSWORD: ${LOCAL_PASSWORD:-local-only-change-me}
+      SERVER_PORT: '8112'
       OTEL_SERVICE_NAME: marketplace-service
       OTEL_EXPORTER_OTLP_ENDPOINT: http://otel-collector:4318
       OTEL_EXPORTER_OTLP_PROTOCOL: http/protobuf
       OTEL_METRICS_EXPORTER: none
       OTEL_LOGS_EXPORTER: none
       JAVA_TOOL_OPTIONS: -XX:MaxRAMPercentage=60 -XX:InitialRAMPercentage=15
-      MARKETPLACE_ENABLED_TENANTS: ${MARKETPLACE_ENABLED_TENANTS:-11111111-1111-1111-1111-111111111111}
     ports:
-    - 127.0.0.1:8110:8110
+    - 127.0.0.1:8112:8112
     depends_on:
       postgres:
         condition: service_healthy

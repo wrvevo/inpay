@@ -102,9 +102,13 @@ Consultadas em 19/11/2026:
 - [PagBank: Orders](https://developer.pagbank.com.br/reference/criar-pedido).
 - Demais referências oficiais estão no catálogo de provedores e em [CONNECTORS.md](../docs/CONNECTORS.md).
 
-## Marketplace e portal do titular
+## Quatro produtos
 
-As rotas `#marketplace` e `#my-credit` exibem administração e portal de compras, respectivamente.
-No modo conectado, `MARKETPLACE_URL` aponta para o serviço isolado na porta 8110. APIs do gateway
-não são usadas para armazenar saldos. Consulte `docs/MARKETPLACE.md` na raiz para seed local,
-Cognito, dupla aprovação, estados de pedidos e limitações de integração real.
+- Gateway: operação de pagamentos e conectores existentes.
+- Accounts (`#accounts`): consulta de saldo; o parceiro Banking ainda está indisponível.
+- Marketplace (`#commerce`): consulta de vendedores, planos de split e conciliações.
+- Credits (`#credits`, `#my-credit`): gestão de benefícios e portal de resgates.
+
+`CREDITS_URL` usa 8110; `ACCOUNTS_URL`, 8111; `MARKETPLACE_URL`, 8112.
+Os cadastros novos de Accounts/Marketplace estão publicados no Swagger; o painel oferece consultas iniciais.
+Leia [migração e limites reais](../docs/PRODUCT_MODULES.md).

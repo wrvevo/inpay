@@ -10,8 +10,10 @@ import { api, money, type Session } from "../api";
 import { toCents } from "../domain.mjs";
 import { Heading, Notice, Modal, Empty } from "../components/UI";
 
-type Source = "CREDIT" | "BALANCE" | "VOUCHER" | "EXTERNAL";
+type Source = "PROMOTIONAL" | "CREDIT" | "BALANCE" | "VOUCHER" | "EXTERNAL";
 type Account = {
+  promotional?: number;
+  promotionalReserved?: number;
   owner: string;
   creditor: string;
   contract: string;
@@ -71,9 +73,17 @@ type Data = {
   journal: Entry[];
   account?: Account;
 };
-const sources: Source[] = ["CREDIT", "BALANCE", "VOUCHER", "EXTERNAL"];
+const sources: Source[] = [
+  "PROMOTIONAL",
+  "CREDIT",
+  "BALANCE",
+  "VOUCHER",
+  "EXTERNAL",
+];
 const labels: Record<string, string> = {
-  CREDIT: "Crédito aprovado",
+  PROMOTIONAL: "Crédito promocional",
+  PROMOTIONAL_GRANT: "Concessão de benefício",
+  CREDIT: "Crédito contratual legado",
   BALANCE: "Saldo de repasses",
   VOUCHER: "Voucher conciliado",
   EXTERNAL: "Pagamento externo",
@@ -169,10 +179,7 @@ export default function Marketplace({
     setBusy(true);
     setError("");
     try {
-      const result = await api(
-        session,
-        `marketplace/${customer ? "me" : "admin"}`,
-      );
+      const result = await api(session, `credits/${customer ? "me" : "admin"}`);
       setData({
         ...empty,
         ...result,
@@ -198,7 +205,7 @@ export default function Marketplace({
     setError("");
     setMessage("");
     try {
-      await api(session, `marketplace/${path}`, { operationId, ...body });
+      await api(session, `credits/${path}`, { operationId, ...body });
       commandKeys.current.delete(signature);
       setModal("");
       setSelected(null);
@@ -286,6 +293,11 @@ export default function Marketplace({
   const stats = customer
     ? ([
         [
+          "Benefícios disponíveis",
+          sum((a) => (a.promotional ?? 0) - (a.promotionalReserved ?? 0)),
+          ShoppingBag,
+        ],
+        [
           "Crédito disponível",
           sum((a) => a.creditLimit - a.creditUsed - a.creditReserved),
           CreditCard,
@@ -303,6 +315,11 @@ export default function Marketplace({
         ["Crédito utilizado", sum((a) => a.creditUsed), ShieldCheck],
       ] as const)
     : ([
+        [
+          "Benefícios disponíveis",
+          sum((a) => (a.promotional ?? 0) - (a.promotionalReserved ?? 0)),
+          ShoppingBag,
+        ],
         ["Limites aprovados", sum((a) => a.creditLimit), CreditCard],
         ["Crédito utilizado", sum((a) => a.creditUsed), Wallet],
         [
@@ -335,9 +352,7 @@ export default function Marketplace({
     <div className="marketplace-page">
       <Heading
         title={
-          customer
-            ? "Meu crédito e minhas compras"
-            : "Créditos e saldos do marketplace"
+          customer ? "Meu crédito e minhas compras" : "Créditos e benefícios"
         }
         subtitle={
           customer
@@ -356,7 +371,7 @@ export default function Marketplace({
       <Notice>
         {connected
           ? "Em ambiente local, pedidos são simulados e não geram gift cards válidos. Crédito e repasses dependem de evidência e aprovação."
-          : "Prévia com dados fictícios. Ative o modo conectado em Configurações para operar o marketplace local. Estes dados não alteram o gateway."}
+          : "Prévia com dados fictícios. Ative o modo conectado em Configurações para operar Credits local. Estes dados não alteram o gateway."}
       </Notice>
       {error && (
         <p role="alert" className="form-error">
@@ -377,11 +392,7 @@ export default function Marketplace({
           </article>
         ))}
       </div>
-      <div
-        className="mp-tabs"
-        role="tablist"
-        aria-label="Seções do marketplace"
-      >
+      <div className="mp-tabs" role="tablist" aria-label="Seções de Credits">
         {sections.map(([id, label]) => (
           <button
             role="tab"
@@ -675,7 +686,7 @@ export default function Marketplace({
         <section className="mp-section">
           <div className="mp-toolbar">
             <h2>
-              {customer ? "Produtos elegíveis" : "Catálogo do marketplace"}
+              {customer ? "Produtos elegíveis" : "Catálogo de benefícios"}
             </h2>
             {!customer && (
               <button
@@ -860,6 +871,7 @@ export default function Marketplace({
                   Tipo
                   <select name="kind">
                     {[
+                      "PROMOTIONAL_GRANT",
                       "CREDIT_LIMIT",
                       "SETTLED_REPASS",
                       "VERIFIED_VOUCHER",

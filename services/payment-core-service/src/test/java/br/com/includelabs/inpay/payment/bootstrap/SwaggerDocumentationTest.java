@@ -35,12 +35,19 @@ class SwaggerDocumentationTest {
     void publishesInPayContractWithDocumentedEndpoints() throws Exception {
         mockMvc.perform(get("/v3/api-docs"))
                 .andExpect(status().isOk())
-                .andExpect(jsonPath("$.info.title").value("InPay | payment-core-service"))
+                .andExpect(jsonPath("$.info.title").value("INPAY Gateway"))
                 .andExpect(
                         jsonPath("$.paths['/v1/payments'].post.summary")
                                 .value("Registrar pagamento idempotente"))
                 .andExpect(
                         jsonPath("$.paths['/v1/payments/{id}/captures'].post.responses['501']")
+                                .exists())
+                .andExpect(
+                        jsonPath("$.components.schemas.GatewayOrderResponse.properties.charges")
+                                .exists())
+                .andExpect(
+                        jsonPath(
+                                        "$.components.schemas.GatewayChargeResponse.properties.processing_status")
                                 .exists())
                 .andExpect(
                         jsonPath("$.components.securitySchemes.localBasic.scheme").value("basic"));

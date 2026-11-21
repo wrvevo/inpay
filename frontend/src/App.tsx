@@ -22,6 +22,7 @@ import {
   X,
   PanelLeftClose,
 } from "lucide-react";
+import ProductModule from "./pages/ProductModule";
 import Marketplace from "./pages/Marketplace";
 import Overview from "./pages/Overview";
 import Transactions from "./pages/Transactions";
@@ -40,9 +41,17 @@ import { Modal } from "./components/UI";
 import type { Session } from "./api";
 const navigation = [
   {
-    group: "MARKETPLACE",
+    group: "INPAY ACCOUNTS",
+    items: [["accounts", "Contas financeiras", Building2]],
+  },
+  {
+    group: "INPAY MARKETPLACE",
+    items: [["commerce", "Vendedores e repasses", ShoppingBag]],
+  },
+  {
+    group: "INPAY CREDITS",
     items: [
-      ["marketplace", "Créditos e saldos", Wallet],
+      ["credits", "Créditos e benefícios", Wallet],
       ["my-credit", "Meu crédito e compras", ShoppingBag],
     ],
   },
@@ -54,7 +63,7 @@ const navigation = [
     ],
   },
   {
-    group: "OPERAÇÃO",
+    group: "INPAY GATEWAY",
     items: [
       ["transactions", "Transações", CreditCard],
       ["links", "Links de pagamento", Link2],
@@ -126,7 +135,11 @@ export default function App() {
     .flatMap((g) => g.items)
     .find((i) => i[0] === page)?.[1];
   let content;
-  if (page === "marketplace") content = <Marketplace session={session} />;
+  if (page === "accounts")
+    content = <ProductModule product="accounts" session={session} />;
+  else if (page === "commerce")
+    content = <ProductModule product="marketplace" session={session} />;
+  else if (page === "credits") content = <Marketplace session={session} />;
   else if (page === "my-credit")
     content = <Marketplace session={session} customer />;
   else if (page === "overview")

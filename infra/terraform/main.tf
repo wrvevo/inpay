@@ -15,7 +15,9 @@ resource "aws_cognito_user_pool_domain" "m2m" {
 locals {
   scopes = {
     payments         = ["create", "read", "capture", "void", "refund"]
-    marketplace      = ["admin", "approve", "operate", "customer"]
+    credits          = ["admin", "approve", "operate", "customer"]
+    marketplace      = ["read", "write"]
+    accounts         = ["read", "write", "transfer"]
     links            = ["write", "read"]
     fraud            = ["evaluate", "read"]
     routing          = ["select", "read"]
@@ -197,7 +199,7 @@ resource "aws_cognito_user_pool_client" "marketplace_portal" {
   generate_secret = false
   allowed_oauth_flows_user_pool_client = true
   allowed_oauth_flows = ["code"]
-  allowed_oauth_scopes = each.key == "customer" ? ["openid", "marketplace/customer"] : ["openid", "marketplace/admin", "marketplace/approve", "marketplace/operate"]
+  allowed_oauth_scopes = each.key == "customer" ? ["openid", "credits/customer"] : ["openid", "credits/admin", "credits/approve", "credits/operate"]
   callback_urls = each.value.callbacks
   logout_urls = each.value.logout_urls
   supported_identity_providers = ["COGNITO"]

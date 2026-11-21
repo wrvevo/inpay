@@ -6,14 +6,11 @@ O projeto foi refatorado para facilitar leitura e manutenção por desenvolvedor
 
 **Estágio real:** estrutura de desenvolvimento com componentes funcionais. O Core registra pagamentos em CREATED e publica PaymentCreated, mas ainda não executa a saga financeira completa. Os connectors agora incluem chamadas HTTP externas de autorização, captura, cancelamento/estorno e consulta, desabilitadas por padrão e ainda dependentes de homologação com suas credenciais. O perfil local preserva os simuladores. Consulte [CONNECTORS.md](docs/CONNECTORS.md). O ciclo de crédito Cielo foi exercitado em sandbox pelas APIs internas do InPay; cobertura e limitações estão em [CIELO_COLLECTION_COVERAGE.md](docs/CIELO_COLLECTION_COVERAGE.md).
 
-## Marketplace independente
+## Gateway, Accounts, Marketplace e Credits
 
-O serviço opcional `marketplace-service` (8110) adiciona contas de crédito, saldos de repasses,
-vouchers, pagamento combinado com até duas fontes, aprovação independente, journal e conciliação.
-Possui banco, APIs, escopos e tópico próprios. O gateway continua atendendo os demais clientes.
-Os painéis **Créditos e saldos** e **Meu crédito e compras** consomem as novas APIs.
-Fulfillment é simulado somente em local; Nuuvem/gateway reais permanecem bloqueados até homologação.
-Consulte [arquitetura, execução, controles e limites](docs/MARKETPLACE.md).
+Quatro agregadores em `modules/` separam pagamentos, Banking, gestão comercial e benefícios.
+`credits-service` (8110) mantém a gestão anterior; `accounts-service` (8111) e o novo
+`marketplace-service` (8112) têm bancos próprios. Consulte [arquitetura, APIs e migração](docs/PRODUCT_MODULES.md).
 
 ## Painel gerencial
 
@@ -151,3 +148,9 @@ Tokens simulados não substituem tokenização real. O caminho padrão usa token
 Default profile das aplicações é `aws`; somente o Compose local ativa `local`. Cada API mantém seu scope e ownership. Alterar o nome Java não renomeou tabelas, bancos nem tópicos para evitar perda de compatibilidade de dados existentes.
 
 Referências oficiais: [Springdoc](https://springdoc.org/), [Cognito M2M](https://docs.aws.amazon.com/cognito/latest/developerguide/cognito-user-pools-define-resource-servers.html), [Lambda Java em containers](https://docs.aws.amazon.com/lambda/latest/dg/java-image.html).
+
+## Quatro produtos InPay
+
+A organização atual é **Gateway, Accounts, Marketplace e Credits**, com agregadores em `modules/`.
+Veja [arquitetura, APIs, migração e limitações reais](docs/PRODUCT_MODULES.md).
+A gestão de créditos anterior foi movida para `credits-service`; o novo Marketplace usa banco próprio.

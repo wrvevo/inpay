@@ -14,7 +14,8 @@ import org.springframework.scheduling.annotation.EnableScheduling;
             "br.com.includelabs.inpay.payment",
             "br.com.includelabs.inpay.security",
             "br.com.includelabs.inpay.messaging",
-            "br.com.includelabs.inpay.openapi"
+            "br.com.includelabs.inpay.openapi",
+            "br.com.includelabs.inpay.resources"
         })
 public class Application {
 

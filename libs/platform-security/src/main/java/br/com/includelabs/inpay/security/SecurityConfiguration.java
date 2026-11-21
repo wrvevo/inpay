@@ -41,6 +41,11 @@ public class SecurityConfiguration {
 
     private static final String[] SCOPES =
             new String[] {
+                "SCOPE_accounts/read",
+                "SCOPE_accounts/write",
+                "SCOPE_accounts/transfer",
+                "SCOPE_marketplace/read",
+                "SCOPE_marketplace/write",
                 "SCOPE_payments/create",
                 "SCOPE_payments/read",
                 "SCOPE_payments/capture",

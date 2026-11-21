@@ -40,12 +40,22 @@ public class InPayOpenApiConfiguration {
         return new OpenAPI()
                 .info(
                         new Info()
-                                .title("InPay | " + serviceName)
+                                .title(
+                                        switch (serviceName) {
+                                            case "payment-core-service" -> "INPAY Gateway";
+                                            case "accounts-service" -> "INPAY Accounts";
+                                            case "marketplace-service" -> "INPAY Marketplace";
+                                            case "credits-service" -> "INPAY Credits";
+                                            default -> "InPay | " + serviceName;
+                                        })
                                 .version("0.2.0")
                                 .description(
-                                        "API modular do InPay. Operações com resposta 501 ainda não"
-                                                + " estão implementadas. Conectores do perfil local são"
-                                                + " simulações e não efetuam cobranças reais."))
+                                        "InPay: Gateway, Accounts, Marketplace e Credits. Valores em centavos, BRL, "
+                                                + "identificadores opacos e isolamento por tenant. POSTs de criação usam Idempotency-Key, "
+                                                + "exceto contratos Credits que usam operationId. 202 confirma registro, não liquidação. "
+                                                + "Operações 501 não implementadas; 503 indica parceiro/configuração indisponível. "
+                                                + "Conectores externos explicitamente habilitados podem chamar sandbox ou produção; "
+                                                + "consulte a configuração e o contrato de cada operação."))
                 .components(new Components().addSecuritySchemes(schemeName, scheme))
                 .addSecurityItem(new SecurityRequirement().addList(schemeName));
     }

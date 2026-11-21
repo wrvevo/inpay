@@ -63,7 +63,7 @@ export function createPanelServer(env = process.env, fetchUpstream = fetch) {
           !request.headers.authorization &&
           env.PANEL_AUTH_MODE === "local" &&
           env.LOCAL_PASSWORD &&
-          /^\/api\/marketplace\/me(?:\/|$)/.test(url.pathname)
+          /^\/api\/credits\/me(?:\/|$)/.test(url.pathname)
         ) {
           authorization = `Basic ${Buffer.from(`customer:${env.LOCAL_PASSWORD}`).toString("base64")}`;
         }
