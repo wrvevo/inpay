@@ -159,3 +159,6 @@ homologação Pix/Banking/Nuuvem, a saga do Gateway, a execução de repasses ne
 Recorrência, disputa/chargeback, tokens de rede e todos os recursos Pagar.me não foram replicados.
 A separação técnica não afirma dispensa regulatória. Políticas de retenção de dados pessoais,
 criptografia em repouso e autorização operacional precisam acompanhar o ambiente de produção.
+
+
+Atualização de cobrança: `billing-service` pertence ao Gateway. Adaptadores nativos Cielo Pix/Cielo2 e PagBank Pix/boleto foram acrescentados; a saga normalizada continua pendente. Consulte [gestão financeira](FINANCIAL_OPERATIONS.md) para cobertura e limites atuais.

@@ -11,9 +11,15 @@ import java.util.*;
 import javax.net.ssl.*;
 import tools.jackson.databind.ObjectMapper;
 
-/** Transporte HTTPS com timeout, sem redirecionamentos, sem retentativas e sem log de payload. */
+/**
+ * Transporte HTTPS com timeout, sem redirecionamentos, retry limitado de consultas e sem log de
+ * payload.
+ */
 public class ProviderTransport {
 
+    private final CircuitGate circuit;
+    private final ResilienceSettings resilience;
+    private final java.util.concurrent.Semaphore bulkhead;
     private final HttpClient client;
 
     private final Duration timeout;
@@ -22,6 +28,14 @@ public class ProviderTransport {
 
     /** Cria cliente TLS; PKCS12 opcional habilita autenticação mútua do estabelecimento. */
     public ProviderTransport(ProviderSettings settings) {
+        this(settings, ResilienceSettings.defaults());
+    }
+
+    /** Injeta políticas de circuito, concorrência e retry exclusivamente de consultas. */
+    public ProviderTransport(ProviderSettings settings, ResilienceSettings resilience) {
+        this.resilience = resilience;
+        circuit = new CircuitGate(resilience.failureThreshold(), resilience.openDuration());
+        bulkhead = new java.util.concurrent.Semaphore(resilience.maxConcurrent());
         timeout = settings.readTimeout();
         var builder =
                 HttpClient.newBuilder()
@@ -47,12 +61,46 @@ public class ProviderTransport {
         client = builder.build();
     }
 
+    /** Retenta apenas GET. Comandos financeiros mantêm uma única tentativa e resultado incerto. */
+    public Reply send(
+            String method, String url, Map<String, String> headers, Object body, boolean form) {
+        if (!bulkhead.tryAcquire()) return new Reply(503, Map.of(), true);
+        try {
+            int attempts = "GET".equals(method) ? resilience.queryAttempts() : 1;
+            Reply reply = new Reply(0, Map.of(), true);
+            for (int index = 0; index < attempts; index++) {
+                CircuitGate.Lease lease = circuit.acquire();
+                if (lease == null) return new Reply(503, Map.of(), true);
+                reply = sendOnce(method, url, headers, body, form);
+                boolean transientFailure =
+                        reply.uncertain()
+                                || reply.status() == 429
+                                || reply.status() >= 500
+                                || reply.status() == 408;
+                circuit.complete(lease, !transientFailure);
+                if (!transientFailure || index + 1 == attempts) return reply;
+                try {
+                    Thread.sleep(
+                            resilience.retryDelay().toMillis() * (1L << index)
+                                    + java.util.concurrent.ThreadLocalRandom.current()
+                                            .nextLong(50));
+                } catch (InterruptedException interrupted) {
+                    Thread.currentThread().interrupt();
+                    return new Reply(0, Map.of(), true);
+                }
+            }
+            return reply;
+        } finally {
+            bulkhead.release();
+        }
+    }
+
     /**
      * Envia exatamente uma chamada. Não retorna mensagens de erro que possam conter cartão ou
      * segredo.
      */
     @SuppressWarnings("unchecked")
-    public Reply send(
+    private Reply sendOnce(
             String method, String url, Map<String, String> headers, Object body, boolean form) {
         try {
             String data =

@@ -24,7 +24,22 @@ public class PagbankApiAdapter implements ProviderPort {
                     "customer",
                     "items",
                     "charges.0.amount.value",
-                    "charges.0.payment_method.capture");
+                    "charges.0.payment_method.type");
+            String type = JsonFields.text(body, "charges.0.payment_method.type");
+            switch (type) {
+                case "PIX" ->
+                        JsonFields.require(body, "charges.0.payment_method.pix.expiration_date");
+                case "BOLETO" ->
+                        JsonFields.require(
+                                body,
+                                "charges.0.payment_method.boleto.due_date",
+                                "charges.0.payment_method.boleto.holder.name",
+                                "charges.0.payment_method.boleto.holder.tax_id",
+                                "charges.0.payment_method.boleto.holder.email",
+                                "charges.0.payment_method.boleto.holder.address");
+                case "CREDIT_CARD" -> JsonFields.require(body, "charges.0.payment_method.capture");
+                default -> throw new IllegalArgumentException("Unsupported PagBank payment method");
+            }
         }
         if (operation == ProviderOperation.AUTHORIZE
                 && (!(body.get("charges") instanceof java.util.List<?> charges)
@@ -82,6 +97,12 @@ public class PagbankApiAdapter implements ProviderPort {
         if (status.isBlank() || providerId == null || providerId.isBlank()) {
             return ProviderResult.unknown(providerId, httpStatus);
         }
-        return new ProviderResult(providerId, status, code, httpStatus, false);
+        Map<String, String> artifacts = new HashMap<>();
+        String prefix = operation == ProviderOperation.AUTHORIZE ? "charges.0." : "";
+        String qr = JsonFields.text(response, prefix + "qr_code.text");
+        String barcode = JsonFields.text(response, prefix + "payment_method.boleto.barcode");
+        if (!qr.isBlank()) artifacts.put("pix_copy_paste", qr);
+        if (!barcode.isBlank()) artifacts.put("boleto_barcode", barcode);
+        return new ProviderResult(providerId, status, code, httpStatus, false, artifacts);
     }
 }

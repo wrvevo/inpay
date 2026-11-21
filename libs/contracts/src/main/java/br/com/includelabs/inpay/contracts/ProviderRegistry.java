@@ -7,6 +7,7 @@ public final class ProviderRegistry {
     public enum Capability {
         CARD_PAYMENTS,
         PIX_COLLECTION,
+        BOLETO_COLLECTION,
         PIX_REFUND,
         SPLIT,
         BANK_ACCOUNTS,
@@ -69,7 +70,20 @@ public final class ProviderRegistry {
                                 "pagbank",
                                 "safrapay")
                         .stream()
-                        .map(id -> new Provider(id, Set.of(Capability.CARD_PAYMENTS)))
+                        .map(
+                                id ->
+                                        new Provider(
+                                                id,
+                                                id.equals("pagbank")
+                                                        ? Set.of(
+                                                                Capability.CARD_PAYMENTS,
+                                                                Capability.PIX_COLLECTION,
+                                                                Capability.BOLETO_COLLECTION)
+                                                        : id.equals("cielo")
+                                                                ? Set.of(
+                                                                        Capability.CARD_PAYMENTS,
+                                                                        Capability.PIX_COLLECTION)
+                                                                : Set.of(Capability.CARD_PAYMENTS)))
                         .toList());
     }
 }

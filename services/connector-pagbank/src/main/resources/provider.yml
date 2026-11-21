@@ -25,3 +25,11 @@ inpay:
     read-timeout: ${PAGBANK_READ_TIMEOUT:30s}
     allow-sensitive-card-data: ${PAGBANK_ALLOW_SENSITIVE_CARD_DATA:false}
     brazil-enabled: ${PAGBANK_BRAZIL_ENABLED:false}
+
+# Retry exclusivamente de GET; timeout de escrita exige reconciliação antes de reenvio.
+  resilience:
+    failure-threshold: ${PROVIDER_CIRCUIT_FAILURE_THRESHOLD:5}
+    open-duration: ${PROVIDER_CIRCUIT_OPEN_DURATION:30s}
+    query-attempts: ${PROVIDER_QUERY_ATTEMPTS:2}
+    retry-delay: ${PROVIDER_QUERY_RETRY_DELAY:100ms}
+    max-concurrent: ${PROVIDER_MAX_CONCURRENT:32}

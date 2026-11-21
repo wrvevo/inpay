@@ -43,3 +43,6 @@ CREATE USER accounts_service WITH PASSWORD 'local-only';
 CREATE DATABASE accounts_service OWNER accounts_service;
 CREATE USER commerce_marketplace WITH PASSWORD 'local-only';
 CREATE DATABASE commerce_marketplace OWNER commerce_marketplace;
+
+CREATE USER billing_service WITH PASSWORD 'local-only';
+CREATE DATABASE billing_service OWNER billing_service;

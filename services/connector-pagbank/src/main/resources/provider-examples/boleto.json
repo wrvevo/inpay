@@ -1,0 +1,51 @@
+{
+  "operationId": "22222222-2222-2222-2222-222222222222",
+  "payload": {
+    "reference_id": "InPayExample",
+    "customer": {
+      "name": "Cliente Teste",
+      "email": "teste@example.com",
+      "tax_id": "12345678901"
+    },
+    "items": [
+      {
+        "name": "Produto teste",
+        "quantity": 1,
+        "unit_amount": 10000
+      }
+    ],
+    "charges": [
+      {
+        "amount": {
+          "value": 10000,
+          "currency": "BRL"
+        },
+        "payment_method": {
+          "type": "BOLETO",
+          "boleto": {
+            "due_date": "2027-01-01",
+            "instruction_lines": {
+              "line_1": "Pagar até o vencimento",
+              "line_2": "Cobrança de exemplo"
+            },
+            "holder": {
+              "name": "Cliente Teste",
+              "tax_id": "12345678901",
+              "email": "teste@example.com",
+              "address": {
+                "street": "Rua Teste",
+                "number": "100",
+                "locality": "Centro",
+                "city": "Sao Paulo",
+                "region": "Sao Paulo",
+                "region_code": "SP",
+                "country": "BRA",
+                "postal_code": "01001000"
+              }
+            }
+          }
+        }
+      }
+    ]
+  }
+}

@@ -1,0 +1,32 @@
+{
+  "operationId": "22222222-2222-2222-2222-222222222222",
+  "payload": {
+    "reference_id": "InPayExample",
+    "customer": {
+      "name": "Cliente Teste",
+      "email": "teste@example.com",
+      "tax_id": "12345678901"
+    },
+    "items": [
+      {
+        "name": "Produto teste",
+        "quantity": 1,
+        "unit_amount": 10000
+      }
+    ],
+    "charges": [
+      {
+        "amount": {
+          "value": 10000,
+          "currency": "BRL"
+        },
+        "payment_method": {
+          "type": "PIX",
+          "pix": {
+            "expiration_date": "2027-01-01T23:59:59-03:00"
+          }
+        }
+      }
+    ]
+  }
+}

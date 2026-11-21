@@ -183,6 +183,34 @@ public class CommerceController {
         throw new UnsupportedOperationException();
     }
 
+    public record RulePreview(
+            @Positive long amount,
+            @NotBlank String paymentMethod,
+            @NotEmpty List<SplitPolicy.Rule> rules) {}
+
+    /**
+     * Prévia determinística; cada meio possui seu plano próprio e limites externos são verificados
+     * na execução.
+     */
+    @PostMapping("/split-plans/preview")
+    @PreAuthorize("hasAuthority('SCOPE_marketplace/write')")
+    @Operation(
+            summary = "Calcular split fixo, percentual ou misto",
+            description =
+                    "Percentuais em basis points sobre o restante após parcelas fixas. Não promete participantes ilimitados no provedor.")
+    public Map<String, Object> preview(@Valid @RequestBody RulePreview body) {
+        tenants.resolve(http.getHeader("X-Merchant-Id"));
+        if (!Set.of("PIX", "BOLETO", "CREDIT_CARD").contains(body.paymentMethod()))
+            throw new IllegalArgumentException();
+        return Map.of(
+                "payment_method",
+                body.paymentMethod(),
+                "allocations",
+                SplitPolicy.allocate(body.amount(), body.rules()),
+                "executed",
+                false);
+    }
+
     private String kind(String uri) {
         if (uri.contains("/recipients")) return "mp_rec";
         if (uri.contains("/split-plans")) return "mp_split";

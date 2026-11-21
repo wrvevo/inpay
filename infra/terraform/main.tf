@@ -14,6 +14,7 @@ resource "aws_cognito_user_pool_domain" "m2m" {
 }
 locals {
   scopes = {
+    billing = ["read", "write", "approve", "events", "erp"]
     payments         = ["create", "read", "capture", "void", "refund"]
     credits          = ["admin", "approve", "operate", "customer"]
     marketplace      = ["read", "write"]

@@ -18,9 +18,7 @@ class ProviderRegistryTest {
                                         tenant,
                                         Capability.PIX_COLLECTION,
                                         new Binding(
-                                                tenant,
-                                                "cielo",
-                                                Set.of(Capability.PIX_COLLECTION))));
+                                                tenant, "bin", Set.of(Capability.PIX_COLLECTION))));
     }
 
     @Test

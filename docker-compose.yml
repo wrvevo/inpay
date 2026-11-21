@@ -14,6 +14,7 @@ services:
       FRAUD_URL: http://fraud-service:8087
       CREDITS_URL: http://credits-service:8110
       MARKETPLACE_URL: http://marketplace-service:8112
+      BILLING_URL: http://billing-service:8113
       ACCOUNTS_URL: http://accounts-service:8111
     restart: unless-stopped
   postgres:
@@ -1302,6 +1303,53 @@ services:
     stop_grace_period: 30s
     security_opt:
     - no-new-privileges:true
+
+  billing-service:
+    build:
+      context: .
+      args:
+        MODULE: billing-service
+      target: spring-service
+    environment:
+      SPRING_PROFILES_ACTIVE: local
+      DB_URL: jdbc:postgresql://postgres:5432/billing_service
+      DB_USER: billing_service
+      DB_PASSWORD: local-only
+      KAFKA_BOOTSTRAP_SERVERS: kafka:19092
+      BILLING_SCHEDULER_ENABLED: ${BILLING_SCHEDULER_ENABLED:-false}
+      BILLING_CYCLE_BATCH: ${BILLING_CYCLE_BATCH:-100}
+      LOCAL_PASSWORD: ${LOCAL_PASSWORD:-local-only-change-me}
+      SERVER_PORT: '8113'
+      OTEL_SERVICE_NAME: billing-service
+      OTEL_EXPORTER_OTLP_ENDPOINT: http://otel-collector:4318
+      OTEL_EXPORTER_OTLP_PROTOCOL: http/protobuf
+      OTEL_METRICS_EXPORTER: none
+      OTEL_LOGS_EXPORTER: none
+      JAVA_TOOL_OPTIONS: -XX:MaxRAMPercentage=60 -XX:InitialRAMPercentage=15
+    ports:
+    - 127.0.0.1:8113:8113
+    depends_on:
+      postgres:
+        condition: service_healthy
+      kafka:
+        condition: service_healthy
+      kafka-init:
+        condition: service_completed_successfully
+    mem_limit: ${SERVICE_MEMORY_LIMIT:-512m}
+    restart: unless-stopped
+    image: inpay/billing-service:0.2.0
+    healthcheck:
+      test:
+      - CMD-SHELL
+      - java -cp /app/health Healthcheck http://localhost:$$SERVER_PORT/actuator/health
+      interval: 30s
+      timeout: 10s
+      start_period: 120s
+      retries: 10
+    stop_grace_period: 30s
+    security_opt:
+    - no-new-privileges:true
+
 
 volumes:
   postgres-data: {}

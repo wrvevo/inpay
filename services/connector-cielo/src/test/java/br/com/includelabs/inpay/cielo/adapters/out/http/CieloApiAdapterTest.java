@@ -111,4 +111,26 @@ class CieloApiAdapterTest {
         var result = adapter.interpret(ProviderOperation.AUTHORIZE, null, 200, Map.of());
         assertTrue(result.uncertain() || "PROVIDER_REJECTED".equals(result.status()));
     }
+
+    @Test
+    void pixUsesCielo2AndDoesNotPretendQrIsPayment() throws Exception {
+        var call = adapter.prepare(ProviderOperation.AUTHORIZE, null, operation, payload("pix"));
+        assertEquals("/1/sales/", call.path());
+        var result =
+                adapter.interpret(
+                        ProviderOperation.AUTHORIZE,
+                        null,
+                        201,
+                        Map.of(
+                                "Payment",
+                                Map.of(
+                                        "PaymentId",
+                                        "pix-1",
+                                        "Status",
+                                        12,
+                                        "QrCodeString",
+                                        "pix-copy-paste")));
+        assertNotEquals("PAID", result.status());
+        assertTrue(result.paymentArtifacts().containsValue("pix-copy-paste"));
+    }
 }

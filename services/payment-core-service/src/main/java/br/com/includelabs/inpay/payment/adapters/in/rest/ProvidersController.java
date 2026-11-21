@@ -30,7 +30,7 @@ public class ProvidersController {
     @Operation(
             summary = "Consultar conectores e capacidades implementadas",
             description =
-                    "Nenhum conector Pix normalizado está habilitado nesta versão. Cobrança Pix, transferência e gestão de chaves são capacidades distintas.")
+                    "Pix nativo implementado em Cielo e PagBank; sujeito a credenciamento/homologação. Orquestração pública não habilitada. Cobrança Pix, transferência e gestão de chaves são capacidades distintas.")
     public Map<String, Object> providers() {
         tenants.resolve(http.getHeader("X-Merchant-Id"));
         return Map.of("data", ProviderRegistry.installed().catalog(), "routing_enabled", false);

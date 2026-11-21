@@ -3,6 +3,29 @@ const uuid =
 const rules = [
   [
     "GET",
+    /^\/api\/billing\/dashboard\/page\/([1-9][0-9]{0,4})$/,
+    "BILLING_URL",
+    "http://127.0.0.1:8113",
+    (page) => `/billing/v1/dashboard?page=${page}&size=20`,
+  ],
+  [
+    "GET",
+    /^\/api\/billing\/resources\/(merchants|invoices|subscriptions|costs|payables|notifications|audit)\/page\/([1-9][0-9]{0,4})$/,
+    "BILLING_URL",
+    "http://127.0.0.1:8113",
+    (type, page) => `/billing/v1/resources/${type}?page=${page}&size=20`,
+  ],
+  [
+    "POST",
+    new RegExp(
+      `^/api/billing/(merchants|invoices|subscriptions|payables|reminders|cycles/run|merchants/${uuid}/approve|subscriptions/${uuid}/cancel)$`,
+    ),
+    "BILLING_URL",
+    "http://127.0.0.1:8113",
+    (path) => `/billing/v1/${path}`,
+  ],
+  [
+    "GET",
     /^\/api\/commerce\/(recipients|split-plans|settlements)$/,
     "MARKETPLACE_URL",
     "http://127.0.0.1:8112",
@@ -84,7 +107,7 @@ export function resolveRoute(method, path, env = process.env) {
       throw new Error("Invalid service URL");
     if (env.PANEL_AUTH_MODE !== "local" && base.protocol !== "https:")
       throw new Error("HTTPS upstream required outside local mode");
-    return new URL(build(match[1]), base).toString();
+    return new URL(build(...match.slice(1)), base).toString();
   }
   return null;
 }

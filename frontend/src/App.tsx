@@ -23,6 +23,7 @@ import {
   PanelLeftClose,
 } from "lucide-react";
 import ProductModule from "./pages/ProductModule";
+import Billing from "./pages/Billing";
 import Marketplace from "./pages/Marketplace";
 import Overview from "./pages/Overview";
 import Transactions from "./pages/Transactions";
@@ -40,6 +41,7 @@ import { Developers, Settings } from "./pages/Settings";
 import { Modal } from "./components/UI";
 import type { Session } from "./api";
 const navigation = [
+  { group: "TIME INPAY", items: [["billing", "Gestão financeira", Wallet]] },
   {
     group: "INPAY ACCOUNTS",
     items: [["accounts", "Contas financeiras", Building2]],
@@ -135,7 +137,8 @@ export default function App() {
     .flatMap((g) => g.items)
     .find((i) => i[0] === page)?.[1];
   let content;
-  if (page === "accounts")
+  if (page === "billing") content = <Billing session={session} />;
+  else if (page === "accounts")
     content = <ProductModule product="accounts" session={session} />;
   else if (page === "commerce")
     content = <ProductModule product="marketplace" session={session} />;

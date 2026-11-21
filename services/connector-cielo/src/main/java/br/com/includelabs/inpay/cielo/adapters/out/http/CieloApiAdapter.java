@@ -18,13 +18,18 @@ public class CieloApiAdapter implements ProviderPort {
             ProviderOperation operation, String id, UUID operationId, Map<String, Object> payload) {
         Map<String, Object> body = JsonFields.copy(payload);
         if (operation == ProviderOperation.AUTHORIZE) {
-            JsonFields.require(
-                    body,
-                    "MerchantOrderId",
-                    "Payment.Type",
-                    "Payment.Amount",
-                    "Payment.Installments",
-                    "Payment.Capture");
+            JsonFields.require(body, "MerchantOrderId", "Payment.Type", "Payment.Amount");
+            if ("Pix".equals(JsonFields.text(body, "Payment.Type"))) {
+                JsonFields.require(body, "Payment.Provider", "Payment.QrCode.Expiration");
+                if (!"Cielo2".equals(JsonFields.text(body, "Payment.Provider")))
+                    throw new IllegalArgumentException("Use contracted Cielo2 Pix integration");
+                int expiration =
+                        Integer.parseInt(JsonFields.text(body, "Payment.QrCode.Expiration"));
+                if (expiration < 1 || expiration > 86400)
+                    throw new IllegalArgumentException("Pix expiration exceeds 24h");
+            } else {
+                JsonFields.require(body, "Payment.Installments", "Payment.Capture");
+            }
         }
         if (operation == ProviderOperation.CAPTURE
                 || operation == ProviderOperation.CANCEL
@@ -99,6 +104,13 @@ public class CieloApiAdapter implements ProviderPort {
         if (status.isBlank() || providerId == null || providerId.isBlank()) {
             return ProviderResult.unknown(providerId, httpStatus);
         }
-        return new ProviderResult(providerId, status, code, httpStatus, false);
+        String qr = JsonFields.text(response, "Payment.QrCodeString");
+        return new ProviderResult(
+                providerId,
+                status,
+                code,
+                httpStatus,
+                false,
+                qr.isBlank() ? Map.of() : Map.of("pix_copy_paste", qr));
     }
 }

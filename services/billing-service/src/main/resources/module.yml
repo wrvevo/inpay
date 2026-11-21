@@ -1,0 +1,9 @@
+inpay:
+  product: Billing
+  billing:
+    scheduler-enabled: ${BILLING_SCHEDULER_ENABLED:false}
+    event-clients: ${BILLING_EVENT_CLIENTS:}
+    cycle-batch: ${BILLING_CYCLE_BATCH:100}
+    notification-provider-enabled: false
+    card-late-charges-enabled: false
+    base-url: ${BILLING_PUBLIC_BASE_URL:http://localhost:3080}

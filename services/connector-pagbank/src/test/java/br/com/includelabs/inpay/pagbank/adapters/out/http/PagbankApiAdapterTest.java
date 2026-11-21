@@ -111,4 +111,33 @@ class PagbankApiAdapterTest {
         var result = adapter.interpret(ProviderOperation.AUTHORIZE, null, 200, Map.of());
         assertTrue(result.uncertain() || "PROVIDER_REJECTED".equals(result.status()));
     }
+
+    @Test
+    void pixAndBoletoDoNotRequireCardCapture() throws Exception {
+        for (String method : List.of("pix", "boleto")) {
+            var call =
+                    adapter.prepare(ProviderOperation.AUTHORIZE, null, operation, payload(method));
+            assertEquals("/orders", call.path());
+            assertEquals("POST", call.method());
+        }
+        var result =
+                adapter.interpret(
+                        ProviderOperation.AUTHORIZE,
+                        null,
+                        201,
+                        Map.of(
+                                "id",
+                                "order-1",
+                                "charges",
+                                List.of(
+                                        Map.of(
+                                                "id",
+                                                "charge-1",
+                                                "status",
+                                                "WAITING",
+                                                "qr_code",
+                                                Map.of("text", "pix-copy-paste")))));
+        assertNotEquals("PAID", result.status());
+        assertTrue(result.paymentArtifacts().containsValue("pix-copy-paste"));
+    }
 }

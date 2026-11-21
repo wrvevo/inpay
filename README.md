@@ -154,3 +154,7 @@ Referências oficiais: [Springdoc](https://springdoc.org/), [Cognito M2M](https:
 A organização atual é **Gateway, Accounts, Marketplace e Credits**, com agregadores em `modules/`.
 Veja [arquitetura, APIs, migração e limitações reais](docs/PRODUCT_MODULES.md).
 A gestão de créditos anterior foi movida para `credits-service`; o novo Marketplace usa banco próprio.
+
+## Gestão financeira e cobrança
+
+O `billing-service` integra o produto Gateway, com painel financeiro, homologação por dupla aprovação, faturas, geração de recorrências, custos de liquidação e contratos ERP REST/SOAP. Veja [operação e limites](docs/FINANCIAL_OPERATIONS.md), [planos propostos](docs/PRICING.md) e [protótipo NFC](apps/inpay-tap/README.md).

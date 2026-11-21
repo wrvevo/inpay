@@ -8,12 +8,12 @@ import org.springframework.transaction.PlatformTransactionManager;
 
 /** Composição do runtime; os contratos HTTP específicos permanecem dentro de cada connector. */
 @Configuration
-@EnableConfigurationProperties(ProviderSettings.class)
+@EnableConfigurationProperties({ProviderSettings.class, ResilienceSettings.class})
 public class ProviderConfiguration {
     /** Cria transporte com TLS e timeouts configurados por serviço. */
     @Bean
-    ProviderTransport providerTransport(ProviderSettings settings) {
-        return new ProviderTransport(settings);
+    ProviderTransport providerTransport(ProviderSettings settings, ResilienceSettings resilience) {
+        return new ProviderTransport(settings, resilience);
     }
 
     /** Cria o cache de credenciais exclusivo da instância/estabelecimento. */

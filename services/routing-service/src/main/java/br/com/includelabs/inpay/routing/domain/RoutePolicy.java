@@ -39,4 +39,30 @@ public final class RoutePolicy {
                 .min(Comparator.comparingInt(Candidate::priority))
                 .orElseThrow(() -> new IllegalStateException("No compatible route"));
     }
+
+    public record BrandRoute(
+            Candidate candidate,
+            Set<String> brands,
+            Set<String> paymentMethods,
+            boolean circuitOpen) {}
+
+    /** Filtra bandeira, meio, credenciamento/token e saúde antes de selecionar a prioridade. */
+    public Candidate chooseForBrand(
+            List<BrandRoute> routes,
+            String brand,
+            String paymentMethod,
+            Set<String> tokenBindings,
+            boolean previousUnknown) {
+        var eligible =
+                routes.stream()
+                        .filter(r -> !r.circuitOpen())
+                        .filter(r -> r.paymentMethods().contains(paymentMethod))
+                        .filter(
+                                r ->
+                                        !paymentMethod.equals("CREDIT_CARD")
+                                                || r.brands().contains(brand))
+                        .map(BrandRoute::candidate)
+                        .toList();
+        return choose(eligible, tokenBindings, previousUnknown);
+    }
 }
