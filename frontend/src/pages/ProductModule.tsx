@@ -1,3 +1,4 @@
+import BankConnections from "./BankConnections";
 import { useEffect, useState } from "react";
 import { api, type Session } from "../api";
 import { Notice } from "../components/UI";
@@ -53,6 +54,7 @@ export default function ProductModule({ session, product }: Props) {
         </Notice>
       )}
       {error && <Notice>{error}</Notice>}
+      {product === "accounts" && <BankConnections session={session} />}
       {product === "marketplace" ? (
         <>
           <label>

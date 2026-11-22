@@ -3,6 +3,20 @@ const uuid =
 const rules = [
   [
     "GET",
+    /^\/api\/bank-config\/(banks|connections)$/,
+    "ACCOUNTS_URL",
+    "http://127.0.0.1:8111",
+    (resource) => `/accounts/v1/${resource}`,
+  ],
+  [
+    "POST",
+    /^\/api\/bank-config\/connections$/,
+    "ACCOUNTS_URL",
+    "http://127.0.0.1:8111",
+    () => "/accounts/v1/connections",
+  ],
+  [
+    "GET",
     /^\/api\/billing\/dashboard\/page\/([1-9][0-9]{0,4})$/,
     "BILLING_URL",
     "http://127.0.0.1:8113",

@@ -1,0 +1,17 @@
+{
+  "id": "itau",
+  "name": "Itaú",
+  "documentation": "https://devportal.itau.com.br/",
+  "status": "NOT_IMPLEMENTED",
+  "enabled": false,
+  "implementedOperations": [],
+  "requiredConfiguration": [
+    "client_id",
+    "client_secret_reference",
+    "certificate_reference",
+    "tenant_binding",
+    "contracted_products",
+    "sandbox_base_url"
+  ],
+  "notes": "Cadastro de integração não equivale a conta aberta ou habilitação BaaS."
+}

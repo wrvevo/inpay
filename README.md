@@ -158,3 +158,9 @@ A gestão de créditos anterior foi movida para `credits-service`; o novo Market
 ## Gestão financeira e cobrança
 
 O `billing-service` integra o produto Gateway, com painel financeiro, homologação por dupla aprovação, faturas, geração de recorrências, custos de liquidação e contratos ERP REST/SOAP. Veja [operação e limites](docs/FINANCIAL_OPERATIONS.md), [planos propostos](docs/PRICING.md) e [protótipo NFC](apps/inpay-tap/README.md).
+
+## Laboratório ecommerce e jornadas independentes
+
+[Loja InPlay Games: execução e testes](examples/game-store/README.md) · [Arquitetura e cobertura](docs/architecture/README.md) · [Draw.io editável](docs/architecture/inpay-journeys.drawio) · [Evidências Cielo](docs/testing/store-and-cielo.md) · [Infraestrutura](docs/architecture/infrastructure.md).
+
+O catálogo de bancos identifica integrações ainda não implementadas. A aprovação do teste de cartão Cielo não representa cobertura integral de todos os produtos bancários.

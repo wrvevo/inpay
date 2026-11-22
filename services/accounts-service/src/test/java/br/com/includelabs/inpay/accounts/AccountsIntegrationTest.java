@@ -114,4 +114,36 @@ class AccountsIntegrationTest {
                                 HttpResponse.BodyHandlers.ofString())
                         .statusCode());
     }
+
+    @Test
+    void bankConfigurationRemainsDisabledAndIdempotent() throws Exception {
+        var catalog = json.readTree(get("/accounts/v1/banks").body());
+        assertEquals(12, catalog.size());
+        for (var bank : catalog) {
+            assertFalse(bank.path("enabled").asBoolean());
+            assertEquals("NOT_IMPLEMENTED", bank.path("status").asText());
+        }
+        String body =
+                """
+                {"bank":"c6","environment":"sandbox",
+                 "credentialReference":"secrets/tenant/c6","certificateReference":"secrets/tenant/cert"}
+                """;
+        String key = UUID.randomUUID().toString();
+        var first = post("/accounts/v1/connections", key, body);
+        assertEquals(200, first.statusCode());
+        var saved = json.readTree(first.body());
+        assertEquals("PENDING_IMPLEMENTATION", saved.path("status").asText());
+        assertFalse(saved.path("enabled").asBoolean());
+        assertEquals(
+                saved.path("id"),
+                json.readTree(post("/accounts/v1/connections", key, body).body()).path("id"));
+        assertEquals(
+                409,
+                post("/accounts/v1/connections", key, body.replace("sandbox", "production"))
+                        .statusCode());
+        assertEquals(
+                400,
+                post("/accounts/v1/connections", "invalid", body.replace("\"sandbox\"", "null"))
+                        .statusCode());
+    }
 }

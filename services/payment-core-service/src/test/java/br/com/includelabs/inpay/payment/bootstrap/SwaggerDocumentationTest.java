@@ -26,6 +26,8 @@ import org.springframework.test.web.servlet.MockMvc;
 @AutoConfigureMockMvc
 class SwaggerDocumentationTest {
     @Autowired private MockMvc mockMvc;
+    @MockitoBean private br.com.includelabs.inpay.payment.application.PaymentJourneys journeys;
+    @MockitoBean private br.com.includelabs.inpay.payment.domain.JourneyStore journeyStore;
     @MockitoBean private PaymentStore paymentStore;
     @MockitoBean private JdbcTemplate jdbcTemplate;
     @MockitoBean private KafkaTemplate<String, String> kafkaTemplate;

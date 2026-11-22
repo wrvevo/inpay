@@ -97,6 +97,9 @@ export function createPanelServer(env = process.env, fetchUpstream = fetch) {
             Authorization: authorization,
             "Content-Type": "application/json",
             ...(tenant ? { "X-Merchant-Id": tenant } : {}),
+            ...(request.headers["idempotency-key"]
+              ? { "Idempotency-Key": request.headers["idempotency-key"] }
+              : {}),
           },
         });
         if (!upstream.ok) {
