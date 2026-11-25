@@ -92,7 +92,8 @@ public final class ProviderRegistry {
                         Capability.BANK_ACCOUNTS,
                         Capability.PIX_TRANSFER,
                         Capability.PIX_KEYS);
-        for (String id : List.of("c6", "itau", "santander", "bb", "bradesco", "caixa", "banrisul")) {
+        for (String id :
+                List.of("c6", "itau", "santander", "bb", "bradesco", "caixa", "banrisul")) {
             providers.add(new Provider(id, banking));
         }
         return new ProviderRegistry(providers);
