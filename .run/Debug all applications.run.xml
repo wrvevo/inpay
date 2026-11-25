@@ -1,0 +1,36 @@
+<component name="ProjectRunConfigurationManager">
+  <configuration default="false" name="Debug all applications" type="CompoundRunConfigurationType" factoryName="Compound">
+    <toRun name="merchant-service" type="SpringBootApplicationConfigurationType" />
+    <toRun name="payment-links-service" type="SpringBootApplicationConfigurationType" />
+    <toRun name="checkout-service" type="SpringBootApplicationConfigurationType" />
+    <toRun name="payment-core-service" type="SpringBootApplicationConfigurationType" />
+    <toRun name="routing-service" type="SpringBootApplicationConfigurationType" />
+    <toRun name="token-service" type="SpringBootApplicationConfigurationType" />
+    <toRun name="fraud-service" type="SpringBootApplicationConfigurationType" />
+    <toRun name="webhook-ingress-service" type="SpringBootApplicationConfigurationType" />
+    <toRun name="reconciliation-service" type="SpringBootApplicationConfigurationType" />
+    <toRun name="notification-service" type="SpringBootApplicationConfigurationType" />
+    <toRun name="transaction-query-service" type="SpringBootApplicationConfigurationType" />
+    <toRun name="bank-mock-server" type="SpringBootApplicationConfigurationType" />
+    <toRun name="credits-service" type="SpringBootApplicationConfigurationType" />
+    <toRun name="accounts-service" type="SpringBootApplicationConfigurationType" />
+    <toRun name="marketplace-service" type="SpringBootApplicationConfigurationType" />
+    <toRun name="billing-service" type="SpringBootApplicationConfigurationType" />
+    <toRun name="connector-cielo" type="SpringBootApplicationConfigurationType" />
+    <toRun name="connector-rede" type="SpringBootApplicationConfigurationType" />
+    <toRun name="connector-getnet" type="SpringBootApplicationConfigurationType" />
+    <toRun name="connector-stone" type="SpringBootApplicationConfigurationType" />
+    <toRun name="connector-bin" type="SpringBootApplicationConfigurationType" />
+    <toRun name="connector-global-payments" type="SpringBootApplicationConfigurationType" />
+    <toRun name="connector-pagbank" type="SpringBootApplicationConfigurationType" />
+    <toRun name="connector-safrapay" type="SpringBootApplicationConfigurationType" />
+    <toRun name="connector-c6" type="SpringBootApplicationConfigurationType" />
+    <toRun name="connector-itau" type="SpringBootApplicationConfigurationType" />
+    <toRun name="connector-santander" type="SpringBootApplicationConfigurationType" />
+    <toRun name="connector-bb" type="SpringBootApplicationConfigurationType" />
+    <toRun name="connector-bradesco" type="SpringBootApplicationConfigurationType" />
+    <toRun name="connector-caixa" type="SpringBootApplicationConfigurationType" />
+    <toRun name="connector-banrisul" type="SpringBootApplicationConfigurationType" />
+    <method v="2" />
+  </configuration>
+</component>

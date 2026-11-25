@@ -3,6 +3,9 @@ package br.com.includelabs.inpay.payment;
 import static org.junit.jupiter.api.Assertions.*;
 
 import br.com.includelabs.inpay.payment.bootstrap.Application;
+import com.github.tomakehurst.wiremock.WireMockServer;
+import com.github.tomakehurst.wiremock.client.WireMock;
+import com.github.tomakehurst.wiremock.core.WireMockConfiguration;
 import io.zonky.test.db.postgres.embedded.EmbeddedPostgres;
 import java.net.*;
 import java.net.http.*;
@@ -20,6 +23,9 @@ import tools.jackson.databind.json.JsonMapper;
 class GatewayResourcesIntegrationTest {
     static EmbeddedPostgres pg;
     static ConfigurableApplicationContext context;
+    static WireMockServer bankConnector;
+    static ConfigurableApplicationContext itau;
+    static ConfigurableApplicationContext santander;
     static String base;
     static final HttpClient client = HttpClient.newHttpClient();
     static final JsonMapper json = JsonMapper.builder().build();
@@ -33,6 +39,47 @@ class GatewayResourcesIntegrationTest {
                         .setPort(0)
                         .setServerConfig("unix_socket_directories", "")
                         .start();
+        bankConnector = new WireMockServer(WireMockConfiguration.options().dynamicPort());
+        bankConnector.start();
+        itau =
+                new SpringApplicationBuilder(
+                                br.com.includelabs.inpay.itau.bootstrap.Application.class)
+                        .run(
+                                "--spring.profiles.active=local",
+                                "--server.port=0",
+                                "--inpay.local-password=test-only",
+                                "--inpay.itau.enabled=false",
+                                "--inpay.itau.certificate=",
+                                "--inpay.itau.private-key=",
+                                "--spring.autoconfigure.exclude=org.springframework.boot.jdbc.autoconfigure.DataSourceAutoConfiguration,org.springframework.boot.flyway.autoconfigure.FlywayAutoConfiguration,org.springframework.boot.kafka.autoconfigure.KafkaAutoConfiguration",
+                                "--spring.flyway.enabled=false",
+                                "--logging.level.root=WARN",
+                                "--spring.main.banner-mode=off");
+        int itauPort = ((WebServerApplicationContext) itau).getWebServer().getPort();
+        santander =
+                new SpringApplicationBuilder(
+                                br.com.includelabs.inpay.santander.bootstrap.Application.class)
+                        .run(
+                                "--spring.profiles.active=local",
+                                "--server.port=0",
+                                "--inpay.local-password=test-only",
+                                "--inpay.santander.enabled=false",
+                                "--inpay.santander.certificate=",
+                                "--inpay.santander.private-key=",
+                                "--spring.autoconfigure.exclude=org.springframework.boot.jdbc.autoconfigure.DataSourceAutoConfiguration,org.springframework.boot.flyway.autoconfigure.FlywayAutoConfiguration,org.springframework.boot.kafka.autoconfigure.KafkaAutoConfiguration",
+                                "--spring.flyway.enabled=false",
+                                "--logging.level.root=WARN",
+                                "--spring.main.banner-mode=off");
+        int santanderPort = ((WebServerApplicationContext) santander).getWebServer().getPort();
+        bankConnector.stubFor(
+                WireMock.post(WireMock.urlPathEqualTo("/internal/v1/bank/operations/PIX_COB_PUT"))
+                        .withHeader("X-Mock", WireMock.equalTo("true"))
+                        .willReturn(
+                                WireMock.aResponse()
+                                        .withStatus(200)
+                                        .withHeader("Content-Type", "application/json")
+                                        .withBody(
+                                                "{\"bank\":\"c6\",\"operation\":\"PIX_COB_PUT\",\"status\":200,\"uncertain\":false,\"mocked\":true,\"body\":{\"status\":\"ATIVA\"}}")));
         context =
                 new SpringApplicationBuilder(Application.class)
                         .run(
@@ -44,6 +91,11 @@ class GatewayResourcesIntegrationTest {
                                 "--spring.datasource.username=postgres",
                                 "--spring.datasource.password=",
                                 "--inpay.local-password=test-only",
+                                "--inpay.bank-gateway.password=test-only",
+                                "--inpay.bank-gateway.urls.c6=http://127.0.0.1:"
+                                        + bankConnector.port(),
+                                "--inpay.bank-gateway.urls.itau=http://127.0.0.1:" + itauPort,
+                                "--inpay.bank-gateway.urls.santander=http://127.0.0.1:" + santanderPort,
                                 "--spring.kafka.listener.auto-startup=false",
                                 "--inpay.outbox.delay=3600000",
                                 "--logging.level.root=WARN",
@@ -56,6 +108,9 @@ class GatewayResourcesIntegrationTest {
     @AfterAll
     static void stop() throws Exception {
         if (context != null) context.close();
+        if (itau != null) itau.close();
+        if (santander != null) santander.close();
+        if (bankConnector != null) bankConnector.stop();
         if (pg != null) pg.close();
     }
 
@@ -148,6 +203,108 @@ class GatewayResourcesIntegrationTest {
                         .GET()
                         .build();
         assertEquals(403, client.send(request, HttpResponse.BodyHandlers.ofString()).statusCode());
+    }
+
+    @Test
+    void transactionalApisAcceptPixJourneyAndMockedBankCall() throws Exception {
+        var providers = json.readTree(get("/gateway/v1/providers").body());
+        assertTrue(providers.get("data").toString().contains("\"c6\""));
+        var journey =
+                post(
+                        "/gateway/v1/journeys",
+                        "journey-pix-1",
+                        "{\"merchantOrder\":\"order-pix\",\"amount\":1500,\"method\":\"pix\",\"instrument\":\"fixture\"}");
+        assertEquals(200, journey.statusCode(), journey.body());
+        assertEquals(
+                json.readTree(journey.body()).get("id"),
+                json.readTree(
+                                get("/gateway/v1/journeys/by-key/journey-pix-1").body())
+                        .get("id"));
+        HttpResponse<String> bank = null;
+        for (int attempt = 0; attempt < 20; attempt++) {
+            bank =
+                    client.send(
+                            HttpRequest.newBuilder(
+                                            URI.create(
+                                                    base
+                                                            + "/gateway/v1/bank-operations/c6/PIX_COB_PUT"))
+                                    .header("Authorization", auth)
+                                    .header("X-Mock", "true")
+                                    .header("Idempotency-Key", "pix-cob-1")
+                                    .header("Content-Type", "application/json")
+                                    .POST(
+                                            HttpRequest.BodyPublishers.ofString(
+                                                    "{\"txid\":\"abc123\",\"valor\":\"10.00\"}"))
+                                    .build(),
+                            HttpResponse.BodyHandlers.ofString());
+            if (bank.statusCode() == 200) {
+                break;
+            }
+        }
+        assertEquals(200, bank.statusCode(), bank.body());
+        assertTrue(bank.body().contains("\"mocked\":true"));
+        assertEquals(
+                401,
+                client.send(
+                                HttpRequest.newBuilder(URI.create(base + "/v1/payments"))
+                                        .POST(HttpRequest.BodyPublishers.ofString("{}"))
+                                        .build(),
+                                HttpResponse.BodyHandlers.ofString())
+                        .statusCode());
+        assertEquals(200, get("/gateway/v1/charges").statusCode());
+        assertEquals(200, get("/gateway/v1/customers").statusCode());
+    }
+
+    @Test
+    void gatewayReachesTheItauConnector() throws Exception {
+        int status = 503;
+        String responseBody = "";
+        for (int attempt = 0; attempt < 20 && status != 200; attempt++) {
+            HttpResponse<String> bank =
+                    client.send(
+                            HttpRequest.newBuilder(
+                                            URI.create(
+                                                    base
+                                                            + "/gateway/v1/bank-operations/itau/PIX_COB_PUT"))
+                                    .header("Authorization", auth)
+                                    .header("X-Mock", "true")
+                                    .header("Idempotency-Key", "itau-pix-1")
+                                    .header("Content-Type", "application/json")
+                                    .POST(HttpRequest.BodyPublishers.ofString("{\"txid\":\"abc123\"}"))
+                                    .build(),
+                            HttpResponse.BodyHandlers.ofString());
+            status = bank.statusCode();
+            responseBody = bank.body();
+        }
+        assertEquals(200, status, responseBody);
+        assertTrue(responseBody.contains("pixCopiaECola"));
+        assertTrue(responseBody.contains("itau"));
+    }
+
+    @Test
+    void gatewayReachesTheSantanderConnector() throws Exception {
+        int status = 503;
+        String responseBody = "";
+        for (int attempt = 0; attempt < 20 && status != 200; attempt++) {
+            HttpResponse<String> bank =
+                    client.send(
+                            HttpRequest.newBuilder(
+                                            URI.create(
+                                                    base
+                                                            + "/gateway/v1/bank-operations/santander/PIX_COB_PUT"))
+                                    .header("Authorization", auth)
+                                    .header("X-Mock", "true")
+                                    .header("Idempotency-Key", "santander-pix-1")
+                                    .header("Content-Type", "application/json")
+                                    .POST(HttpRequest.BodyPublishers.ofString("{\"txid\":\"abc123\"}"))
+                                    .build(),
+                            HttpResponse.BodyHandlers.ofString());
+            status = bank.statusCode();
+            responseBody = bank.body();
+        }
+        assertEquals(200, status, responseBody);
+        assertTrue(responseBody.contains("pixCopiaECola"));
+        assertTrue(responseBody.contains("santander"));
     }
 
     @Test

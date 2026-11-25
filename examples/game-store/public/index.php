@@ -64,15 +64,11 @@ try {
         }
         if ($action === "checkout") {
             $method = $_POST["method"] ?? "";
-            if (
-                !in_array(
-                    $method,
-                    ["credit_card", "debit_card", "pix", "boleto", "transfer"],
-                    true,
-                )
-            ) {
+            $catalog = paymentMethods();
+            if (!isset($catalog[$method])) {
                 throw new RuntimeException("Meio inválido");
             }
+            $journeyMethod = $catalog[$method][1];
             $key = $_POST["checkout_key"] ?? "";
             if (
                 !isset($_SESSION["checkout_key"]) ||
@@ -84,7 +80,11 @@ try {
                 getenv("STORE_MODE") === "cielo-sandbox"
                     ? trim($_POST["instrument"] ?? "sandbox-approved")
                     : "fixture-approved";
-            $prepared = repository(function (&$d) use ($method, $key) {
+            $prepared = repository(function (&$d) use (
+                $method,
+                $journeyMethod,
+                $key,
+            ) {
                 foreach ($d["orders"] as $o) {
                     if ($o["id"] === $key) {
                         return ["order" => $o, "created" => false];
@@ -114,7 +114,8 @@ try {
                     "owner" => $_SESSION["owner"],
                     "items" => $items,
                     "amount" => $total,
-                    "method" => $method,
+                            "provider" => $method,
+                            "method" => $journeyMethod,
                     "status" => "PROCESSING",
                     "journey_id" => null,
                     "artifacts" => [],
@@ -131,7 +132,7 @@ try {
                         [
                             "merchantOrder" => $key,
                             "amount" => $prepared["order"]["amount"],
-                            "method" => $method,
+                            "method" => $journeyMethod,
                             "instrument" => $instrument,
                         ],
                         $key,
@@ -242,18 +243,22 @@ function orderTable(array $orders): void
     !$orders
 ): ?><p class="empty">Seus pedidos aparecerão aqui após o checkout.</p><?php endif;
 }
-?><!doctype html><html lang="pt-BR"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1"><title>InPlay Games · Laboratório InPay</title><link rel="stylesheet" href="/style.css"></head><body>
+?><!doctype html><html lang="pt-BR"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1"><title>InPay · Loja Magento</title><link rel="stylesheet" href="/style.css"></head><body>
 <div class="lab">LABORATÓRIO INPAY <span>Produtos fictícios · <?= getenv(
     "STORE_MODE",
 ) === "cielo-sandbox"
     ? "Cielo sandbox · cartão fictício de teste"
     : "Simulação local · nenhum dinheiro movimentado" ?></span></div>
-<header><a class="brand" href="/">in<span>play</span><small>GAMES</small></a><nav><a href="/">Explorar</a><a href="/?page=orders">Meus pedidos</a><a href="/?page=admin">Administração</a><a class="cart" href="/?page=checkout">Carrinho <b><?= $cartCount ?></b></a></nav></header>
+<header><a class="brand" href="/">in<span>pay</span><small>MAGENTO</small></a><nav><a href="/">Loja</a><a href="/?page=orders">Pedidos</a><a href="/admin">Painel</a><a href="<?= escape(
+    getenv("INPAY_SWAGGER_URL") ?: "http://localhost:8084/swagger-ui/index.html",
+) ?>" target="_blank" rel="noreferrer">Swagger</a><a class="cart" href="/?page=checkout">Carrinho <b><?= $cartCount ?></b></a></nav></header>
 <main><?php if ($error): ?><div role="alert" class="error"><?= escape(
     $error,
 ) ?></div><?php endif; ?>
 <?php if ($page === "store"): ?>
-<section class="hero"><div><span class="eyebrow">SEU PRÓXIMO UNIVERSO COMEÇA AQUI</span><h1>Play beyond.<br><em>Explore mais.</em></h1><p>Jogos, assinaturas e novas histórias.<br>Uma loja de demonstração conectada ao InPay.</p><a class="button" href="#catalog">Descobrir os jogos ↗</a><div class="chips"><span>10 produtos</span><span>5 meios de pagamento</span><span>Jornada rastreável</span></div></div><div class="hero-art"><div class="orb">✦</div><span>NEON HORIZON</span><small>Uma nova dimensão para explorar</small></div></section>
+<section class="hero"><div><span class="eyebrow">SEU PRÓXIMO UNIVERSO COMEÇA AQUI</span><h1>Play beyond.<br><em>Explore mais.</em></h1><p>Jogos, assinaturas e novas histórias.<br>Uma loja de demonstração conectada ao InPay.</p><a class="button" href="#catalog">Descobrir os jogos ↗</a><div class="chips"><span>10 produtos</span><span><?= count(
+    paymentMethods(),
+) ?> meios no gateway</span><span>Jornada rastreável</span></div></div><div class="hero-art"><div class="orb">✦</div><span>NEON HORIZON</span><small>Uma nova dimensão para explorar</small></div></section>
 <section id="catalog"><div class="section-title"><div><span class="eyebrow">SELEÇÃO INPLAY</span><h2>Encontre sua próxima aventura</h2></div><span>Catálogo demonstrativo</span></div><div class="products"><?php foreach (
     $data["products"]
     as $i => $p
@@ -300,18 +305,12 @@ endforeach; ?><div class="line total"><span>Total</span><b><?= money(
     $_SESSION["checkout_key"],
 ) ?>"><?php
 foreach (
-    [
-        "pix" => "Pix",
-        "credit_card" => "Cartão de crédito",
-        "debit_card" => "Cartão de débito",
-        "transfer" => "Transferência bancária",
-        "boleto" => "Boleto",
-    ]
-    as $value => $label
-): ?><label class="payment"><input type="radio" name="method" value="<?= $value ?>" required <?= $value ===
-"pix"
+    paymentMethods() as $value => [$label]
+): ?><label class="payment"><input type="radio" name="method" value="<?= escape(
+    $value,
+) ?>" required <?= $value === "pix"
     ? "checked"
-    : "" ?>><?= $label ?></label><?php endforeach;
+    : "" ?>><?= escape($label) ?></label><?php endforeach;
 if (
     getenv("STORE_MODE") === "cielo-sandbox"
 ): ?><input type="hidden" name="instrument" value="sandbox-approved"><p>Cartão fictício de teste Cielo. Este modo requer habilitação explícita das fixtures no Gateway.</p><?php endif;
@@ -330,7 +329,13 @@ elseif (
     array_filter($orders, fn($o) => $o["status"] === "PAID"),
 ) ?></strong></div><div><small>Catálogo</small><strong><?= count(
     $data["products"],
-) ?> produtos</strong></div></div><h2>Pedidos e cancelamentos</h2><?php orderTable(
+) ?> produtos</strong></div></div><h2>Meios de pagamento</h2><p class="muted">Todos habilitados e integrados ao gateway em <code>/gateway/v1/journeys</code>. Os conectores conservam os stubs de <code>X-Mock: true</code>.</p><div class="admin-products"><?php foreach (
+    paymentMethods() as $id => [$label, $journey]
+): ?><article class="box"><strong><?= escape(
+    $label,
+) ?></strong><p>Habilitado · jornada <code><?= escape(
+    $journey,
+) ?></code></p></article><?php endforeach; ?></div><h2>Pedidos e cancelamentos</h2><?php orderTable(
      $orders,
  ); ?><h2>Gerenciar catálogo</h2><div class="admin-products"><?php foreach (
     $data["products"]

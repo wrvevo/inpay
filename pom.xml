@@ -25,6 +25,7 @@
         <module>modules/credits</module>
 
         <module>libs/connector-runtime</module>
+        <module>libs/bank-connector</module>
         <module>libs/contracts</module>
         <module>libs/platform-security</module>
         <module>libs/platform-messaging</module>

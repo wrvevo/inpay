@@ -1,0 +1,20 @@
+{
+  "request": {
+    "method": "GET",
+    "urlPathPattern": "^/caixa/contas/v1/saldo$"
+  },
+  "priority": 20,
+  "response": {
+    "status": 200,
+    "headers": {
+      "Content-Type": "application/json"
+    },
+    "jsonBody": {
+      "mocked": true,
+      "bank": "caixa",
+      "operation": "BALANCE_GET",
+      "status": "ATIVA",
+      "pixCopiaECola": "000201mocked"
+    }
+  }
+}

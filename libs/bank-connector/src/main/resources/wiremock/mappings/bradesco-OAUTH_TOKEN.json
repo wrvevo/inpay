@@ -1,0 +1,20 @@
+{
+  "request": {
+    "method": "POST",
+    "urlPathPattern": "^/bradesco/oauth/token$"
+  },
+  "priority": 20,
+  "response": {
+    "status": 200,
+    "headers": {
+      "Content-Type": "application/json"
+    },
+    "jsonBody": {
+      "mocked": true,
+      "bank": "bradesco",
+      "operation": "OAUTH_TOKEN",
+      "status": "ATIVA",
+      "pixCopiaECola": "000201mocked"
+    }
+  }
+}

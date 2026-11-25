@@ -1,0 +1,16 @@
+<component name="ProjectRunConfigurationManager">
+  <configuration default="false" name="connector-c6" type="SpringBootApplicationConfigurationType" factoryName="Spring Boot">
+    <option name="ACTIVE_PROFILES" value="local" />
+    <module name="connector-c6" />
+    <option name="SHORTEN_COMMAND_LINE" value="ARGS_FILE" />
+    <option name="SPRING_BOOT_MAIN_CLASS" value="br.com.includelabs.inpay.c6.bootstrap.Application" />
+    <option name="PROGRAM_PARAMETERS" value="--server.port=8121 --inpay.c6.kafka-enabled=true" />
+    <envs>
+      <env name="C6_CERT_PATH" value="C:\Users\William.machado\Downloads\crt - William Robert Cirino Machado Machado" />
+      <env name="C6_KEY_PATH" value="C:\Users\William.machado\Downloads\key - William Robert Cirino Machado Machado" />
+    </envs>
+    <method v="2">
+      <option name="Make" enabled="true" />
+    </method>
+  </configuration>
+</component>

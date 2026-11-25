@@ -1,0 +1,34 @@
+<?xml version="1.0"?>
+<config xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="urn:magento:module:Magento_Store:etc/config.xsd">
+    <default>
+        <payment>
+            <inpay_credit_card><active>1</active><model>InPayMethodCreditCard</model><title>Cartão de crédito</title><order_status>pending_payment</order_status></inpay_credit_card>
+            <inpay_debit_card><active>1</active><model>InPayMethodDebitCard</model><title>Cartão de débito</title><order_status>pending_payment</order_status></inpay_debit_card>
+            <inpay_pix><active>1</active><model>InPayMethodPix</model><title>Pix</title><order_status>pending_payment</order_status></inpay_pix>
+            <inpay_boleto><active>1</active><model>InPayMethodBoleto</model><title>Boleto</title><order_status>pending_payment</order_status></inpay_boleto>
+            <inpay_transfer><active>1</active><model>InPayMethodTransfer</model><title>Transferência bancária</title><order_status>pending_payment</order_status></inpay_transfer>
+            <inpay_cielo><active>1</active><model>InPayMethodCielo</model><title>Cielo · cartão de crédito</title><order_status>pending_payment</order_status></inpay_cielo>
+            <inpay_rede><active>1</active><model>InPayMethodRede</model><title>Rede · cartão de crédito</title><order_status>pending_payment</order_status></inpay_rede>
+            <inpay_getnet><active>1</active><model>InPayMethodGetnet</model><title>Getnet · cartão de crédito</title><order_status>pending_payment</order_status></inpay_getnet>
+            <inpay_stone><active>1</active><model>InPayMethodStone</model><title>Stone · cartão de crédito</title><order_status>pending_payment</order_status></inpay_stone>
+            <inpay_bin><active>1</active><model>InPayMethodBin</model><title>Bin · cartão de crédito</title><order_status>pending_payment</order_status></inpay_bin>
+            <inpay_global_payments><active>1</active><model>InPayMethodGlobalPayments</model><title>Global Payments · cartão de crédito</title><order_status>pending_payment</order_status></inpay_global_payments>
+            <inpay_pagbank><active>1</active><model>InPayMethodPagbank</model><title>PagBank · cartão de crédito</title><order_status>pending_payment</order_status></inpay_pagbank>
+            <inpay_safrapay><active>1</active><model>InPayMethodSafrapay</model><title>SafraPay · cartão de crédito</title><order_status>pending_payment</order_status></inpay_safrapay>
+            <inpay_c6_pix><active>1</active><model>InPayMethodC6Pix</model><title>C6 Bank · Pix</title><order_status>pending_payment</order_status></inpay_c6_pix>
+            <inpay_c6_boleto><active>1</active><model>InPayMethodC6Boleto</model><title>C6 Bank · boleto</title><order_status>pending_payment</order_status></inpay_c6_boleto>
+            <inpay_itau_pix><active>1</active><model>InPayMethodItauPix</model><title>Itaú · Pix</title><order_status>pending_payment</order_status></inpay_itau_pix>
+            <inpay_itau_boleto><active>1</active><model>InPayMethodItauBoleto</model><title>Itaú · boleto</title><order_status>pending_payment</order_status></inpay_itau_boleto>
+            <inpay_santander_pix><active>1</active><model>InPayMethodSantanderPix</model><title>Santander · Pix</title><order_status>pending_payment</order_status></inpay_santander_pix>
+            <inpay_santander_boleto><active>1</active><model>InPayMethodSantanderBoleto</model><title>Santander · boleto</title><order_status>pending_payment</order_status></inpay_santander_boleto>
+            <inpay_bb_pix><active>1</active><model>InPayMethodBbPix</model><title>Banco do Brasil · Pix</title><order_status>pending_payment</order_status></inpay_bb_pix>
+            <inpay_bb_boleto><active>1</active><model>InPayMethodBbBoleto</model><title>Banco do Brasil · boleto</title><order_status>pending_payment</order_status></inpay_bb_boleto>
+            <inpay_bradesco_pix><active>1</active><model>InPayMethodBradescoPix</model><title>Bradesco · Pix</title><order_status>pending_payment</order_status></inpay_bradesco_pix>
+            <inpay_bradesco_boleto><active>1</active><model>InPayMethodBradescoBoleto</model><title>Bradesco · boleto</title><order_status>pending_payment</order_status></inpay_bradesco_boleto>
+            <inpay_caixa_pix><active>1</active><model>InPayMethodCaixaPix</model><title>Caixa · Pix</title><order_status>pending_payment</order_status></inpay_caixa_pix>
+            <inpay_caixa_boleto><active>1</active><model>InPayMethodCaixaBoleto</model><title>Caixa · boleto</title><order_status>pending_payment</order_status></inpay_caixa_boleto>
+            <inpay_banrisul_pix><active>1</active><model>InPayMethodBanrisulPix</model><title>Banrisul · Pix</title><order_status>pending_payment</order_status></inpay_banrisul_pix>
+            <inpay_banrisul_boleto><active>1</active><model>InPayMethodBanrisulBoleto</model><title>Banrisul · boleto</title><order_status>pending_payment</order_status></inpay_banrisul_boleto>
+        </payment>
+    </default>
+</config>

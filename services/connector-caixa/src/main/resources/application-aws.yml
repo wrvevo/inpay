@@ -1,0 +1,4 @@
+inpay:
+  bank:
+    mock-enabled: false
+    enabled: ${BANK_ENABLED:false}

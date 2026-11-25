@@ -1,0 +1,12 @@
+<component name="ProjectRunConfigurationManager">
+  <configuration default="false" name="payment-core-service" type="SpringBootApplicationConfigurationType" factoryName="Spring Boot">
+    <option name="ACTIVE_PROFILES" value="local" />
+    <module name="payment-core-service" />
+    <option name="SHORTEN_COMMAND_LINE" value="ARGS_FILE" />
+    <option name="SPRING_BOOT_MAIN_CLASS" value="br.com.includelabs.inpay.payment.bootstrap.Application" />
+    <option name="PROGRAM_PARAMETERS" value="--server.port=8084 --inpay.bank-gateway.urls.c6=http://127.0.0.1:8121 --inpay.bank-gateway.urls.itau=http://127.0.0.1:8122 --inpay.bank-gateway.urls.santander=http://127.0.0.1:8123 --inpay.bank-gateway.urls.bb=http://127.0.0.1:8124 --inpay.bank-gateway.urls.bradesco=http://127.0.0.1:8125 --inpay.bank-gateway.urls.caixa=http://127.0.0.1:8126 --inpay.bank-gateway.urls.banrisul=http://127.0.0.1:8127" />
+    <method v="2">
+      <option name="Make" enabled="true" />
+    </method>
+  </configuration>
+</component>

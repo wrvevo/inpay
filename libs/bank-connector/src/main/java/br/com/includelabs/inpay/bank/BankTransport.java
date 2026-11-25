@@ -1,0 +1,173 @@
+package br.com.includelabs.inpay.bank;
+
+import io.micrometer.core.instrument.MeterRegistry;
+import io.micrometer.core.instrument.Timer;
+import java.net.URI;
+import java.net.http.HttpClient;
+import java.net.http.HttpRequest;
+import java.net.http.HttpResponse;
+import java.nio.charset.StandardCharsets;
+import java.time.Duration;
+import java.util.Map;
+import java.util.concurrent.TimeUnit;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
+import tools.jackson.databind.ObjectMapper;
+
+/**
+ * Chamada HTTPS externa com orçamento máximo de 100 ms e circuit breaker. Payload não é logado.
+ */
+public final class BankTransport {
+    public static final Duration MAX_BUDGET = Duration.ofMillis(100);
+
+    private static final Logger LOG = LogManager.getLogger(BankTransport.class);
+
+    private final BankCircuit circuit;
+    private final HttpClient client;
+    private final ObjectMapper mapper;
+    private final MeterRegistry meters;
+
+    public BankTransport(BankSettings settings) {
+        this(settings, null);
+    }
+
+    public BankTransport(BankSettings settings, MeterRegistry meters) {
+        this.circuit = new BankCircuit(settings.failureThreshold(), settings.openDuration());
+        this.client =
+                HttpClient.newBuilder()
+                        .connectTimeout(MAX_BUDGET)
+                        .followRedirects(HttpClient.Redirect.NEVER)
+                        .build();
+        this.mapper = new ObjectMapper();
+        this.meters = meters;
+    }
+
+    public BankResult send(
+            BankId bank, BankOperation operation, boolean mocked, URI uri, String body) {
+        long started = System.nanoTime();
+        LOG.info(
+                "External bank call started bank={} operation={} mock={} host={}",
+                bank.slug(),
+                operation.name(),
+                mocked,
+                uri.getHost());
+        BankCircuit.Lease lease = circuit.acquire();
+        if (lease == null) {
+            return finish(bank, operation, mocked, started, "open", BankResult.unavailable(bank.slug(), operation.name(), mocked));
+        }
+        HttpRequest.Builder request =
+                HttpRequest.newBuilder(uri)
+                        .timeout(MAX_BUDGET)
+                        .header("Accept", "application/json")
+                        .header("Content-Type", "application/json");
+        if (body == null || body.isBlank()) {
+            request.method(operation.method(), HttpRequest.BodyPublishers.noBody());
+        } else {
+            request.method(
+                    operation.method(),
+                    HttpRequest.BodyPublishers.ofString(body, StandardCharsets.UTF_8));
+        }
+        var future = client.sendAsync(request.build(), HttpResponse.BodyHandlers.ofByteArray());
+        try {
+            HttpResponse<byte[]> response =
+                    future.get(MAX_BUDGET.toMillis(), TimeUnit.MILLISECONDS);
+            boolean transientFailure =
+                    response.statusCode() == 408
+                            || response.statusCode() == 429
+                            || response.statusCode() >= 500;
+            circuit.complete(lease, !transientFailure);
+            BankResult result =
+                    new BankResult(
+                            bank.slug(),
+                            operation.name(),
+                            response.statusCode(),
+                            transientFailure,
+                            mocked,
+                            decode(response.body()));
+            return finish(
+                    bank,
+                    operation,
+                    mocked,
+                    started,
+                    transientFailure ? "transient" : "completed",
+                    result);
+        } catch (InterruptedException exception) {
+            Thread.currentThread().interrupt();
+            future.cancel(true);
+            circuit.complete(lease, false);
+            LOG.error(
+                    "External bank call interrupted bank={} operation={}",
+                    bank.slug(),
+                    operation.name(),
+                    exception);
+            return finish(
+                    bank,
+                    operation,
+                    mocked,
+                    started,
+                    "interrupted",
+                    BankResult.unavailable(bank.slug(), operation.name(), mocked));
+        } catch (Exception exception) {
+            future.cancel(true);
+            circuit.complete(lease, false);
+            LOG.error(
+                    "External bank call failed within 100ms budget bank={} operation={}",
+                    bank.slug(),
+                    operation.name(),
+                    exception);
+            return finish(
+                    bank,
+                    operation,
+                    mocked,
+                    started,
+                    "timeout",
+                    BankResult.unavailable(bank.slug(), operation.name(), mocked));
+        }
+    }
+
+    private BankResult finish(
+            BankId bank,
+            BankOperation operation,
+            boolean mocked,
+            long started,
+            String outcome,
+            BankResult result) {
+        long elapsed = System.nanoTime() - started;
+        LOG.info(
+                "External bank call finished bank={} operation={} mock={} status={} uncertain={} outcome={} elapsedMs={}",
+                bank.slug(),
+                operation.name(),
+                mocked,
+                result.status(),
+                result.uncertain(),
+                outcome,
+                elapsed / 1_000_000);
+        if (meters != null) {
+            Timer.builder("inpay.bank.external.call")
+                    .tag("bank", bank.slug())
+                    .tag("operation", operation.name())
+                    .tag("mock", Boolean.toString(mocked))
+                    .tag("outcome", outcome)
+                    .register(meters)
+                    .record(elapsed, TimeUnit.NANOSECONDS);
+        }
+        return result;
+    }
+
+    @SuppressWarnings("unchecked")
+    private Map<String, Object> decode(byte[] bytes) {
+        if (bytes == null || bytes.length == 0 || bytes.length > 1_048_576) {
+            return Map.of();
+        }
+        try {
+            Object decoded = mapper.readValue(bytes, Object.class);
+            if (decoded instanceof Map<?, ?> map) {
+                return (Map<String, Object>) map;
+            }
+            return Map.of("items", decoded);
+        } catch (Exception exception) {
+            LOG.error("External bank response was not JSON", exception);
+            return Map.of();
+        }
+    }
+}

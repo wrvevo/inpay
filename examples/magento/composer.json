@@ -1,0 +1,20 @@
+{
+  "name": "inpay/magento-gateway",
+  "description": "Meios de pagamento InPay para Magento Open Source. Checkout chama o gateway; não envia PAN/CVV.",
+  "type": "magento2-module",
+  "license": "proprietary",
+  "require": {
+    "php": ">=8.2",
+    "magento/framework": ">=103.0.0",
+    "magento/module-payment": ">=100.4.0",
+    "magento/module-sales": ">=103.0.0"
+  },
+  "autoload": {
+    "files": [
+      "registration.php"
+    ],
+    "psr-4": {
+      "InPay\\Gateway\\": ""
+    }
+  }
+}

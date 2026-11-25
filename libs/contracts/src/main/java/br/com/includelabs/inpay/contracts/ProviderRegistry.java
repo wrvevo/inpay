@@ -59,31 +59,42 @@ public final class ProviderRegistry {
      * inclusão.
      */
     public static ProviderRegistry installed() {
-        return new ProviderRegistry(
+        List<Provider> providers = new ArrayList<>();
+        for (String id :
                 List.of(
-                                "cielo",
-                                "rede",
-                                "getnet",
-                                "stone",
-                                "bin",
-                                "global-payments",
-                                "pagbank",
-                                "safrapay")
-                        .stream()
-                        .map(
-                                id ->
-                                        new Provider(
-                                                id,
-                                                id.equals("pagbank")
-                                                        ? Set.of(
-                                                                Capability.CARD_PAYMENTS,
-                                                                Capability.PIX_COLLECTION,
-                                                                Capability.BOLETO_COLLECTION)
-                                                        : id.equals("cielo")
-                                                                ? Set.of(
-                                                                        Capability.CARD_PAYMENTS,
-                                                                        Capability.PIX_COLLECTION)
-                                                                : Set.of(Capability.CARD_PAYMENTS)))
-                        .toList());
+                        "cielo",
+                        "rede",
+                        "getnet",
+                        "stone",
+                        "bin",
+                        "global-payments",
+                        "pagbank",
+                        "safrapay")) {
+            providers.add(
+                    new Provider(
+                            id,
+                            id.equals("pagbank")
+                                    ? Set.of(
+                                            Capability.CARD_PAYMENTS,
+                                            Capability.PIX_COLLECTION,
+                                            Capability.BOLETO_COLLECTION)
+                                    : id.equals("cielo")
+                                            ? Set.of(
+                                                    Capability.CARD_PAYMENTS,
+                                                    Capability.PIX_COLLECTION)
+                                            : Set.of(Capability.CARD_PAYMENTS)));
+        }
+        Set<Capability> banking =
+                Set.of(
+                        Capability.PIX_COLLECTION,
+                        Capability.BOLETO_COLLECTION,
+                        Capability.PIX_REFUND,
+                        Capability.BANK_ACCOUNTS,
+                        Capability.PIX_TRANSFER,
+                        Capability.PIX_KEYS);
+        for (String id : List.of("c6", "itau", "santander", "bb", "bradesco", "caixa", "banrisul")) {
+            providers.add(new Provider(id, banking));
+        }
+        return new ProviderRegistry(providers);
     }
 }

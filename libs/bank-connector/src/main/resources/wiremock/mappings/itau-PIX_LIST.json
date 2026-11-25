@@ -1,0 +1,20 @@
+{
+  "request": {
+    "method": "GET",
+    "urlPathPattern": "^/itau/pix/v2/pix$"
+  },
+  "priority": 20,
+  "response": {
+    "status": 200,
+    "headers": {
+      "Content-Type": "application/json"
+    },
+    "jsonBody": {
+      "mocked": true,
+      "bank": "itau",
+      "operation": "PIX_LIST",
+      "status": "ATIVA",
+      "pixCopiaECola": "000201mocked"
+    }
+  }
+}

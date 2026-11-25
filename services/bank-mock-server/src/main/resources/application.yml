@@ -1,0 +1,13 @@
+spring:
+  application:
+    name: bank-mock-server
+server:
+  port: 8098
+inpay:
+  mock:
+    port: 8099
+management:
+  endpoints:
+    web:
+      exposure:
+        include: health

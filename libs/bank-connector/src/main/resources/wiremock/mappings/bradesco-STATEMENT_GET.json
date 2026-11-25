@@ -1,0 +1,20 @@
+{
+  "request": {
+    "method": "GET",
+    "urlPathPattern": "^/bradesco/contas/v1/extrato$"
+  },
+  "priority": 20,
+  "response": {
+    "status": 200,
+    "headers": {
+      "Content-Type": "application/json"
+    },
+    "jsonBody": {
+      "mocked": true,
+      "bank": "bradesco",
+      "operation": "STATEMENT_GET",
+      "status": "ATIVA",
+      "pixCopiaECola": "000201mocked"
+    }
+  }
+}

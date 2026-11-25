@@ -35,7 +35,7 @@ saldo/produto. Não confiar em status enviado pelo navegador ou em um webhook se
 | Loja Pix, débito, boleto e transferência | Checkout e ciclo local com simulador | Habilitação e E2E bancário de cada meio; autenticação de débito |
 | Cielo e-Commerce | 20 operações nativas distintas da coleção no conector; parâmetros nativos opcionais | Cobertura de cada variante comercial e erros; ver relatório de testes |
 | Cielo Pix Cielo2 | Payload nativo e configuração | Sandbox oficial não disponibiliza novo Pix; habilitação comercial e teste controlado |
-| C6 / bancos | Catálogo e referências por tenant no Accounts e painel | Aplicações conectoras bancárias, OpenAPI autorizado, mTLS/OAuth, credenciais e testes |
+| C6 / bancos | Conectores separados com Pix BACEN, boleto, TED, saldo e chaves em mock WireMock (`X-Mock: true`). Live permanece desligado | OpenAPI contratado, mTLS/OAuth, credencial e homologação com o banco |
 | Recorrência | Operações nativas Cielo; geração de faturas no Billing | Orquestração integral da loja, agendamento durável, retries por regra de negócio |
 | Conciliação | Consulta de pagamento e outbox da nova jornada | Arquivos/extratos, taxas, liquidação, divergências e fechamento financeiro |
 | Split | Prévia comercial existente e desenho de fluxo | Split financeiro contratado, recebedores, estornos proporcionais, repasses efetivos |

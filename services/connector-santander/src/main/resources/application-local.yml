@@ -1,0 +1,17 @@
+inpay:
+  local-password: ${LOCAL_PASSWORD:local-only-change-me}
+  local-merchant: 11111111-1111-1111-1111-111111111111
+  bank:
+    mock-enabled: true
+    enabled: false
+  santander:
+    enabled: ${SANTANDER_ENABLED:false}
+    token-url: ${SANTANDER_TOKEN_URL:https://trust-sandbox.api.santander.com.br/auth/oauth/v2/token}
+    pix-base-url: ${SANTANDER_PIX_BASE_URL:https://pix.santander.com.br/api/v1/sandbox}
+    billing-base-url: ${SANTANDER_BILLING_BASE_URL:https://trust-sandbox.api.santander.com.br/collection_bill_management/v2}
+    payments-base-url: ${SANTANDER_PAYMENTS_BASE_URL:https://trust-sandbox.api.santander.com.br/management_payments_partners/v1}
+    client-id: ${SANTANDER_CLIENT_ID:}
+    client-secret: ${SANTANDER_CLIENT_SECRET:}
+    certificate: ${SANTANDER_CERT_PATH:}
+    private-key: ${SANTANDER_KEY_PATH:}
+    confirm-unverified-paths: ${SANTANDER_CONFIRM_UNVERIFIED_PATHS:false}

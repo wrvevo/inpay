@@ -1,0 +1,20 @@
+{
+  "request": {
+    "method": "GET",
+    "urlPathPattern": "^/santander/boletos/v1/boletos/[^/]+/pdf$"
+  },
+  "priority": 19,
+  "response": {
+    "status": 200,
+    "headers": {
+      "Content-Type": "application/json"
+    },
+    "jsonBody": {
+      "mocked": true,
+      "bank": "santander",
+      "operation": "BOLETO_PDF",
+      "status": "ATIVA",
+      "pixCopiaECola": "000201mocked"
+    }
+  }
+}

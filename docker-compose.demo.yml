@@ -25,6 +25,7 @@ services:
       INPAY_URL: http://payment-core-service:8084
       INPAY_AUTHORIZATION: ${DEMO_CONNECTOR_AUTHORIZATION:?Defina Basic base64(developer:LOCAL_PASSWORD)}
       INPAY_TENANT: 11111111-1111-1111-1111-111111111111
+      INPAY_SWAGGER_URL: http://localhost:8084/swagger-ui/index.html
     ports:
       - 127.0.0.1:8099:8099
     volumes:

@@ -1,0 +1,84 @@
+<?xml version="1.0"?>
+<config xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="urn:magento:framework:ObjectManager/etc/config.xsd">
+    <virtualType name="InPayMethodCreditCard" type="InPay\Gateway\Model\GatewayMethod">
+        <arguments><argument name="code" xsi:type="string">inpay_credit_card</argument><argument name="journey" xsi:type="string">credit_card</argument></arguments>
+    </virtualType>
+    <virtualType name="InPayMethodDebitCard" type="InPay\Gateway\Model\GatewayMethod">
+        <arguments><argument name="code" xsi:type="string">inpay_debit_card</argument><argument name="journey" xsi:type="string">debit_card</argument></arguments>
+    </virtualType>
+    <virtualType name="InPayMethodPix" type="InPay\Gateway\Model\GatewayMethod">
+        <arguments><argument name="code" xsi:type="string">inpay_pix</argument><argument name="journey" xsi:type="string">pix</argument></arguments>
+    </virtualType>
+    <virtualType name="InPayMethodBoleto" type="InPay\Gateway\Model\GatewayMethod">
+        <arguments><argument name="code" xsi:type="string">inpay_boleto</argument><argument name="journey" xsi:type="string">boleto</argument></arguments>
+    </virtualType>
+    <virtualType name="InPayMethodTransfer" type="InPay\Gateway\Model\GatewayMethod">
+        <arguments><argument name="code" xsi:type="string">inpay_transfer</argument><argument name="journey" xsi:type="string">transfer</argument></arguments>
+    </virtualType>
+    <virtualType name="InPayMethodCielo" type="InPay\Gateway\Model\GatewayMethod">
+        <arguments><argument name="code" xsi:type="string">inpay_cielo</argument><argument name="journey" xsi:type="string">credit_card</argument></arguments>
+    </virtualType>
+    <virtualType name="InPayMethodRede" type="InPay\Gateway\Model\GatewayMethod">
+        <arguments><argument name="code" xsi:type="string">inpay_rede</argument><argument name="journey" xsi:type="string">credit_card</argument></arguments>
+    </virtualType>
+    <virtualType name="InPayMethodGetnet" type="InPay\Gateway\Model\GatewayMethod">
+        <arguments><argument name="code" xsi:type="string">inpay_getnet</argument><argument name="journey" xsi:type="string">credit_card</argument></arguments>
+    </virtualType>
+    <virtualType name="InPayMethodStone" type="InPay\Gateway\Model\GatewayMethod">
+        <arguments><argument name="code" xsi:type="string">inpay_stone</argument><argument name="journey" xsi:type="string">credit_card</argument></arguments>
+    </virtualType>
+    <virtualType name="InPayMethodBin" type="InPay\Gateway\Model\GatewayMethod">
+        <arguments><argument name="code" xsi:type="string">inpay_bin</argument><argument name="journey" xsi:type="string">credit_card</argument></arguments>
+    </virtualType>
+    <virtualType name="InPayMethodGlobalPayments" type="InPay\Gateway\Model\GatewayMethod">
+        <arguments><argument name="code" xsi:type="string">inpay_global_payments</argument><argument name="journey" xsi:type="string">credit_card</argument></arguments>
+    </virtualType>
+    <virtualType name="InPayMethodPagbank" type="InPay\Gateway\Model\GatewayMethod">
+        <arguments><argument name="code" xsi:type="string">inpay_pagbank</argument><argument name="journey" xsi:type="string">credit_card</argument></arguments>
+    </virtualType>
+    <virtualType name="InPayMethodSafrapay" type="InPay\Gateway\Model\GatewayMethod">
+        <arguments><argument name="code" xsi:type="string">inpay_safrapay</argument><argument name="journey" xsi:type="string">credit_card</argument></arguments>
+    </virtualType>
+    <virtualType name="InPayMethodC6Pix" type="InPay\Gateway\Model\GatewayMethod">
+        <arguments><argument name="code" xsi:type="string">inpay_c6_pix</argument><argument name="journey" xsi:type="string">pix</argument></arguments>
+    </virtualType>
+    <virtualType name="InPayMethodC6Boleto" type="InPay\Gateway\Model\GatewayMethod">
+        <arguments><argument name="code" xsi:type="string">inpay_c6_boleto</argument><argument name="journey" xsi:type="string">boleto</argument></arguments>
+    </virtualType>
+    <virtualType name="InPayMethodItauPix" type="InPay\Gateway\Model\GatewayMethod">
+        <arguments><argument name="code" xsi:type="string">inpay_itau_pix</argument><argument name="journey" xsi:type="string">pix</argument></arguments>
+    </virtualType>
+    <virtualType name="InPayMethodItauBoleto" type="InPay\Gateway\Model\GatewayMethod">
+        <arguments><argument name="code" xsi:type="string">inpay_itau_boleto</argument><argument name="journey" xsi:type="string">boleto</argument></arguments>
+    </virtualType>
+    <virtualType name="InPayMethodSantanderPix" type="InPay\Gateway\Model\GatewayMethod">
+        <arguments><argument name="code" xsi:type="string">inpay_santander_pix</argument><argument name="journey" xsi:type="string">pix</argument></arguments>
+    </virtualType>
+    <virtualType name="InPayMethodSantanderBoleto" type="InPay\Gateway\Model\GatewayMethod">
+        <arguments><argument name="code" xsi:type="string">inpay_santander_boleto</argument><argument name="journey" xsi:type="string">boleto</argument></arguments>
+    </virtualType>
+    <virtualType name="InPayMethodBbPix" type="InPay\Gateway\Model\GatewayMethod">
+        <arguments><argument name="code" xsi:type="string">inpay_bb_pix</argument><argument name="journey" xsi:type="string">pix</argument></arguments>
+    </virtualType>
+    <virtualType name="InPayMethodBbBoleto" type="InPay\Gateway\Model\GatewayMethod">
+        <arguments><argument name="code" xsi:type="string">inpay_bb_boleto</argument><argument name="journey" xsi:type="string">boleto</argument></arguments>
+    </virtualType>
+    <virtualType name="InPayMethodBradescoPix" type="InPay\Gateway\Model\GatewayMethod">
+        <arguments><argument name="code" xsi:type="string">inpay_bradesco_pix</argument><argument name="journey" xsi:type="string">pix</argument></arguments>
+    </virtualType>
+    <virtualType name="InPayMethodBradescoBoleto" type="InPay\Gateway\Model\GatewayMethod">
+        <arguments><argument name="code" xsi:type="string">inpay_bradesco_boleto</argument><argument name="journey" xsi:type="string">boleto</argument></arguments>
+    </virtualType>
+    <virtualType name="InPayMethodCaixaPix" type="InPay\Gateway\Model\GatewayMethod">
+        <arguments><argument name="code" xsi:type="string">inpay_caixa_pix</argument><argument name="journey" xsi:type="string">pix</argument></arguments>
+    </virtualType>
+    <virtualType name="InPayMethodCaixaBoleto" type="InPay\Gateway\Model\GatewayMethod">
+        <arguments><argument name="code" xsi:type="string">inpay_caixa_boleto</argument><argument name="journey" xsi:type="string">boleto</argument></arguments>
+    </virtualType>
+    <virtualType name="InPayMethodBanrisulPix" type="InPay\Gateway\Model\GatewayMethod">
+        <arguments><argument name="code" xsi:type="string">inpay_banrisul_pix</argument><argument name="journey" xsi:type="string">pix</argument></arguments>
+    </virtualType>
+    <virtualType name="InPayMethodBanrisulBoleto" type="InPay\Gateway\Model\GatewayMethod">
+        <arguments><argument name="code" xsi:type="string">inpay_banrisul_boleto</argument><argument name="journey" xsi:type="string">boleto</argument></arguments>
+    </virtualType>
+</config>

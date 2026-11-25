@@ -1,0 +1,1892 @@
+{
+  "info": {
+    "_postman_id": "9db960a5-52e6-4975-9c6e-0f192606aad9",
+    "name": "API Cielo e-Commerce - Manual",
+    "description": "Coleção destinada a utilização no Manual 3.0 - NÃO DEVE SER APAGADA",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json",
+    "_exporter_id": "1265975",
+    "_collection_link": "https://go.postman.co/collection/1265975-9db960a5-52e6-4975-9c6e-0f192606aad9?source=collection_link"
+  },
+  "item": [
+    {
+      "name": "MP - Cartão de crédito",
+      "item": [
+        {
+          "name": "Authorize - CreditCard - Mínimo",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "MerchantId",
+                "value": "{{merchantid}}"
+              },
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              },
+              {
+                "key": "MerchantKey",
+                "value": "{{merchantkey}}"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\r\n   \"MerchantOrderId\":\"2014111703\",\r\n   \"Payment\":{\r\n     \"Type\":\"CreditCard\",\r\n     \"Amount\":15700,\r\n     \"Installments\":1,\r\n     \"SoftDescriptor\":\"123456789ABCD\",\r\n     \"CreditCard\":{\r\n         \"CardNumber\":\"4551870000000183\",\r\n         \"Holder\":\"Teste Holder\",\r\n         \"ExpirationDate\":\"12/2021\",\r\n         \"SecurityCode\":\"123\",\r\n         \"Brand\":\"Visa\"\r\n     }\r\n   }\r\n}"
+            },
+            "url": {
+              "raw": "{{apiUrl}}/1/sales",
+              "host": [
+                "{{apiUrl}}"
+              ],
+              "path": [
+                "1",
+                "sales"
+              ]
+            }
+          },
+          "response": [
+            {
+              "name": "Autorização",
+              "originalRequest": {
+                "method": "POST",
+                "header": [
+                  {
+                    "key": "MerchantId",
+                    "value": "{{merchantId}}"
+                  },
+                  {
+                    "description": "The mime type of this content",
+                    "key": "Content-Type",
+                    "value": "application/json"
+                  },
+                  {
+                    "key": "MerchantKey",
+                    "value": "{{merchantKey}}"
+                  }
+                ],
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\r\n   \"MerchantOrderId\":\"2014111703\",\r\n   \"Payment\":{\r\n     \"Provider\":\"Simulado\",\r\n     \"Type\":\"CreditCard\",\r\n     \"Amount\":15700,\r\n     \"Installments\":1,\r\n     \"SoftDescriptor\":\"123456789ABCD\",\r\n     \"CreditCard\":{\r\n         \"CardNumber\":\"4551870000000181\",\r\n         \"Holder\":\"Teste Holder\",\r\n         \"ExpirationDate\":\"12/2021\",\r\n         \"SecurityCode\":\"123\",\r\n         \"Brand\":\"Visa\"\r\n     }\r\n   }\r\n}"
+                },
+                "url": {
+                  "raw": "{{apiUrl}}/1/sales",
+                  "host": [
+                    "{{apiUrl}}"
+                  ],
+                  "path": [
+                    "1",
+                    "sales"
+                  ]
+                }
+              },
+              "status": "Created",
+              "code": 201,
+              "_postman_previewlanguage": "json",
+              "header": [
+                {
+                  "description": "",
+                  "key": "Access-Control-Allow-Origin",
+                  "name": "Access-Control-Allow-Origin",
+                  "value": "*"
+                },
+                {
+                  "description": "",
+                  "key": "Cache-Control",
+                  "name": "Cache-Control",
+                  "value": "no-cache"
+                },
+                {
+                  "description": "",
+                  "key": "Connection",
+                  "name": "Connection",
+                  "value": "close"
+                },
+                {
+                  "description": "",
+                  "key": "Content-Length",
+                  "name": "Content-Length",
+                  "value": "1074"
+                },
+                {
+                  "description": "",
+                  "key": "Content-Type",
+                  "name": "Content-Type",
+                  "value": "application/json; charset=utf-8"
+                },
+                {
+                  "description": "",
+                  "key": "Date",
+                  "name": "Date",
+                  "value": "Fri, 07 Apr 2017 15:08:58 GMT"
+                },
+                {
+                  "description": "",
+                  "key": "Expires",
+                  "name": "Expires",
+                  "value": "-1"
+                },
+                {
+                  "description": "",
+                  "key": "Location",
+                  "name": "Location",
+                  "value": "https://apiquerydev.cieloecommerce.cielo.com.br/1/sales/eb616a9f-00bc-437d-bbf8-0f5e8a3e716c"
+                },
+                {
+                  "description": "",
+                  "key": "Pragma",
+                  "name": "Pragma",
+                  "value": "no-cache"
+                },
+                {
+                  "description": "",
+                  "key": "Server",
+                  "name": "Server",
+                  "value": "Microsoft-IIS/8.0"
+                },
+                {
+                  "description": "",
+                  "key": "X-AspNet-Version",
+                  "name": "X-AspNet-Version",
+                  "value": "4.0.30319"
+                },
+                {
+                  "description": "",
+                  "key": "X-Powered-By",
+                  "name": "X-Powered-By",
+                  "value": "ASP.NET"
+                },
+                {
+                  "description": "",
+                  "key": "X-Response-Time",
+                  "name": "X-Response-Time",
+                  "value": "470ms"
+                }
+              ],
+              "cookie": [],
+              "body": "{\"MerchantOrderId\":\"2014111703\",\"Customer\":{\"Name\":\"[Guest]\"},\"Payment\":{\"ServiceTaxAmount\":0,\"Installments\":1,\"Interest\":0,\"Capture\":false,\"Authenticate\":false,\"Recurrent\":false,\"CreditCard\":{\"CardNumber\":\"455187******0181\",\"Holder\":\"Teste Holder\",\"ExpirationDate\":\"12/2021\",\"SaveCard\":false,\"Brand\":\"Visa\"},\"Tid\":\"0407120858677\",\"ProofOfSale\":\"858677\",\"AuthorizationCode\":\"408180\",\"SoftDescriptor\":\"123456789ABCD\",\"Provider\":\"Simulado\",\"PaymentId\":\"eb616a9f-00bc-437d-bbf8-0f5e8a3e716c\",\"Type\":\"CreditCard\",\"Amount\":15700,\"ReceivedDate\":\"2017-04-07 12:08:58\",\"Currency\":\"BRL\",\"Country\":\"BRA\",\"ReturnCode\":\"4\",\"ReturnMessage\":\"Operation Successful\",\"Status\":1,\"Links\":[{\"Method\":\"GET\",\"Rel\":\"self\",\"Href\":\"https://apiquerydev.cieloecommerce.cielo.com.br/1/sales/eb616a9f-00bc-437d-bbf8-0f5e8a3e716c\"},{\"Method\":\"PUT\",\"Rel\":\"capture\",\"Href\":\"https://apidev.cieloecommerce.cielo.com.br/1/sales/eb616a9f-00bc-437d-bbf8-0f5e8a3e716c/capture\"},{\"Method\":\"PUT\",\"Rel\":\"void\",\"Href\":\"https://apidev.cieloecommerce.cielo.com.br/1/sales/eb616a9f-00bc-437d-bbf8-0f5e8a3e716c/void\"}]}}"
+            }
+          ]
+        },
+        {
+          "name": "Authorize - CreditCard - Autenticated",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "MerchantId",
+                "value": "{{merchantId}}"
+              },
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              },
+              {
+                "key": "MerchantKey",
+                "value": "{{merchantKey}}"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{ \n  \"MerchantOrderId\":\"2014111903\", \n  \"Customer\":\n  { \n    \"Name\":\"Comprador Teste\" \n  }, \n  \"Payment\":\n  { \n      \"Type\":\"CreditCard\", \n      \"Amount\":15700, \n      \"Provider\":\"Cielo\",\n      \"ReturnUrl\":\"https://www.google.com.br\",\n      \"Installments\":1, \n      \"Authenticate\":true,\n      \"CreditCard\":\n      { \n        \"CardNumber\":\"1234123412341231\", \n        \"Holder\":\"Teste Holder\", \n        \"ExpirationDate\":\"12/2018\", \n        \"SecurityCode\":\"123\", \n        \"Brand\":\"Visa\" \n      } \n  } \n}"
+            },
+            "url": {
+              "raw": "{{apiUrl}}/1/sales",
+              "host": [
+                "{{apiUrl}}"
+              ],
+              "path": [
+                "1",
+                "sales"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Authorize - CreditCard - Completo",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              },
+              {
+                "key": "MerchantId",
+                "value": "{{merchantId}}"
+              },
+              {
+                "key": "MerchantKey",
+                "value": "{{merchantKey}}"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{  \r\n   \"MerchantOrderId\":\"2014111701\",\r\n    \"Customer\":{  \r\n      \"Name\":\"Comprador Teste\",\r\n      \"Identity\":\"11225468954\",\r\n      \"IdentityType\":\"CPF\",\r\n      \"Email\":\"compradorteste@teste.com\",\r\n      \"Birthdate\":\"1991-01-02\",\r\n      \"Address\":{  \r\n         \"Street\":\"Rua Teste\",\r\n         \"Number\":\"123\",\r\n         \"Complement\":\"AP 123\",\r\n         \"ZipCode\":\"12345987\",\r\n         \"City\":\"Rio de Janeiro\",\r\n         \"State\":\"RJ\",\r\n         \"Country\":\"BRA\"\r\n      },\r\n        \"DeliveryAddress\": {\r\n            \"Street\": \"Rua Teste\",\r\n            \"Number\": \"123\",\r\n            \"Complement\": \"AP 123\",\r\n            \"ZipCode\": \"12345987\",\r\n            \"City\": \"Rio de Janeiro\",\r\n            \"State\": \"RJ\",\r\n            \"Country\": \"BRA\"\r\n        }\r\n   },\r\n   \"Payment\":{  \r\n     \"Type\":\"CreditCard\",\r\n     \"Amount\":15700,\r\n     \"Currency\":\"BRL\",\r\n     \"Country\":\"BRA\",\r\n     \"Provider\":\"Simulado\",\r\n     \"ServiceTaxAmount\":0,\r\n     \"Installments\":1,\r\n     \"Interest\":\"ByMerchant\",\r\n     \"Capture\":false,\r\n     \"Authenticate\":false,    \r\n     \"Recurrent\": false,\r\n     \"SoftDescriptor\":\"123456789ABCD\",\r\n     \"CreditCard\":{  \r\n         \"CardNumber\":\"4024007197692931\",\r\n         \"Holder\":\"Teste Holder\",\r\n         \"ExpirationDate\":\"12/2021\",\r\n         \"SecurityCode\":\"123\",\r\n         \"SaveCard\":\"false\",\r\n         \"Brand\":\"Visa\"\r\n     }\r\n   }\r\n}"
+            },
+            "url": {
+              "raw": "{{apiUrl}}/1/sales",
+              "host": [
+                "{{apiUrl}}"
+              ],
+              "path": [
+                "1",
+                "sales"
+              ]
+            }
+          },
+          "response": []
+        }
+      ]
+    },
+    {
+      "name": "MP - Cartão de débito",
+      "item": [
+        {
+          "name": "Authorize - DebitCard",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "MerchantId",
+                "value": "{{merchantId}}"
+              },
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              },
+              {
+                "key": "MerchantKey",
+                "value": "{{merchantKey}}"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{  \n   \"MerchantOrderId\":\"2014121201\",\n   \"Customer\":{  \n      \"Name\":\"Paulo Henrique\"     \n   },\n   \"Payment\":{  \n     \"Type\":\"DebitCard\",\n     \"Amount\":15700,\n     \"Provider\":\"Simulado\",\n     \"ReturnUrl\":\"http://www.google.com.br\",\n     \"DebitCard\":{  \n         \"CardNumber\":\"4532117080573703\",\n         \"Holder\":\"Teste Holder\",\n         \"ExpirationDate\":\"12/2019\",\n         \"SecurityCode\":\"023\",\n         \"Brand\":\"Visa\"\n     }\n   }\n}"
+            },
+            "url": {
+              "raw": "{{apiUrl}}/1/sales",
+              "host": [
+                "{{apiUrl}}"
+              ],
+              "path": [
+                "1",
+                "sales"
+              ]
+            }
+          },
+          "response": []
+        }
+      ]
+    },
+    {
+      "name": "MP - Boleto",
+      "item": [
+        {
+          "name": "Authorize - Boleto - Sem Registro e Registrado",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "MerchantId",
+                "value": "{{merchantId}}"
+              },
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              },
+              {
+                "key": "MerchantKey",
+                "value": "{{merchantKey}}"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{  \n    \"MerchantOrderId\":\"2014111706\",\n    \"Customer\":\n    {  \n        \"Name\":\"Comprador Teste Boleto\",\n        \"Identity\": \"1234567890\",\n        \"Address\":\n        {\n          \"Street\": \"Avenida Marechal Câmara\",\n          \"Number\": \"160\",  \n          \"Complement\": \"Sala 934\",\n          \"ZipCode\" : \"22750012\",\n          \"District\": \"Centro\",\n          \"City\": \"Rio de Janeiro\",\n          \"State\" : \"RJ\",\n          \"Country\": \"BRA\"\n        }\n    },\n    \"Payment\":\n    {  \n        \"Type\":\"Boleto\",\n        \"Amount\":15700,\n        \"Provider\":\"bradesco2\",\n        \"Address\": \"Rua Teste\",\n        \"BoletoNumber\": \"123\",\n        \"Assignor\": \"Empresa Teste\",\n        \"Demonstrative\": \"Desmonstrative Teste\",\n        \"ExpirationDate\": \"5/1/2015\",\n        \"Identification\": \"11884926754\",\n        \"Instructions\": \"Aceitar somente até a data de vencimento, após essa data juros de 1% dia.\"\n    }\n}"
+            },
+            "url": {
+              "raw": "{{apiUrl}}/1/sales",
+              "host": [
+                "{{apiUrl}}"
+              ],
+              "path": [
+                "1",
+                "sales"
+              ]
+            }
+          },
+          "response": []
+        }
+      ]
+    },
+    {
+      "name": "MP - Transferência Eletrônica",
+      "item": [
+        {
+          "name": "Authorize - ElectronicTransfer",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "MerchantId",
+                "value": "{{merchantId}}"
+              },
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              },
+              {
+                "key": "MerchantKey",
+                "value": "{{merchantKey}}"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{  \n    \"MerchantOrderId\":\"2014111706\",\n    \"Customer\":\n    {  \n        \"Name\":\"Comprador Teste\"     \n    },\n    \"Payment\":\n    {  \n        \"Type\":\"EletronicTransfer\",\n        \"Amount\":15700,\n        \"Provider\":\"Bradesco\",\n        \"ReturnUrl\":\"http://www.google.com.br\"\n    }\n}"
+            },
+            "url": {
+              "raw": "{{apiUrl}}/1/sales",
+              "host": [
+                "{{apiUrl}}"
+              ],
+              "path": [
+                "1",
+                "sales"
+              ]
+            }
+          },
+          "response": []
+        }
+      ]
+    },
+    {
+      "name": "Antifraud Gateway",
+      "item": [
+        {
+          "name": "Authorize - CreditCard - FraudAnalysis",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "MerchantId",
+                "value": "{{merchantId}}"
+              },
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              },
+              {
+                "key": "MerchantKey",
+                "value": "{{merchantKey}}"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\r\n   \"MerchantOrderId\":\"2014111457673454307\",\r\n   \"Customer\":{\r\n      \"Name\":\"Comprador accept\",\r\n      \"Identity\":\"30602458005\",\r\n      \"IdentityType\":\"CPF\",\r\n      \"Email\":\"compradorteste@live.com\",\r\n      \"Birthdate\":\"1991-01-02\",\r\n      \"Address\":{\r\n         \"Street\":\"Rua Júpter\",\r\n         \"Number\":\"174\",\r\n         \"Complement\":\"AP 201\",\r\n         \"ZipCode\":\"21241140\",\r\n         \"City\":\"Rio de Janeiro\",\r\n         \"State\":\"RJ\",\r\n         \"Country\":\"BRA\"\r\n      },\r\n      \"DeliveryAddress\":{\r\n         \"Street\":\"Rua Júpter\",\r\n         \"Number\":\"174\",\r\n         \"Complement\":\"AP 201\",\r\n         \"ZipCode\":\"21241140\",\r\n         \"City\":\"Rio de Janeiro\",\r\n         \"State\":\"RJ\",\r\n         \"Country\":\"BRA\"\r\n      }\r\n   },\r\n   \"Payment\":{\r\n      \"Type\":\"CreditCard\",\r\n      \"Amount\":100,\r\n      \"Currency\":\"BRL\",\r\n      \"Country\":\"BRA\",\r\n      \"Provider\":\"Simulado\",\r\n      \"ServiceTaxAmount\":0,\r\n      \"Installments\":1,\r\n      \"Interest\":\"ByMerchant\",\r\n      \"Capture\":false,\r\n      \"Authenticate\":false,\r\n      \"CreditCard\":{\r\n         \"CardNumber\":\"4024000097692931\",\r\n         \"Holder\":\"Teste accept\",\r\n         \"ExpirationDate\":\"12/2019\",\r\n         \"SecurityCode\":\"023\",\r\n         \"Brand\":\"Visa\"\r\n      },\r\n      \"FraudAnalysis\":{\r\n         \"Sequence\":\"AuthorizeFirst\",\r\n         \"SequenceCriteria\":\"OnSuccess\",\r\n         \"Provider\":\"CyberSource\",\r\n         \"FingerPrintId\":\"074c1ee676ed4998ab66491013c565e2\",\r\n         \"CaptureOnLowRisk\":true,\r\n         \"VoidOnHighRisk\":false,\r\n         \"Browser\":{\r\n            \"CookiesAccepted\":false,\r\n            \"Email\":\"compradorteste@live.com\",\r\n            \"HostName\":\"Teste\",\r\n            \"IpAddress\":\"200.190.150.350\",\r\n            \"Type\":\"Chrome\"\r\n         },\r\n         \"Cart\":{\r\n            \"IsGift\":false,\r\n            \"ReturnsAccepted\":true,\r\n            \"Items\":[\r\n               {\r\n                  \"GiftCategory\":\"Undefined\",\r\n                  \"HostHedge\":\"Off\",\r\n                  \"NonSensicalHedge\":\"Off\",\r\n                  \"ObscenitiesHedge\":\"Off\",\r\n                  \"PhoneHedge\":\"Off\",\r\n                  \"Name\":\"ItemTeste\",\r\n                  \"Quantity\":1,\r\n                  \"Sku\":\"201411170235134521346\",\r\n                  \"UnitPrice\":123,\r\n                  \"Risk\":\"High\",\r\n                  \"TimeHedge\":\"Normal\",\r\n                  \"Type\":\"AdultContent\",\r\n                  \"VelocityHedge\":\"High\",\r\n                  \"Passenger\":{\r\n                     \"Email\":\"compradorteste@live.com\",\r\n                     \"Identity\":\"1234567890\",\r\n                     \"Name\":\"Comprador accept\",\r\n                     \"Rating\":\"Adult\",\r\n                     \"Phone\":\"999994444\",\r\n                     \"Status\":\"Accepted\"\r\n                  }\r\n               }\r\n            ]\r\n         },\r\n         \"MerchantDefinedFields\":[\r\n            {\r\n               \"Id\":95,\r\n               \"Value\":\"Eu defini isso\"\r\n            }\r\n         ],\r\n         \"Shipping\":{\r\n            \"Addressee\":\"Sr Comprador Teste\",\r\n            \"Method\":\"LowCost\",\r\n            \"Phone\":\"21114740\"\r\n         },\r\n         \"Travel\":{\r\n            \"DepartureTime\":\"2010-01-02\",\r\n            \"JourneyType\":\"Ida\",\r\n            \"Route\":\"MAO-RJO\",\r\n            \"Legs\":[\r\n               {\r\n                  \"Destination\":\"GYN\",\r\n                  \"Origin\":\"VCP\"\r\n               }\r\n            ]\r\n         }\r\n      }\r\n   }\r\n}"
+            },
+            "url": {
+              "raw": "{{apiUrl}}/1/sales",
+              "host": [
+                "{{apiUrl}}"
+              ],
+              "path": [
+                "1",
+                "sales"
+              ]
+            }
+          },
+          "response": []
+        }
+      ]
+    },
+    {
+      "name": "Consulta - Captura - Cancelamento",
+      "item": [
+        {
+          "name": "Cancelamento de transações",
+          "item": [
+            {
+              "name": "Void - By PaymentID",
+              "request": {
+                "method": "PUT",
+                "header": [
+                  {
+                    "key": "MerchantId",
+                    "value": "{{merchantId}}"
+                  },
+                  {
+                    "key": "Content-Type",
+                    "value": "text/json"
+                  },
+                  {
+                    "key": "MerchantKey",
+                    "value": "{{merchantKey}}"
+                  }
+                ],
+                "body": {
+                  "mode": "raw",
+                  "raw": ""
+                },
+                "url": {
+                  "raw": "{{apiUrl}}/1/sales/5f4e6d0a-0dc3-489f-a967-b7af760eb892/void",
+                  "host": [
+                    "{{apiUrl}}"
+                  ],
+                  "path": [
+                    "1",
+                    "sales",
+                    "5f4e6d0a-0dc3-489f-a967-b7af760eb892",
+                    "void"
+                  ]
+                }
+              },
+              "response": []
+            },
+            {
+              "name": "Void - By MerchantOrderId",
+              "request": {
+                "method": "PUT",
+                "header": [
+                  {
+                    "key": "MerchantId",
+                    "value": "{{merchantId}}"
+                  },
+                  {
+                    "key": "Content-Type",
+                    "value": "text/json"
+                  },
+                  {
+                    "key": "MerchantKey",
+                    "value": "{{merchantKey}}"
+                  }
+                ],
+                "body": {
+                  "mode": "raw",
+                  "raw": ""
+                },
+                "url": {
+                  "raw": "{{apiUrl}}/1/sales/orderId/2014111703/void",
+                  "host": [
+                    "{{apiUrl}}"
+                  ],
+                  "path": [
+                    "1",
+                    "sales",
+                    "orderId",
+                    "2014111703",
+                    "void"
+                  ]
+                }
+              },
+              "response": []
+            },
+            {
+              "name": "Void - By PaymentID - Parcial",
+              "request": {
+                "method": "PUT",
+                "header": [
+                  {
+                    "key": "MerchantId",
+                    "value": "{{merchantId}}"
+                  },
+                  {
+                    "key": "Content-Type",
+                    "value": "text/json"
+                  },
+                  {
+                    "key": "MerchantKey",
+                    "value": "{{merchantKey}}"
+                  }
+                ],
+                "body": {
+                  "mode": "raw",
+                  "raw": ""
+                },
+                "url": {
+                  "raw": "{{apiUrl}}/1/sales/{{paymentId}}/void?amount={{Valor}}",
+                  "host": [
+                    "{{apiUrl}}"
+                  ],
+                  "path": [
+                    "1",
+                    "sales",
+                    "{{paymentId}}",
+                    "void"
+                  ],
+                  "query": [
+                    {
+                      "key": "amount",
+                      "value": "{{Valor}}"
+                    }
+                  ]
+                }
+              },
+              "response": []
+            }
+          ]
+        },
+        {
+          "name": "Captura de transações",
+          "item": [
+            {
+              "name": "Capture - By PaymentID",
+              "request": {
+                "method": "PUT",
+                "header": [
+                  {
+                    "key": "MerchantId",
+                    "value": "{{merchantId}}"
+                  },
+                  {
+                    "key": "Content-Type",
+                    "value": "text/json"
+                  },
+                  {
+                    "key": "MerchantKey",
+                    "value": "{{merchantKey}}"
+                  }
+                ],
+                "body": {
+                  "mode": "raw",
+                  "raw": ""
+                },
+                "url": {
+                  "raw": "{{apiUrl}}/1/sales/{{paymentId}}/capture",
+                  "host": [
+                    "{{apiUrl}}"
+                  ],
+                  "path": [
+                    "1",
+                    "sales",
+                    "{{paymentId}}",
+                    "capture"
+                  ]
+                }
+              },
+              "response": []
+            },
+            {
+              "name": "Capture - By PaymentID - Parcial",
+              "request": {
+                "method": "PUT",
+                "header": [
+                  {
+                    "key": "MerchantId",
+                    "value": "{{merchantId}}"
+                  },
+                  {
+                    "key": "Content-Type",
+                    "value": "text/json"
+                  },
+                  {
+                    "key": "MerchantKey",
+                    "value": "{{merchantKey}}"
+                  }
+                ],
+                "body": {
+                  "mode": "raw",
+                  "raw": ""
+                },
+                "url": {
+                  "raw": "{{apiUrl}}/1/sales/{{paymentId}}/capture?amount={{Valor}}",
+                  "host": [
+                    "{{apiUrl}}"
+                  ],
+                  "path": [
+                    "1",
+                    "sales",
+                    "{{paymentId}}",
+                    "capture"
+                  ],
+                  "query": [
+                    {
+                      "key": "amount",
+                      "value": "{{Valor}}"
+                    }
+                  ]
+                }
+              },
+              "response": []
+            }
+          ]
+        },
+        {
+          "name": "Consulta de Transações",
+          "item": [
+            {
+              "name": "Get",
+              "request": {
+                "method": "GET",
+                "header": [
+                  {
+                    "key": "MerchantId",
+                    "value": "{{merchantId}}"
+                  },
+                  {
+                    "key": "Content-Type",
+                    "value": "text/json"
+                  },
+                  {
+                    "key": "MerchantKey",
+                    "value": "{{merchantKey}}"
+                  }
+                ],
+                "url": {
+                  "raw": "{{apiQueryUrl}}/1/sales/7bb58766-d579-47e6-848c-9842065d3a71",
+                  "host": [
+                    "{{apiQueryUrl}}"
+                  ],
+                  "path": [
+                    "1",
+                    "sales",
+                    "7bb58766-d579-47e6-848c-9842065d3a71"
+                  ]
+                }
+              },
+              "response": []
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "name": "Recorrência",
+      "item": [
+        {
+          "name": "Authorize - Recurrent - CreditCard",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "MerchantId",
+                "value": "{{merchantId}}"
+              },
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              },
+              {
+                "key": "MerchantKey",
+                "value": "{{merchantKey}}"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n \"MerchantOrderId\": \"559042024\",\n \"Customer\": {\n   \"Name\": \"Fulano da Silva\"\n },\n \"Payment\": {\n   \"Installments\": 1,\n   \"RecurrentPayment\": {\n     \"AuthorizeNow\": true,\n     \"EndDate\": \"2017-02-27\",\n     \"Interval\": \"Bimonthly\"\n   },\n   \"CreditCard\": {\n     \"CardNumber\": \"4024007197692931\",\n     \"Holder\": \"Teste Holder\",\n     \"ExpirationDate\": \"12/2017\",\n     \"SecurityCode\": \"123\",\n     \"SaveCard\": true,\n     \"Brand\": \"Visa\"\n   },\n   \"SoftDescriptor\": \".Net Tes\",\n   \"Type\": \"CreditCard\",\n   \"Amount\": 15000,\n   \"Currency\": \"BRL\",\n   \"Country\": \"BRA\"\n }\n}"
+            },
+            "url": {
+              "raw": "{{apiUrl}}/1/sales",
+              "host": [
+                "{{apiUrl}}"
+              ],
+              "path": [
+                "1",
+                "sales"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Get - RecurrentPayment",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "MerchantId",
+                "value": "{{merchantId}}"
+              },
+              {
+                "key": "Content-Type",
+                "value": "text/json"
+              },
+              {
+                "key": "MerchantKey",
+                "value": "{{merchantKey}}"
+              }
+            ],
+            "url": {
+              "raw": "{{apiQueryUrl}}/1/RecurrentPayment/c30f5c78-fca2-459c-9f3c-9c4b41b09048",
+              "host": [
+                "{{apiQueryUrl}}"
+              ],
+              "path": [
+                "1",
+                "RecurrentPayment",
+                "c30f5c78-fca2-459c-9f3c-9c4b41b09048"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Update - Recurrent - Customer",
+          "request": {
+            "method": "PUT",
+            "header": [
+              {
+                "key": "MerchantId",
+                "value": "94E5EA52-79B0-7DBA-1867-BE7B081EDD97"
+              },
+              {
+                "key": "Content-Type",
+                "value": "text/json"
+              },
+              {
+                "key": "MerchantKey",
+                "value": "0123456789012345678901234567890123456789"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{  \n      \"Name\":\"Customer\",\n      \"Email\":\"customer@teste.com\",\n      \"Birthdate\":\"1999-12-12\",\n      \"Identity\":\"22658954236\",\n      \"IdentityType\":\"CPF\",\n      \"Address\":{  \n         \"Street\":\"Rua Teste\",\n         \"Number\":\"174\",\n         \"Complement\":\"AP 201\",\n         \"ZipCode\":\"21241140\",\n         \"City\":\"Rio de Janeiro\",\n         \"State\":\"RJ\",\n         \"Country\":\"BRA\"\n      },\n      \"DeliveryAddress\":{  \n         \"Street\":\"Outra Rua Teste\",\n         \"Number\":\"123\",\n         \"Complement\":\"AP 111\",\n         \"ZipCode\":\"21241111\",\n         \"City\":\"Qualquer Lugar\",\n         \"State\":\"QL\",\n         \"Country\":\"BRA\",\n        \"District\":\"Teste\"\n      }\n   }"
+            },
+            "url": {
+              "raw": "{{apiUrl}}/1/RecurrentPayment/38ce7f41-b952-4136-9905-6138ba0c02cc/Customer",
+              "host": [
+                "{{apiUrl}}"
+              ],
+              "path": [
+                "1",
+                "RecurrentPayment",
+                "38ce7f41-b952-4136-9905-6138ba0c02cc",
+                "Customer"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Update - Recurrent - Interval",
+          "request": {
+            "method": "PUT",
+            "header": [
+              {
+                "key": "MerchantId",
+                "value": "94E5EA52-79B0-7DBA-1867-BE7B081EDD97"
+              },
+              {
+                "key": "Content-Type",
+                "value": "text/json"
+              },
+              {
+                "key": "MerchantKey",
+                "value": "0123456789012345678901234567890123456789"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "6"
+            },
+            "url": {
+              "raw": "{{apiUrl}}/1/RecurrentPayment/6716406f-1cba-4c7a-8054-7e8988032b17/Interval",
+              "host": [
+                "{{apiUrl}}"
+              ],
+              "path": [
+                "1",
+                "RecurrentPayment",
+                "6716406f-1cba-4c7a-8054-7e8988032b17",
+                "Interval"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Update - Recurrent - EndDate",
+          "request": {
+            "method": "PUT",
+            "header": [
+              {
+                "key": "MerchantId",
+                "value": "94E5EA52-79B0-7DBA-1867-BE7B081EDD97"
+              },
+              {
+                "key": "Content-Type",
+                "value": "text/json"
+              },
+              {
+                "key": "MerchantKey",
+                "value": "0123456789012345678901234567890123456789"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "\"2021-01-09\""
+            },
+            "url": {
+              "raw": "{{apiUrl}}/1/RecurrentPayment/38ce7f41-b952-4136-9905-6138ba0c02cc/EndDate",
+              "host": [
+                "{{apiUrl}}"
+              ],
+              "path": [
+                "1",
+                "RecurrentPayment",
+                "38ce7f41-b952-4136-9905-6138ba0c02cc",
+                "EndDate"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Update - Recurrent - RecurrencyDay",
+          "request": {
+            "method": "PUT",
+            "header": [
+              {
+                "key": "MerchantId",
+                "value": "94E5EA52-79B0-7DBA-1867-BE7B081EDD97"
+              },
+              {
+                "key": "Content-Type",
+                "value": "text/json"
+              },
+              {
+                "key": "MerchantKey",
+                "value": "0123456789012345678901234567890123456789"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "23"
+            },
+            "url": {
+              "raw": "{{apiUrl}}/1/RecurrentPayment/6a746229-cbeb-4d05-bdb0-6b45a2e2e461/RecurrencyDay",
+              "host": [
+                "{{apiUrl}}"
+              ],
+              "path": [
+                "1",
+                "RecurrentPayment",
+                "6a746229-cbeb-4d05-bdb0-6b45a2e2e461",
+                "RecurrencyDay"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Update - Recurrent - Reactivate",
+          "request": {
+            "method": "PUT",
+            "header": [
+              {
+                "key": "MerchantId",
+                "value": "94E5EA52-79B0-7DBA-1867-BE7B081EDD97"
+              },
+              {
+                "key": "Content-Type",
+                "value": "text/json"
+              },
+              {
+                "key": "MerchantKey",
+                "value": "0123456789012345678901234567890123456789"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": ""
+            },
+            "url": {
+              "raw": "{{apiUrl}}/1/RecurrentPayment/6716406f-1cba-4c7a-8054-7e8988032b17/Reactivate",
+              "host": [
+                "{{apiUrl}}"
+              ],
+              "path": [
+                "1",
+                "RecurrentPayment",
+                "6716406f-1cba-4c7a-8054-7e8988032b17",
+                "Reactivate"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Update - Recurrent - Deactivate",
+          "request": {
+            "method": "PUT",
+            "header": [
+              {
+                "key": "MerchantId",
+                "value": "{{merchantId}}"
+              },
+              {
+                "key": "Content-Type",
+                "value": "text/json"
+              },
+              {
+                "key": "MerchantKey",
+                "value": "{{merchantKey}}"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": ""
+            },
+            "url": {
+              "raw": "{{apiUrl}}/1/RecurrentPayment/c4bc2199-f43a-4405-bfe4-272a2f00c367/Deactivate",
+              "host": [
+                "{{apiUrl}}"
+              ],
+              "path": [
+                "1",
+                "RecurrentPayment",
+                "c4bc2199-f43a-4405-bfe4-272a2f00c367",
+                "Deactivate"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Update - Recurrent - Installments",
+          "request": {
+            "method": "PUT",
+            "header": [
+              {
+                "key": "MerchantId",
+                "value": "94E5EA52-79B0-7DBA-1867-BE7B081EDD97"
+              },
+              {
+                "key": "Content-Type",
+                "value": "text/json"
+              },
+              {
+                "key": "MerchantKey",
+                "value": "0123456789012345678901234567890123456789"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "6"
+            },
+            "url": {
+              "raw": "{{apiUrl}}/1/RecurrentPayment/6716406f-1cba-4c7a-8054-7e8988032b17/Installments",
+              "host": [
+                "{{apiUrl}}"
+              ],
+              "path": [
+                "1",
+                "RecurrentPayment",
+                "6716406f-1cba-4c7a-8054-7e8988032b17",
+                "Installments"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Update - Recurrent - Payment",
+          "request": {
+            "method": "PUT",
+            "header": [
+              {
+                "key": "MerchantId",
+                "value": "94E5EA52-79B0-7DBA-1867-BE7B081EDD97"
+              },
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              },
+              {
+                "key": "MerchantKey",
+                "value": "0123456789012345678901234567890123456789"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\r\n   \"Type\":\"CreditCard\",\r\n   \"Amount\":\"123\",\r\n   \"Installments\":1,\r\n   \"CreditCard\":{\r\n      \"Brand\":\"Master\",\r\n      \"Holder\":\"Teset card\",\r\n      \"CardNumber\":\"1234123412341232\",\r\n      \"ExpirationDate\":\"05/2019\"\r\n   },\r\n   \"Country\":\"USA\",\r\n   \"Currency\":\"USD\",\r\n   \"SoftDescriptor\":\"test\",\r\n   \"Provider\":\"Simulado\"\r\n}"
+            },
+            "url": {
+              "raw": "{{apiUrl}}/1/RecurrentPayment/11af5932-68e3-43e2-bb5d-1c368b969e06/Payment",
+              "host": [
+                "{{apiUrl}}"
+              ],
+              "path": [
+                "1",
+                "RecurrentPayment",
+                "11af5932-68e3-43e2-bb5d-1c368b969e06",
+                "Payment"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Update - Recurrent - NextPaymentDate",
+          "request": {
+            "method": "PUT",
+            "header": [
+              {
+                "key": "MerchantId",
+                "value": "94E5EA52-79B0-7DBA-1867-BE7B081EDD97"
+              },
+              {
+                "key": "Content-Type",
+                "value": "text/json"
+              },
+              {
+                "key": "MerchantKey",
+                "value": "0123456789012345678901234567890123456789"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "\"2015-06-25\""
+            },
+            "url": {
+              "raw": "{{apiUrl}}/1/RecurrentPayment/2bc419b4-0eb3-4c9c-88a9-280e8ce3a335/NextPaymentDate",
+              "host": [
+                "{{apiUrl}}"
+              ],
+              "path": [
+                "1",
+                "RecurrentPayment",
+                "2bc419b4-0eb3-4c9c-88a9-280e8ce3a335",
+                "NextPaymentDate"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Update - Recurrent - Amount",
+          "request": {
+            "method": "PUT",
+            "header": [
+              {
+                "key": "MerchantId",
+                "value": "94E5EA52-79B0-7DBA-1867-BE7B081EDD97"
+              },
+              {
+                "key": "Content-Type",
+                "value": "text/json"
+              },
+              {
+                "key": "MerchantKey",
+                "value": "0123456789012345678901234567890123456789"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "156"
+            },
+            "url": {
+              "raw": "{{apiUrl}}/1/RecurrentPayment/6716406f-1cba-4c7a-8054-7e8988032b17/Amount",
+              "host": [
+                "{{apiUrl}}"
+              ],
+              "path": [
+                "1",
+                "RecurrentPayment",
+                "6716406f-1cba-4c7a-8054-7e8988032b17",
+                "Amount"
+              ]
+            }
+          },
+          "response": []
+        }
+      ]
+    },
+    {
+      "name": "Tokenização",
+      "item": [
+        {
+          "name": "Authorize - CreditCard - Saving Card",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "MerchantId",
+                "value": "{{merchantId}}"
+              },
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              },
+              {
+                "key": "MerchantKey",
+                "value": "{{merchantKey}}"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{  \n   \"MerchantOrderId\":\"2014111706\",\n   \"Customer\":{  \n      \"Name\":\"Paulo Henrique\"     \n   },\n   \"Payment\":{  \n     \"Type\":\"CreditCard\",\n     \"Amount\":100,\n     \"Provider\":\"Simulado\",\n     \"Installments\":1,\n     \"CreditCard\":{  \n         \"CardNumber\":\"1234123412341231\",\n         \"Holder\":\"Teste Holder\",\n         \"ExpirationDate\":\"03/2019\",\n         \"SecurityCode\":\"262\",\n         \"SaveCard\":\"true\",\n         \"Brand\":\"Visa\"\n     }\n   }\n}"
+            },
+            "url": {
+              "raw": "{{apiUrl}}/1/sales",
+              "host": [
+                "{{apiUrl}}"
+              ],
+              "path": [
+                "1",
+                "sales"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Authorize - CreditCard - Using Token 1.5",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "MerchantId",
+                "value": "{{merchantId}}"
+              },
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              },
+              {
+                "key": "MerchantKey",
+                "value": "{{merchantKey}}"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{  \n   \"MerchantOrderId\":\"2014111706\",\n   \"Customer\":{  \n      \"Name\":\"Teste Smiles\"     \n   },\n   \"Payment\":{  \n     \"Type\":\"CreditCard\",\n     \"Amount\":100,\n     \"Installments\":1,\n     \"CreditCard\":{  \n       \"CardToken\":\"L0N+g2hPywCHnI4bkRs4f/xzxcKEof0Cuo3Owkl/TVE=\",\n       \"Brand\":\"Amex\"\n     }\n   }\n}"
+            },
+            "url": {
+              "raw": "{{apiUrl}}/1/sales",
+              "host": [
+                "{{apiUrl}}"
+              ],
+              "path": [
+                "1",
+                "sales"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Authorize - CreditCard - Using Token",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "MerchantId",
+                "value": "{{merchantId}}"
+              },
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              },
+              {
+                "key": "MerchantKey",
+                "value": "{{merchantKey}}"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{  \n   \"MerchantOrderId\":\"2014111706\",\n   \"Customer\":{  \n      \"Name\":\"Paulo Henrique\"     \n   },\n   \"Payment\":{  \n     \"Type\":\"CreditCard\",\n     \"Amount\":100,\n     \"Installments\":1,\n     \"CreditCard\":{  \n       \"CardToken\":\"b876b98f-4671-4dce-9a30-4872d87ec807\",\n         \"Brand\": \"Visa\",\n         \"SaveCard\":\"true\"\n     }\n   }\n}\n\n//Token Sandbox - b03d9ba3-69bd-44f9-b5e8-4c030e9c4315\n"
+            },
+            "url": {
+              "raw": "{{apiUrl}}/1/sales",
+              "host": [
+                "{{apiUrl}}"
+              ],
+              "path": [
+                "1",
+                "sales"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Card - Create",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "MerchantId",
+                "value": "{{merchantId}}"
+              },
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              },
+              {
+                "key": "MerchantKey",
+                "value": "{{merchantKey}}"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n    \"CustomerName\": \"Paulo Henrique\",\n    \"CardNumber\":\"4929592299120131\",\n    \"Holder\":\"Teste Holder\",\n    \"ExpirationDate\":\"12/2018\",\n    \"Brand\":\"Visa\"\n}"
+            },
+            "url": {
+              "raw": "{{apiUrl}}/1/card",
+              "host": [
+                "{{apiUrl}}"
+              ],
+              "path": [
+                "1",
+                "card"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Card - Get",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "MerchantId",
+                "value": "{{merchantId}}"
+              },
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              },
+              {
+                "key": "MerchantKey",
+                "value": "{{merchantKey}}"
+              }
+            ],
+            "url": {
+              "raw": "{{apiQueryUrl}}/1/card/0e310ad0-622e-4374-92bd-3ed17f1d6709",
+              "host": [
+                "{{apiQueryUrl}}"
+              ],
+              "path": [
+                "1",
+                "card",
+                "0e310ad0-622e-4374-92bd-3ed17f1d6709"
+              ]
+            }
+          },
+          "response": []
+        }
+      ]
+    },
+    {
+      "name": "Wallet",
+      "item": [
+        {
+          "name": "Authorize - CreditCard - VisaCheckout - Descriptografia",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "MerchantId",
+                "value": "{{merchantId}}"
+              },
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              },
+              {
+                "key": "MerchantKey",
+                "value": "{{merchantKey}}"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{  \n   \"MerchantOrderId\":\"2014111703\",\n   \"Customer\":{  \n      \"Name\":\"Comprador Teste\"\n   },\n   \"Payment\":{  \n      \"Type\":\"CreditCard\",\n      \"Amount\":15700,\n      \"Installments\":1,\n      \"SoftDescriptor\":\"123456789ABCD\",\n      \"CreditCard\":{  \n         \"SecurityCode\":\"123\"\n      },\n      \"Wallet\":{  \n         \"Type\":\"VisaCheckout\",\n         \"WalletKey\":\"1140814777695873901\"\n      }\n   }\n}"
+            },
+            "url": {
+              "raw": "{{apiUrl}}/1/sales",
+              "host": [
+                "{{apiUrl}}"
+              ],
+              "path": [
+                "1",
+                "sales"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Authorize - CreditCard - VisaCheckout - Envio de cartão",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "MerchantId",
+                "value": "{{merchantId}}"
+              },
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              },
+              {
+                "key": "MerchantKey",
+                "value": "{{merchantKey}}"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{  \n   \"MerchantOrderId\":\"2014111703\",\n   \"Customer\":{  \n      \"Name\":\"Comprador Teste\"\n   },\n   \"Payment\":{  \n      \"Type\":\"CreditCard\",\n      \"Amount\":15700,\n      \"Installments\":1,\n      \"SoftDescriptor\":\"123456789ABCD\",\n      \"Wallet\":{  \n         \"Type\":\"VisaCheckout\"\n         \"Eci\": 0,\n    },\n      \"CreditCard\":{  \n         \"CardNumber\":\"1234123412341231\",\n         \"Holder\":\"Teste Holder\",\n         \"ExpirationDate\":\"12/2030\",\n         \"Brand\":\"Visa\"\n    },\n  },\n}"
+            },
+            "url": {
+              "raw": "{{apiUrl}}/1/sales",
+              "host": [
+                "{{apiUrl}}"
+              ],
+              "path": [
+                "1",
+                "sales"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Authorize - CreditCard - ApplePay - Descriptografia",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "MerchantId",
+                "value": "{{merchantId}}"
+              },
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              },
+              {
+                "key": "MerchantKey",
+                "value": "{{merchantKey}}"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"MerchantOrderId\": \"6242-642-723\",\n  \"Customer\": {\n    \"Name\": \"Exemplo Wallet Padrão\",\n    \"Identity\": \"11225468954\",\n    \"IdentityType\": \"CPF\"\n  },\n  \"Payment\": {\n    \"Type\": \"CreditCard\",\n    \"Amount\": 1100,\n    \"Provider\": \"Cielo\",\n    \"Installments\": 1,\n    \"Currency\": \"BRL\",\n    \"Wallet\": {\n      \"Type\": \"ApplePay\",\n      \"WalletKey\": \"9zcCAciwoTS+qBx8jWb++64eHT2QZTWBs6qMVJ0GO+AqpcDVkxGPNpOR/D1bv5AZ62+5lKvucati0+eu7hdilwUYT3n5swkHuIzX2KO80Apx/SkhoVM5dqgyKrak5VD2/drcGh9xqEanWkyd7wl200sYj4QUMbeLhyaY7bCdnnpKDJgpOY6J883fX3TiHoZorb/QlEEOpvYcbcFYs3ELZ7QVtjxyrO2LmPsIkz2BgNm5f+JaJUSAOectahgLZnZR+sRXTDtqLOJQAprs0MNTkPzF95nXGKCCnPV2mfR7z8FHcP7AGqO7aTLBGJLgxFOnRKaFnYlY2E9uTPBbB5JjZywlLIWsPKur5G4m1/E9A6DwjMd0fDYnxjj0bQDfaZpBPeGGPFLu5YYn1IDc\",\n      \"AdditionalData\": {\n        \"EphemeralPublicKey\": \"MFkwEwYHKoZIzj0CAQYIKoZIzj0DAQcDQgAEoedz1NqI6hs9hEO6dBsnn0X0xp5/DKj3gXirjEqxNIJ8JyhGxVB3ITd0E+6uG4W6Evt+kugG8gOhCBrdUU6JwQ==\"\n      }\n    }\n  }\n}"
+            },
+            "url": {
+              "raw": "{{apiUrl}}/1/sales",
+              "host": [
+                "{{apiUrl}}"
+              ],
+              "path": [
+                "1",
+                "sales"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Authorize - CreditCard - ApplePay - Envio de cartão",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "MerchantId",
+                "value": "{{merchantId}}"
+              },
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              },
+              {
+                "key": "MerchantKey",
+                "value": "{{merchantKey}}"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "\n  \"MerchantOrderId\": \"6242-642-723\",\n  \"Customer\": {\n    \"Name\": \"Exemplo Wallet Padrão\",\n    \"Identity\": \"11225468954\",\n    \"IdentityType\": \"CPF\"\n  },\n  \"Payment\": {\n    \"Type\": \"CreditCard\",\n    \"Amount\": 1100,\n    \"Provider\": \"Cielo\",\n    \"Installments\": 1,\n    \"CreditCard\": {\n      \"CardNumber\":\"4532********6521\",\n      \"Holder\":\"Exemplo Wallet Padrão\",\n          \"ExpirationDate\":\"12/2021\",\n          \"SecurityCode\":\"123\",\n          \"Brand\":\"Master\"\n    },\n    \"Currency\": \"BRL\",\n    \"Wallet\": {\n      \"Type\": \"ApplePay\",\n      \"Eci\":\"7\",\n      \"Cavv\":\"AM1mbqehL24XAAa0J04CAoABFA==\"\n    }\n  }\n}"
+            },
+            "url": {
+              "raw": "{{apiUrl}}/1/sales",
+              "host": [
+                "{{apiUrl}}"
+              ],
+              "path": [
+                "1",
+                "sales"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Authorize - CreditCard - MasterPass - Envio de cartão",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "MerchantId",
+                "value": "{{merchantId}}"
+              },
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              },
+              {
+                "key": "MerchantKey",
+                "value": "{{merchantKey}}"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "JSON\n{  \n   \"MerchantOrderId\":\"2014111708\",\n   \"Customer\":{  \n      \"Name\":\"Comprador MasterPass\"     \n   },\n   \"Payment\":{  \n     \"Type\":\"CreditCard\",\n     \"Amount\":15700,\n     \"Installments\":1,\n     \"CreditCard\":{\n               \"CardNumber\": \"4532117080573703\",\n               \"Brand\": \"Visa\",\n               \"SecurityCode\":\"023\"\n     },\n     \"Wallet\":{\n         \"Type\":\"MasterPass\",\n         \"Eci\":\"7\",\n         \"Cavv\":\"AM1mbqehL24XAAa0J04CAoABFA==\"\n         \"AdditionalData\":{\n               \"CaptureCode\": \"103\"\n         }\n     }\n   }\n}"
+            },
+            "url": {
+              "raw": "{{apiUrl}}/1/sales",
+              "host": [
+                "{{apiUrl}}"
+              ],
+              "path": [
+                "1",
+                "sales"
+              ]
+            }
+          },
+          "response": [
+            {
+              "name": "Autorização",
+              "originalRequest": {
+                "method": "POST",
+                "header": [
+                  {
+                    "key": "MerchantId",
+                    "value": "{{merchantId}}"
+                  },
+                  {
+                    "description": "The mime type of this content",
+                    "key": "Content-Type",
+                    "value": "application/json"
+                  },
+                  {
+                    "key": "MerchantKey",
+                    "value": "{{merchantKey}}"
+                  }
+                ],
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\r\n   \"MerchantOrderId\":\"2014111703\",\r\n   \"Payment\":{\r\n     \"Provider\":\"Simulado\",\r\n     \"Type\":\"CreditCard\",\r\n     \"Amount\":15700,\r\n     \"Installments\":1,\r\n     \"SoftDescriptor\":\"123456789ABCD\",\r\n     \"CreditCard\":{\r\n         \"CardNumber\":\"4551870000000181\",\r\n         \"Holder\":\"Teste Holder\",\r\n         \"ExpirationDate\":\"12/2021\",\r\n         \"SecurityCode\":\"123\",\r\n         \"Brand\":\"Visa\"\r\n     }\r\n   }\r\n}"
+                },
+                "url": {
+                  "raw": "{{apiUrl}}/1/sales",
+                  "host": [
+                    "{{apiUrl}}"
+                  ],
+                  "path": [
+                    "1",
+                    "sales"
+                  ]
+                }
+              },
+              "status": "Created",
+              "code": 201,
+              "_postman_previewlanguage": "json",
+              "header": [
+                {
+                  "description": "",
+                  "key": "Access-Control-Allow-Origin",
+                  "name": "Access-Control-Allow-Origin",
+                  "value": "*"
+                },
+                {
+                  "description": "",
+                  "key": "Cache-Control",
+                  "name": "Cache-Control",
+                  "value": "no-cache"
+                },
+                {
+                  "description": "",
+                  "key": "Connection",
+                  "name": "Connection",
+                  "value": "close"
+                },
+                {
+                  "description": "",
+                  "key": "Content-Length",
+                  "name": "Content-Length",
+                  "value": "1074"
+                },
+                {
+                  "description": "",
+                  "key": "Content-Type",
+                  "name": "Content-Type",
+                  "value": "application/json; charset=utf-8"
+                },
+                {
+                  "description": "",
+                  "key": "Date",
+                  "name": "Date",
+                  "value": "Fri, 07 Apr 2017 15:08:58 GMT"
+                },
+                {
+                  "description": "",
+                  "key": "Expires",
+                  "name": "Expires",
+                  "value": "-1"
+                },
+                {
+                  "description": "",
+                  "key": "Location",
+                  "name": "Location",
+                  "value": "https://apiquerydev.cieloecommerce.cielo.com.br/1/sales/eb616a9f-00bc-437d-bbf8-0f5e8a3e716c"
+                },
+                {
+                  "description": "",
+                  "key": "Pragma",
+                  "name": "Pragma",
+                  "value": "no-cache"
+                },
+                {
+                  "description": "",
+                  "key": "Server",
+                  "name": "Server",
+                  "value": "Microsoft-IIS/8.0"
+                },
+                {
+                  "description": "",
+                  "key": "X-AspNet-Version",
+                  "name": "X-AspNet-Version",
+                  "value": "4.0.30319"
+                },
+                {
+                  "description": "",
+                  "key": "X-Powered-By",
+                  "name": "X-Powered-By",
+                  "value": "ASP.NET"
+                },
+                {
+                  "description": "",
+                  "key": "X-Response-Time",
+                  "name": "X-Response-Time",
+                  "value": "470ms"
+                }
+              ],
+              "cookie": [],
+              "body": "{\"MerchantOrderId\":\"2014111703\",\"Customer\":{\"Name\":\"[Guest]\"},\"Payment\":{\"ServiceTaxAmount\":0,\"Installments\":1,\"Interest\":0,\"Capture\":false,\"Authenticate\":false,\"Recurrent\":false,\"CreditCard\":{\"CardNumber\":\"455187******0181\",\"Holder\":\"Teste Holder\",\"ExpirationDate\":\"12/2021\",\"SaveCard\":false,\"Brand\":\"Visa\"},\"Tid\":\"0407120858677\",\"ProofOfSale\":\"858677\",\"AuthorizationCode\":\"408180\",\"SoftDescriptor\":\"123456789ABCD\",\"Provider\":\"Simulado\",\"PaymentId\":\"eb616a9f-00bc-437d-bbf8-0f5e8a3e716c\",\"Type\":\"CreditCard\",\"Amount\":15700,\"ReceivedDate\":\"2017-04-07 12:08:58\",\"Currency\":\"BRL\",\"Country\":\"BRA\",\"ReturnCode\":\"4\",\"ReturnMessage\":\"Operation Successful\",\"Status\":1,\"Links\":[{\"Method\":\"GET\",\"Rel\":\"self\",\"Href\":\"https://apiquerydev.cieloecommerce.cielo.com.br/1/sales/eb616a9f-00bc-437d-bbf8-0f5e8a3e716c\"},{\"Method\":\"PUT\",\"Rel\":\"capture\",\"Href\":\"https://apidev.cieloecommerce.cielo.com.br/1/sales/eb616a9f-00bc-437d-bbf8-0f5e8a3e716c/capture\"},{\"Method\":\"PUT\",\"Rel\":\"void\",\"Href\":\"https://apidev.cieloecommerce.cielo.com.br/1/sales/eb616a9f-00bc-437d-bbf8-0f5e8a3e716c/void\"}]}}"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "name": "AVS",
+      "item": [
+        {
+          "name": "Authorize - CreditCard - With AVS",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "MerchantId",
+                "value": "{{merchantId}}"
+              },
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              },
+              {
+                "key": "MerchantKey",
+                "value": "{{merchantKey}}"
+              },
+              {
+                "key": "Authorization",
+                "value": "{{bearer_token_1ahz}}",
+                "disabled": true
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\r\n   \"MerchantOrderId\":\"2014111703\",\r\n   \"Payment\":{\r\n     \"Type\":\"CreditCard\",\r\n     \"Amount\":15700,\r\n     \"Installments\":1,\r\n     \"SoftDescriptor\":\"123456789ABCD\",\r\n     \"CreditCard\":{\r\n         \"CardNumber\":\"4551870000000181\",\r\n         \"Holder\":\"Teste Holder\",\r\n         \"ExpirationDate\":\"12/2021\",\r\n         \"SecurityCode\":\"123\",\r\n         \"Brand\":\"Visa\",\r\n         \"Avs\":{\r\n          \"Cpf\": \"10939107716\",\r\n          \"ZipCode\": \"24320570\",\r\n          \"Street\": \"Estrada Caetano Monteiro\",\r\n          \"Number\": \"391\",\r\n          \"Complement\": \"Bl\",\r\n          \"District\": \"Niteroi\"\r\n      }\r\n     }\r\n   }\r\n}"
+            },
+            "url": {
+              "raw": "{{apiUrl}}/1/sales",
+              "host": [
+                "{{apiUrl}}"
+              ],
+              "path": [
+                "1",
+                "sales"
+              ]
+            }
+          },
+          "response": [
+            {
+              "name": "Autorização",
+              "originalRequest": {
+                "method": "POST",
+                "header": [
+                  {
+                    "key": "MerchantId",
+                    "value": "{{merchantId}}"
+                  },
+                  {
+                    "description": "The mime type of this content",
+                    "key": "Content-Type",
+                    "value": "application/json"
+                  },
+                  {
+                    "key": "MerchantKey",
+                    "value": "{{merchantKey}}"
+                  }
+                ],
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\r\n   \"MerchantOrderId\":\"2014111703\",\r\n   \"Payment\":{\r\n     \"Provider\":\"Simulado\",\r\n     \"Type\":\"CreditCard\",\r\n     \"Amount\":15700,\r\n     \"Installments\":1,\r\n     \"SoftDescriptor\":\"123456789ABCD\",\r\n     \"CreditCard\":{\r\n         \"CardNumber\":\"4551870000000181\",\r\n         \"Holder\":\"Teste Holder\",\r\n         \"ExpirationDate\":\"12/2021\",\r\n         \"SecurityCode\":\"123\",\r\n         \"Brand\":\"Visa\"\r\n     }\r\n   }\r\n}"
+                },
+                "url": {
+                  "raw": "{{apiUrl}}/1/sales",
+                  "host": [
+                    "{{apiUrl}}"
+                  ],
+                  "path": [
+                    "1",
+                    "sales"
+                  ]
+                }
+              },
+              "status": "Created",
+              "code": 201,
+              "_postman_previewlanguage": "json",
+              "header": [
+                {
+                  "description": "",
+                  "key": "Access-Control-Allow-Origin",
+                  "name": "Access-Control-Allow-Origin",
+                  "value": "*"
+                },
+                {
+                  "description": "",
+                  "key": "Cache-Control",
+                  "name": "Cache-Control",
+                  "value": "no-cache"
+                },
+                {
+                  "description": "",
+                  "key": "Connection",
+                  "name": "Connection",
+                  "value": "close"
+                },
+                {
+                  "description": "",
+                  "key": "Content-Length",
+                  "name": "Content-Length",
+                  "value": "1074"
+                },
+                {
+                  "description": "",
+                  "key": "Content-Type",
+                  "name": "Content-Type",
+                  "value": "application/json; charset=utf-8"
+                },
+                {
+                  "description": "",
+                  "key": "Date",
+                  "name": "Date",
+                  "value": "Fri, 07 Apr 2017 15:08:58 GMT"
+                },
+                {
+                  "description": "",
+                  "key": "Expires",
+                  "name": "Expires",
+                  "value": "-1"
+                },
+                {
+                  "description": "",
+                  "key": "Location",
+                  "name": "Location",
+                  "value": "https://apiquerydev.cieloecommerce.cielo.com.br/1/sales/eb616a9f-00bc-437d-bbf8-0f5e8a3e716c"
+                },
+                {
+                  "description": "",
+                  "key": "Pragma",
+                  "name": "Pragma",
+                  "value": "no-cache"
+                },
+                {
+                  "description": "",
+                  "key": "Server",
+                  "name": "Server",
+                  "value": "Microsoft-IIS/8.0"
+                },
+                {
+                  "description": "",
+                  "key": "X-AspNet-Version",
+                  "name": "X-AspNet-Version",
+                  "value": "4.0.30319"
+                },
+                {
+                  "description": "",
+                  "key": "X-Powered-By",
+                  "name": "X-Powered-By",
+                  "value": "ASP.NET"
+                },
+                {
+                  "description": "",
+                  "key": "X-Response-Time",
+                  "name": "X-Response-Time",
+                  "value": "470ms"
+                }
+              ],
+              "cookie": [],
+              "body": "{\"MerchantOrderId\":\"2014111703\",\"Customer\":{\"Name\":\"[Guest]\"},\"Payment\":{\"ServiceTaxAmount\":0,\"Installments\":1,\"Interest\":0,\"Capture\":false,\"Authenticate\":false,\"Recurrent\":false,\"CreditCard\":{\"CardNumber\":\"455187******0181\",\"Holder\":\"Teste Holder\",\"ExpirationDate\":\"12/2021\",\"SaveCard\":false,\"Brand\":\"Visa\"},\"Tid\":\"0407120858677\",\"ProofOfSale\":\"858677\",\"AuthorizationCode\":\"408180\",\"SoftDescriptor\":\"123456789ABCD\",\"Provider\":\"Simulado\",\"PaymentId\":\"eb616a9f-00bc-437d-bbf8-0f5e8a3e716c\",\"Type\":\"CreditCard\",\"Amount\":15700,\"ReceivedDate\":\"2017-04-07 12:08:58\",\"Currency\":\"BRL\",\"Country\":\"BRA\",\"ReturnCode\":\"4\",\"ReturnMessage\":\"Operation Successful\",\"Status\":1,\"Links\":[{\"Method\":\"GET\",\"Rel\":\"self\",\"Href\":\"https://apiquerydev.cieloecommerce.cielo.com.br/1/sales/eb616a9f-00bc-437d-bbf8-0f5e8a3e716c\"},{\"Method\":\"PUT\",\"Rel\":\"capture\",\"Href\":\"https://apidev.cieloecommerce.cielo.com.br/1/sales/eb616a9f-00bc-437d-bbf8-0f5e8a3e716c/capture\"},{\"Method\":\"PUT\",\"Rel\":\"void\",\"Href\":\"https://apidev.cieloecommerce.cielo.com.br/1/sales/eb616a9f-00bc-437d-bbf8-0f5e8a3e716c/void\"}]}}"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "name": "Zero Auth",
+      "item": [
+        {
+          "name": "ZeroAuth - CardToken",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              },
+              {
+                "key": "MerchantId",
+                "value": "{{merchantId}}"
+              },
+              {
+                "key": "MerchantKey",
+                "value": "{{merchantKey}}"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\r\n  \"CardToken\":\"23712c39-bb08-4030-86b3-490a223a8cc9\",\r\n    \"SaveCard\":\"false\",\r\n    \"Brand\":\"Visa\"\r\n}"
+            },
+            "url": {
+              "raw": "{{apiUrl}}/1/zeroauth",
+              "host": [
+                "{{apiUrl}}"
+              ],
+              "path": [
+                "1",
+                "zeroauth"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "ZeroAuth - Validate With AVS",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              },
+              {
+                "key": "MerchantId",
+                "value": "{{merchantId}}"
+              },
+              {
+                "key": "MerchantKey",
+                "value": "{{merchantKey}}"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\r\n    \"CardType\":\"Credit\",\r\n    \"CardNumber\":\"1234123412341234\",\r\n    \"Holder\":\"Guilherme Schueler\",\r\n    \"ExpirationDate\":\"10/2030\",\r\n    \"SecurityCode\":\"333\",\r\n    \"SaveCard\":\"false\",\r\n    \"Brand\":\"Visa\",\r\n    \"Avs\":{\r\n        \"Cpf\": \"10939107716\",\r\n        \"ZipCode\": \"24320570\",\r\n        \"Street\": \"Estrada Caetano Monteiro\",\r\n        \"Number\": \"391\",\r\n        \"Complement\": \"Bl\",\r\n        \"District\": \"Niteroi\"\r\n    }\r\n}"
+            },
+            "url": {
+              "raw": "{{url}}/1/zeroauth",
+              "host": [
+                "{{url}}"
+              ],
+              "path": [
+                "1",
+                "zeroauth"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "ZeroAuth - Validate",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              },
+              {
+                "key": "MerchantId",
+                "value": "{{merchantId}}"
+              },
+              {
+                "key": "MerchantKey",
+                "value": "{{merchantKey}}"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\r\n    \"CardType\": \"DebitCard\",\r\n    \"CardNumber\":\"1234123412341234\",\r\n    \"Holder\":\"Teste holder\",\r\n    \"ExpirationDate\":\"10/2021\",\r\n    \"SecurityCode\":\"123\",\r\n    \"SaveCard\":\"false\",\r\n    \"Brand\":\"Visa\"\r\n}\r\n\r\n"
+            },
+            "url": {
+              "raw": "{{apiUrl}}/1/zeroauth",
+              "host": [
+                "{{apiUrl}}"
+              ],
+              "path": [
+                "1",
+                "zeroauth"
+              ]
+            }
+          },
+          "response": []
+        }
+      ]
+    },
+    {
+      "name": "Consulta Bins",
+      "item": [
+        {
+          "name": "Bin Query",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "MerchantId",
+                "value": "{{merchantId}}"
+              },
+              {
+                "key": "MerchantKey",
+                "value": "{{merchantKey}}"
+              },
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{apiQueryUrl}}/1/cardBin/401200",
+              "host": [
+                "{{apiQueryUrl}}"
+              ],
+              "path": [
+                "1",
+                "cardBin",
+                "401200"
+              ]
+            }
+          },
+          "response": []
+        }
+      ]
+    }
+  ],
+  "variable": [
+    {
+      "key": "bearer_token_1ahz",
+      "secret": true
+    }
+  ]
+}

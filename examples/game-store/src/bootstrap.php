@@ -77,6 +77,51 @@ function repository(callable $work): mixed
         fclose($file);
     }
 }
+/**
+ * Meios habilitados na loja. A chave visível dos cinco meios originais é o contrato da jornada.
+ * Adquirentes e bancos usam a mesma jornada do gateway; o stub X-Mock dos conectores não muda.
+ */
+function paymentMethods(): array
+{
+    $methods = [
+        "credit_card" => ["Cartão de crédito", "credit_card"],
+        "debit_card" => ["Cartão de débito", "debit_card"],
+        "pix" => ["Pix", "pix"],
+        "boleto" => ["Boleto", "boleto"],
+        "transfer" => ["Transferência bancária", "transfer"],
+    ];
+    foreach (
+        [
+            "cielo" => "Cielo",
+            "rede" => "Rede",
+            "getnet" => "Getnet",
+            "stone" => "Stone",
+            "bin" => "Bin",
+            "global_payments" => "Global Payments",
+            "pagbank" => "PagBank",
+            "safrapay" => "SafraPay",
+        ]
+        as $id => $name
+    ) {
+        $methods[$id] = [$name . " · cartão de crédito", "credit_card"];
+    }
+    foreach (
+        [
+            "c6" => "C6 Bank",
+            "itau" => "Itaú",
+            "santander" => "Santander",
+            "bb" => "Banco do Brasil",
+            "bradesco" => "Bradesco",
+            "caixa" => "Caixa",
+            "banrisul" => "Banrisul",
+        ]
+        as $id => $name
+    ) {
+        $methods[$id . "_pix"] = [$name . " · Pix", "pix"];
+        $methods[$id . "_boleto"] = [$name . " · boleto", "boleto"];
+    }
+    return $methods;
+}
 /** Cliente REST: credencial permanece no servidor; nunca recebe PAN/CVV. */
 function gateway(
     string $method,

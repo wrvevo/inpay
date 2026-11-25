@@ -1,0 +1,133 @@
+name: inpay-banks
+services:
+  bank-mock-server:
+    build:
+      context: .
+      args:
+        MODULE: bank-mock-server
+      target: spring-service
+    environment:
+      SERVER_PORT: "8098"
+      INPAY_MOCK_PORT: "8099"
+    ports:
+      - 127.0.0.1:8098:8098
+      - 127.0.0.1:8099:8099
+  connector-c6:
+    build:
+      context: .
+      args:
+        MODULE: connector-c6
+      target: spring-service
+    environment:
+      SPRING_PROFILES_ACTIVE: local
+      SERVER_PORT: "8111"
+      LOCAL_PASSWORD: ${LOCAL_PASSWORD:-local-only-change-me}
+      BANK_MOCK_BASE_URL: http://bank-mock-server:8099
+      BANK_MOCK_ENABLED: "true"
+      BANK_ENABLED: "false"
+    ports:
+      - 127.0.0.1:8111:8111
+    depends_on:
+      - bank-mock-server
+  connector-itau:
+    build:
+      context: .
+      args:
+        MODULE: connector-itau
+      target: spring-service
+    environment:
+      SPRING_PROFILES_ACTIVE: local
+      SERVER_PORT: "8112"
+      LOCAL_PASSWORD: ${LOCAL_PASSWORD:-local-only-change-me}
+      BANK_MOCK_BASE_URL: http://bank-mock-server:8099
+      BANK_MOCK_ENABLED: "true"
+      BANK_ENABLED: "false"
+    ports:
+      - 127.0.0.1:8112:8112
+    depends_on:
+      - bank-mock-server
+  connector-santander:
+    build:
+      context: .
+      args:
+        MODULE: connector-santander
+      target: spring-service
+    environment:
+      SPRING_PROFILES_ACTIVE: local
+      SERVER_PORT: "8113"
+      LOCAL_PASSWORD: ${LOCAL_PASSWORD:-local-only-change-me}
+      BANK_MOCK_BASE_URL: http://bank-mock-server:8099
+      BANK_MOCK_ENABLED: "true"
+      BANK_ENABLED: "false"
+    ports:
+      - 127.0.0.1:8113:8113
+    depends_on:
+      - bank-mock-server
+  connector-bb:
+    build:
+      context: .
+      args:
+        MODULE: connector-bb
+      target: spring-service
+    environment:
+      SPRING_PROFILES_ACTIVE: local
+      SERVER_PORT: "8114"
+      LOCAL_PASSWORD: ${LOCAL_PASSWORD:-local-only-change-me}
+      BANK_MOCK_BASE_URL: http://bank-mock-server:8099
+      BANK_MOCK_ENABLED: "true"
+      BANK_ENABLED: "false"
+    ports:
+      - 127.0.0.1:8114:8114
+    depends_on:
+      - bank-mock-server
+  connector-bradesco:
+    build:
+      context: .
+      args:
+        MODULE: connector-bradesco
+      target: spring-service
+    environment:
+      SPRING_PROFILES_ACTIVE: local
+      SERVER_PORT: "8115"
+      LOCAL_PASSWORD: ${LOCAL_PASSWORD:-local-only-change-me}
+      BANK_MOCK_BASE_URL: http://bank-mock-server:8099
+      BANK_MOCK_ENABLED: "true"
+      BANK_ENABLED: "false"
+    ports:
+      - 127.0.0.1:8115:8115
+    depends_on:
+      - bank-mock-server
+  connector-caixa:
+    build:
+      context: .
+      args:
+        MODULE: connector-caixa
+      target: spring-service
+    environment:
+      SPRING_PROFILES_ACTIVE: local
+      SERVER_PORT: "8116"
+      LOCAL_PASSWORD: ${LOCAL_PASSWORD:-local-only-change-me}
+      BANK_MOCK_BASE_URL: http://bank-mock-server:8099
+      BANK_MOCK_ENABLED: "true"
+      BANK_ENABLED: "false"
+    ports:
+      - 127.0.0.1:8116:8116
+    depends_on:
+      - bank-mock-server
+  connector-banrisul:
+    build:
+      context: .
+      args:
+        MODULE: connector-banrisul
+      target: spring-service
+    environment:
+      SPRING_PROFILES_ACTIVE: local
+      SERVER_PORT: "8117"
+      LOCAL_PASSWORD: ${LOCAL_PASSWORD:-local-only-change-me}
+      BANK_MOCK_BASE_URL: http://bank-mock-server:8099
+      BANK_MOCK_ENABLED: "true"
+      BANK_ENABLED: "false"
+    ports:
+      - 127.0.0.1:8117:8117
+    depends_on:
+      - bank-mock-server

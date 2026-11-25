@@ -1,0 +1,20 @@
+{
+  "request": {
+    "method": "DELETE",
+    "urlPathPattern": "^/banrisul/pix/v2/chaves/[^/]+$"
+  },
+  "priority": 19,
+  "response": {
+    "status": 200,
+    "headers": {
+      "Content-Type": "application/json"
+    },
+    "jsonBody": {
+      "mocked": true,
+      "bank": "banrisul",
+      "operation": "PIX_KEY_DELETE",
+      "status": "ATIVA",
+      "pixCopiaECola": "000201mocked"
+    }
+  }
+}

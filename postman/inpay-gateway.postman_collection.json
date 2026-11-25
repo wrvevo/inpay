@@ -1,0 +1,4829 @@
+{
+  "info": {
+    "name": "InPay Gateway — checkout, recorrência, conciliação e pagamentos",
+    "description": "Collection para o Collection Runner local. Importe também inpay-local.postman_environment.json. Suba payment-core (8084), payment-links (8082), billing (8113), marketplace (8112), reconciliation (8089) e connector-c6 (8121) com o perfil local, Postgres e Kafka. Auth Basic developer / local-password. Aprovação de recorrência usa reviewer. Liquidação interna usa provider-worker. Operações C6 saem com X-Mock: true. Captura, estorno e o job de conciliação respondem 501 enquanto o adaptador não está ligado. Valores em centavos. Não envie PAN, CVV nem client secret.",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+  },
+  "auth": {
+    "type": "basic",
+    "basic": [
+      {
+        "key": "username",
+        "value": "developer",
+        "type": "string"
+      },
+      {
+        "key": "password",
+        "value": "{{localPassword}}",
+        "type": "string"
+      }
+    ]
+  },
+  "variable": [
+    {
+      "key": "gatewayUrl",
+      "value": "http://127.0.0.1:8084"
+    },
+    {
+      "key": "linksUrl",
+      "value": "http://127.0.0.1:8082"
+    },
+    {
+      "key": "billingUrl",
+      "value": "http://127.0.0.1:8113"
+    },
+    {
+      "key": "marketplaceUrl",
+      "value": "http://127.0.0.1:8112"
+    },
+    {
+      "key": "reconciliationUrl",
+      "value": "http://127.0.0.1:8089"
+    },
+    {
+      "key": "localPassword",
+      "value": "local-only-change-me"
+    },
+    {
+      "key": "merchantId",
+      "value": "11111111-1111-1111-1111-111111111111"
+    },
+    {
+      "key": "pixKey",
+      "value": "071246db-0e8f-46c6-90a5-649514f264ca"
+    },
+    {
+      "key": "customerId",
+      "value": ""
+    },
+    {
+      "key": "orderId",
+      "value": ""
+    },
+    {
+      "key": "chargeId",
+      "value": ""
+    },
+    {
+      "key": "paymentId",
+      "value": ""
+    },
+    {
+      "key": "journeyId",
+      "value": ""
+    },
+    {
+      "key": "journeyKey",
+      "value": ""
+    },
+    {
+      "key": "linkId",
+      "value": ""
+    },
+    {
+      "key": "billingMerchantId",
+      "value": ""
+    },
+    {
+      "key": "invoiceId",
+      "value": ""
+    },
+    {
+      "key": "subscriptionId",
+      "value": ""
+    },
+    {
+      "key": "recipientId",
+      "value": ""
+    },
+    {
+      "key": "splitId",
+      "value": ""
+    },
+    {
+      "key": "settlementId",
+      "value": ""
+    }
+  ],
+  "item": [
+    {
+      "name": "01 Pagamentos",
+      "description": "Clientes, pedidos, cobranças, pagamento tokenizado e jornada. Rode esta pasta antes das demais.",
+      "item": [
+        {
+          "name": "Saúde do gateway",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": "{{gatewayUrl}}/actuator/health",
+            "description": "Sem autenticação.",
+            "auth": {
+              "type": "noauth"
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('HTTP 200', function () {",
+                  "    pm.expect([200]).to.include(pm.response.code);",
+                  "});"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "Listar provedores",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "X-Merchant-Id",
+                "value": "{{merchantId}}",
+                "type": "text"
+              }
+            ],
+            "url": "{{gatewayUrl}}/gateway/v1/providers",
+            "description": ""
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('HTTP 200', function () {",
+                  "    pm.expect([200]).to.include(pm.response.code);",
+                  "});"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "Criar cliente",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json",
+                "type": "text"
+              },
+              {
+                "key": "X-Merchant-Id",
+                "value": "{{merchantId}}",
+                "type": "text"
+              },
+              {
+                "key": "Idempotency-Key",
+                "value": "{{$guid}}",
+                "type": "text"
+              }
+            ],
+            "url": "{{gatewayUrl}}/gateway/v1/customers",
+            "description": "",
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"name\": \"Cliente Homologacao\",\n  \"email\": \"cliente@example.com\",\n  \"type\": \"individual\",\n  \"document\": \"12345678901\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('HTTP 201', function () {",
+                  "    pm.expect([201]).to.include(pm.response.code);",
+                  "});",
+                  "if (pm.response.code < 300) {",
+                  "    const body = pm.response.json();",
+                  "pm.collectionVariables.set(\"customerId\", body.id);",
+                  "}"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "Listar clientes",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "X-Merchant-Id",
+                "value": "{{merchantId}}",
+                "type": "text"
+              }
+            ],
+            "url": "{{gatewayUrl}}/gateway/v1/customers?page=1&size=20",
+            "description": ""
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('HTTP 200', function () {",
+                  "    pm.expect([200]).to.include(pm.response.code);",
+                  "});"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "Obter cliente",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "X-Merchant-Id",
+                "value": "{{merchantId}}",
+                "type": "text"
+              }
+            ],
+            "url": "{{gatewayUrl}}/gateway/v1/customers/{{customerId}}",
+            "description": ""
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('HTTP 200', function () {",
+                  "    pm.expect([200]).to.include(pm.response.code);",
+                  "});"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "Criar pedido Pix",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json",
+                "type": "text"
+              },
+              {
+                "key": "X-Merchant-Id",
+                "value": "{{merchantId}}",
+                "type": "text"
+              },
+              {
+                "key": "Idempotency-Key",
+                "value": "{{$guid}}",
+                "type": "text"
+              }
+            ],
+            "url": "{{gatewayUrl}}/gateway/v1/orders",
+            "description": "202 pending / not_dispatched. A soma dos pagamentos precisa fechar com os itens.",
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"code\": \"pedido-pix\",\n  \"customer_id\": \"{{customerId}}\",\n  \"items\": [\n    {\n      \"code\": \"jogo\",\n      \"description\": \"Jogo digital\",\n      \"amount\": 10000,\n      \"quantity\": 1\n    }\n  ],\n  \"payments\": [\n    {\n      \"payment_method\": \"pix\",\n      \"amount\": 10000,\n      \"pix\": {\n        \"expires_in\": 300\n      }\n    }\n  ]\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('HTTP 202', function () {",
+                  "    pm.expect([202]).to.include(pm.response.code);",
+                  "});",
+                  "if (pm.response.code < 300) {",
+                  "    const body = pm.response.json();",
+                  "pm.collectionVariables.set(\"orderId\", body.id);\n    if (body.charges && body.charges.length) pm.collectionVariables.set(\"chargeId\", body.charges[0].id);",
+                  "}"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "Criar pedido com cartão tokenizado",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json",
+                "type": "text"
+              },
+              {
+                "key": "X-Merchant-Id",
+                "value": "{{merchantId}}",
+                "type": "text"
+              },
+              {
+                "key": "Idempotency-Key",
+                "value": "{{$guid}}",
+                "type": "text"
+              }
+            ],
+            "url": "{{gatewayUrl}}/gateway/v1/orders",
+            "description": "Aceita somente card_token ptok_. PAN e CVV são recusados.",
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"code\": \"pedido-cartao\",\n  \"customer_id\": \"{{customerId}}\",\n  \"items\": [\n    {\n      \"code\": \"assinatura\",\n      \"description\": \"Assinatura mensal\",\n      \"amount\": 4990,\n      \"quantity\": 1\n    }\n  ],\n  \"payments\": [\n    {\n      \"payment_method\": \"credit_card\",\n      \"amount\": 4990,\n      \"credit_card\": {\n        \"card_token\": \"ptok_EXEMPLO_SIMULADO_1234567890\",\n        \"installments\": 1,\n        \"capture\": false\n      }\n    }\n  ]\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('HTTP 202', function () {",
+                  "    pm.expect([202]).to.include(pm.response.code);",
+                  "});"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "Listar pedidos",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "X-Merchant-Id",
+                "value": "{{merchantId}}",
+                "type": "text"
+              }
+            ],
+            "url": "{{gatewayUrl}}/gateway/v1/orders?page=1&size=20",
+            "description": ""
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('HTTP 200', function () {",
+                  "    pm.expect([200]).to.include(pm.response.code);",
+                  "});"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "Obter pedido",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "X-Merchant-Id",
+                "value": "{{merchantId}}",
+                "type": "text"
+              }
+            ],
+            "url": "{{gatewayUrl}}/gateway/v1/orders/{{orderId}}",
+            "description": ""
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('HTTP 200', function () {",
+                  "    pm.expect([200]).to.include(pm.response.code);",
+                  "});"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "Listar cobranças",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "X-Merchant-Id",
+                "value": "{{merchantId}}",
+                "type": "text"
+              }
+            ],
+            "url": "{{gatewayUrl}}/gateway/v1/charges?page=1&size=20",
+            "description": ""
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('HTTP 200', function () {",
+                  "    pm.expect([200]).to.include(pm.response.code);",
+                  "});"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "Obter cobrança",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "X-Merchant-Id",
+                "value": "{{merchantId}}",
+                "type": "text"
+              }
+            ],
+            "url": "{{gatewayUrl}}/gateway/v1/charges/{{chargeId}}",
+            "description": ""
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('HTTP 200', function () {",
+                  "    pm.expect([200]).to.include(pm.response.code);",
+                  "});"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "Registrar pagamento tokenizado",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json",
+                "type": "text"
+              },
+              {
+                "key": "X-Merchant-Id",
+                "value": "{{merchantId}}",
+                "type": "text"
+              },
+              {
+                "key": "Idempotency-Key",
+                "value": "{{$guid}}",
+                "type": "text"
+              }
+            ],
+            "url": "{{gatewayUrl}}/v1/payments",
+            "description": "202 CREATED. Esta versão não autoriza o cartão.",
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"merchantOrderId\": \"PED-1048\",\n  \"amount\": 15990,\n  \"currency\": \"BRL\",\n  \"instrumentToken\": \"ptok_EXEMPLO_SIMULADO_1234567890\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('HTTP 202', function () {",
+                  "    pm.expect([202]).to.include(pm.response.code);",
+                  "});",
+                  "if (pm.response.code < 300) {",
+                  "    const body = pm.response.json();",
+                  "pm.collectionVariables.set(\"paymentId\", body.id);",
+                  "}"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "Consultar pagamento",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "X-Merchant-Id",
+                "value": "{{merchantId}}",
+                "type": "text"
+              }
+            ],
+            "url": "{{gatewayUrl}}/v1/payments/{{paymentId}}",
+            "description": ""
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('HTTP 200', function () {",
+                  "    pm.expect([200]).to.include(pm.response.code);",
+                  "});"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "Iniciar jornada Pix",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json",
+                "type": "text"
+              },
+              {
+                "key": "X-Merchant-Id",
+                "value": "{{merchantId}}",
+                "type": "text"
+              },
+              {
+                "key": "Idempotency-Key",
+                "value": "{{$guid}}",
+                "type": "text"
+              }
+            ],
+            "url": "{{gatewayUrl}}/gateway/v1/journeys",
+            "description": "",
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"merchantOrder\": \"order-pix\",\n  \"amount\": 1500,\n  \"method\": \"pix\",\n  \"instrument\": \"fixture\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('HTTP 200', function () {",
+                  "    pm.expect([200]).to.include(pm.response.code);",
+                  "});",
+                  "if (pm.response.code < 300) {",
+                  "    const body = pm.response.json();",
+                  "pm.collectionVariables.set(\"journeyId\", body.id);\n    const key = pm.request.headers.get(\"Idempotency-Key\");\n    pm.collectionVariables.set(\"journeyKey\", key);",
+                  "}"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "Consultar jornada",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "X-Merchant-Id",
+                "value": "{{merchantId}}",
+                "type": "text"
+              }
+            ],
+            "url": "{{gatewayUrl}}/gateway/v1/journeys/{{journeyId}}",
+            "description": ""
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('HTTP 200', function () {",
+                  "    pm.expect([200]).to.include(pm.response.code);",
+                  "});"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "Recuperar jornada pela chave",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "X-Merchant-Id",
+                "value": "{{merchantId}}",
+                "type": "text"
+              }
+            ],
+            "url": "{{gatewayUrl}}/gateway/v1/journeys/by-key/{{journeyKey}}",
+            "description": ""
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('HTTP 200', function () {",
+                  "    pm.expect([200]).to.include(pm.response.code);",
+                  "});"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "Cobrança Pix imediata C6",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json",
+                "type": "text"
+              },
+              {
+                "key": "X-Merchant-Id",
+                "value": "{{merchantId}}",
+                "type": "text"
+              },
+              {
+                "key": "Idempotency-Key",
+                "value": "{{$guid}}",
+                "type": "text"
+              },
+              {
+                "key": "X-Mock",
+                "value": "true",
+                "type": "text"
+              }
+            ],
+            "url": "{{gatewayUrl}}/gateway/v1/bank-operations/c6/PIX_COB_PUT",
+            "description": "Mock do conector. Sem X-Mock o conector desligado responde 503.",
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"txid\": \"abc123\",\n  \"valor\": \"10.00\",\n  \"chave\": \"{{pixKey}}\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('HTTP 200', function () {",
+                  "    pm.expect([200]).to.include(pm.response.code);",
+                  "});"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "PIX_COB_PUT via Kafka",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json",
+                "type": "text"
+              },
+              {
+                "key": "X-Merchant-Id",
+                "value": "{{merchantId}}",
+                "type": "text"
+              },
+              {
+                "key": "Idempotency-Key",
+                "value": "{{$guid}}",
+                "type": "text"
+              },
+              {
+                "key": "X-Mock",
+                "value": "true",
+                "type": "text"
+              },
+              {
+                "key": "X-Dispatch",
+                "value": "kafka",
+                "type": "text"
+              }
+            ],
+            "url": "{{gatewayUrl}}/gateway/v1/bank-operations/c6/PIX_COB_PUT",
+            "description": "Mesma cobrança publicada em inpay.c6.commands.v1. Exige Kafka e C6_GATEWAY_KAFKA=true.",
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"id\": \"abc123\",\n  \"txid\": \"abc123\",\n  \"e2eid\": \"abc123\",\n  \"chave\": \"{{pixKey}}\",\n  \"data\": \"2026-11-23\",\n  \"valor\": \"10.00\",\n  \"amount\": 1000,\n  \"external_reference_id\": \"pedido123\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('HTTP 202', function () {",
+                  "    pm.expect([202]).to.include(pm.response.code);",
+                  "});"
+                ]
+              }
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "name": "02 Checkout",
+      "description": "Link de pagamento do gateway e checkout C6. O checkout-service ainda não expõe sessão pública.",
+      "item": [
+        {
+          "name": "Criar link de pagamento",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json",
+                "type": "text"
+              },
+              {
+                "key": "X-Merchant-Id",
+                "value": "{{merchantId}}",
+                "type": "text"
+              }
+            ],
+            "url": "{{linksUrl}}/v1/payment-links",
+            "description": "",
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"merchantOrderId\": \"PED-CHECKOUT-1\",\n  \"amount\": 15990,\n  \"expiresAt\": \"2027-06-01T23:59:59Z\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('HTTP 200', function () {",
+                  "    pm.expect([200]).to.include(pm.response.code);",
+                  "});",
+                  "if (pm.response.code < 300) {",
+                  "    const body = pm.response.json();",
+                  "pm.collectionVariables.set(\"linkId\", body.id);",
+                  "}"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "Consultar link",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "X-Merchant-Id",
+                "value": "{{merchantId}}",
+                "type": "text"
+              }
+            ],
+            "url": "{{linksUrl}}/v1/payment-links/{{linkId}}",
+            "description": ""
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('HTTP 200', function () {",
+                  "    pm.expect([200]).to.include(pm.response.code);",
+                  "});"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "Revogar link",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "X-Merchant-Id",
+                "value": "{{merchantId}}",
+                "type": "text"
+              }
+            ],
+            "url": "{{linksUrl}}/v1/payment-links/{{linkId}}/revoke",
+            "description": ""
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('HTTP 200', function () {",
+                  "    pm.expect([200]).to.include(pm.response.code);",
+                  "});"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "CHECKOUT_CREATE",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json",
+                "type": "text"
+              },
+              {
+                "key": "X-Merchant-Id",
+                "value": "{{merchantId}}",
+                "type": "text"
+              },
+              {
+                "key": "Idempotency-Key",
+                "value": "{{$guid}}",
+                "type": "text"
+              },
+              {
+                "key": "X-Mock",
+                "value": "true",
+                "type": "text"
+              }
+            ],
+            "url": "{{gatewayUrl}}/gateway/v1/bank-operations/c6/CHECKOUT_CREATE",
+            "description": "POST /v1/checkouts/ no sandbox C6, em mock.",
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"id\": \"abc123\",\n  \"txid\": \"abc123\",\n  \"e2eid\": \"abc123\",\n  \"chave\": \"{{pixKey}}\",\n  \"data\": \"2026-11-23\",\n  \"valor\": \"10.00\",\n  \"amount\": 1000,\n  \"external_reference_id\": \"pedido123\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('HTTP 200', function () {",
+                  "    pm.expect([200]).to.include(pm.response.code);",
+                  "});"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "CHECKOUT_GET",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json",
+                "type": "text"
+              },
+              {
+                "key": "X-Merchant-Id",
+                "value": "{{merchantId}}",
+                "type": "text"
+              },
+              {
+                "key": "Idempotency-Key",
+                "value": "{{$guid}}",
+                "type": "text"
+              },
+              {
+                "key": "X-Mock",
+                "value": "true",
+                "type": "text"
+              }
+            ],
+            "url": "{{gatewayUrl}}/gateway/v1/bank-operations/c6/CHECKOUT_GET",
+            "description": "GET /v1/checkouts/{id}. O mock devolve a URL de checkout.",
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"id\": \"abc123\",\n  \"txid\": \"abc123\",\n  \"e2eid\": \"abc123\",\n  \"chave\": \"{{pixKey}}\",\n  \"data\": \"2026-11-23\",\n  \"valor\": \"10.00\",\n  \"amount\": 1000,\n  \"external_reference_id\": \"pedido123\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('HTTP 200', function () {",
+                  "    pm.expect([200]).to.include(pm.response.code);",
+                  "});"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "CHECKOUT_CANCEL",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json",
+                "type": "text"
+              },
+              {
+                "key": "X-Merchant-Id",
+                "value": "{{merchantId}}",
+                "type": "text"
+              },
+              {
+                "key": "Idempotency-Key",
+                "value": "{{$guid}}",
+                "type": "text"
+              },
+              {
+                "key": "X-Mock",
+                "value": "true",
+                "type": "text"
+              }
+            ],
+            "url": "{{gatewayUrl}}/gateway/v1/bank-operations/c6/CHECKOUT_CANCEL",
+            "description": "PUT /v1/checkouts/{id}/cancel.",
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"id\": \"abc123\",\n  \"txid\": \"abc123\",\n  \"e2eid\": \"abc123\",\n  \"chave\": \"{{pixKey}}\",\n  \"data\": \"2026-11-23\",\n  \"valor\": \"10.00\",\n  \"amount\": 1000,\n  \"external_reference_id\": \"pedido123\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('HTTP 200', function () {",
+                  "    pm.expect([200]).to.include(pm.response.code);",
+                  "});"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "CHECKOUT_TOKENIZE",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json",
+                "type": "text"
+              },
+              {
+                "key": "X-Merchant-Id",
+                "value": "{{merchantId}}",
+                "type": "text"
+              },
+              {
+                "key": "Idempotency-Key",
+                "value": "{{$guid}}",
+                "type": "text"
+              },
+              {
+                "key": "X-Mock",
+                "value": "true",
+                "type": "text"
+              }
+            ],
+            "url": "{{gatewayUrl}}/gateway/v1/bank-operations/c6/CHECKOUT_TOKENIZE",
+            "description": "Rota ainda não confirmada na documentação pública. No mock responde 200; ao vivo, 422.",
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"id\": \"abc123\",\n  \"txid\": \"abc123\",\n  \"e2eid\": \"abc123\",\n  \"chave\": \"{{pixKey}}\",\n  \"data\": \"2026-11-23\",\n  \"valor\": \"10.00\",\n  \"amount\": 1000,\n  \"external_reference_id\": \"pedido123\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('HTTP 200', function () {",
+                  "    pm.expect([200]).to.include(pm.response.code);",
+                  "});"
+                ]
+              }
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "name": "03 Recorrência",
+      "description": "Assinatura mensal no billing e recorrência C6 (checkout e Pix automático). Aprove com o usuário reviewer.",
+      "item": [
+        {
+          "name": "Cadastrar lojista para recorrência",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json",
+                "type": "text"
+              },
+              {
+                "key": "X-Merchant-Id",
+                "value": "{{merchantId}}",
+                "type": "text"
+              },
+              {
+                "key": "Idempotency-Key",
+                "value": "{{$guid}}",
+                "type": "text"
+              }
+            ],
+            "url": "{{billingUrl}}/billing/v1/merchants",
+            "description": "",
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"operationId\": \"{{$guid}}\",\n  \"tenant\": \"{{merchantId}}\",\n  \"name\": \"Loja Homologacao\",\n  \"plan\": \"START-2026-11\",\n  \"evidence\": \"contract-local\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('HTTP 200', function () {",
+                  "    pm.expect([200]).to.include(pm.response.code);",
+                  "});",
+                  "if (pm.response.code < 300) {",
+                  "    const body = pm.response.json();",
+                  "pm.collectionVariables.set(\"billingMerchantId\", body.id);",
+                  "}"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "Aprovar lojista",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json",
+                "type": "text"
+              },
+              {
+                "key": "X-Merchant-Id",
+                "value": "{{merchantId}}",
+                "type": "text"
+              },
+              {
+                "key": "Idempotency-Key",
+                "value": "{{$guid}}",
+                "type": "text"
+              }
+            ],
+            "url": "{{billingUrl}}/billing/v1/merchants/{{billingMerchantId}}/approve",
+            "description": "O solicitante não aprova o próprio cadastro.",
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"operationId\": \"{{$guid}}\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "auth": {
+              "type": "basic",
+              "basic": [
+                {
+                  "key": "username",
+                  "value": "reviewer",
+                  "type": "string"
+                },
+                {
+                  "key": "password",
+                  "value": "{{localPassword}}",
+                  "type": "string"
+                }
+              ]
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('HTTP 200', function () {",
+                  "    pm.expect([200]).to.include(pm.response.code);",
+                  "});"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "Cadastrar recorrência mensal",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json",
+                "type": "text"
+              },
+              {
+                "key": "X-Merchant-Id",
+                "value": "{{merchantId}}",
+                "type": "text"
+              },
+              {
+                "key": "Idempotency-Key",
+                "value": "{{$guid}}",
+                "type": "text"
+              }
+            ],
+            "url": "{{billingUrl}}/billing/v1/subscriptions",
+            "description": "",
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"operationId\": \"{{$guid}}\",\n  \"merchantId\": \"{{billingMerchantId}}\",\n  \"customerRef\": \"cliente-recorrente\",\n  \"amount\": 4990,\n  \"method\": \"PIX\",\n  \"firstDue\": \"2026-12-31\",\n  \"anchorDay\": 31,\n  \"conditions\": {\n    \"fineBps\": 0,\n    \"dailyInterestBps\": 0,\n    \"discountCents\": 0,\n    \"discountUntil\": null,\n    \"maxSurchargeBps\": 0\n  },\n  \"mandateReference\": \"mandate-local\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('HTTP 200', function () {",
+                  "    pm.expect([200]).to.include(pm.response.code);",
+                  "});",
+                  "if (pm.response.code < 300) {",
+                  "    const body = pm.response.json();",
+                  "pm.collectionVariables.set(\"subscriptionId\", body.id);",
+                  "}"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "Gerar ciclo de faturas",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "X-Merchant-Id",
+                "value": "{{merchantId}}",
+                "type": "text"
+              }
+            ],
+            "url": "{{billingUrl}}/billing/v1/cycles/run",
+            "description": "Gera faturas vencidas até hoje. Uma recorrência com firstDue futuro não cria fatura neste ciclo."
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('HTTP 200', function () {",
+                  "    pm.expect([200]).to.include(pm.response.code);",
+                  "});"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "Listar assinaturas",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "X-Merchant-Id",
+                "value": "{{merchantId}}",
+                "type": "text"
+              }
+            ],
+            "url": "{{billingUrl}}/billing/v1/resources/subscriptions?page=1&size=20",
+            "description": ""
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('HTTP 200', function () {",
+                  "    pm.expect([200]).to.include(pm.response.code);",
+                  "});"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "Cancelar recorrência",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json",
+                "type": "text"
+              },
+              {
+                "key": "X-Merchant-Id",
+                "value": "{{merchantId}}",
+                "type": "text"
+              },
+              {
+                "key": "Idempotency-Key",
+                "value": "{{$guid}}",
+                "type": "text"
+              }
+            ],
+            "url": "{{billingUrl}}/billing/v1/subscriptions/{{subscriptionId}}/cancel",
+            "description": "",
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"operationId\": \"{{$guid}}\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('HTTP 200', function () {",
+                  "    pm.expect([200]).to.include(pm.response.code);",
+                  "});"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "CHECKOUT_RECURRENCE_CREATE",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json",
+                "type": "text"
+              },
+              {
+                "key": "X-Merchant-Id",
+                "value": "{{merchantId}}",
+                "type": "text"
+              },
+              {
+                "key": "Idempotency-Key",
+                "value": "{{$guid}}",
+                "type": "text"
+              },
+              {
+                "key": "X-Mock",
+                "value": "true",
+                "type": "text"
+              }
+            ],
+            "url": "{{gatewayUrl}}/gateway/v1/bank-operations/c6/CHECKOUT_RECURRENCE_CREATE",
+            "description": "Recorrência de checkout C6. Path não confirmado; mock 200, ao vivo 422.",
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"id\": \"abc123\",\n  \"txid\": \"abc123\",\n  \"e2eid\": \"abc123\",\n  \"chave\": \"{{pixKey}}\",\n  \"data\": \"2026-11-23\",\n  \"valor\": \"10.00\",\n  \"amount\": 1000,\n  \"external_reference_id\": \"pedido123\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('HTTP 200', function () {",
+                  "    pm.expect([200]).to.include(pm.response.code);",
+                  "});"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "CHECKOUT_RECURRENCE_GET",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json",
+                "type": "text"
+              },
+              {
+                "key": "X-Merchant-Id",
+                "value": "{{merchantId}}",
+                "type": "text"
+              },
+              {
+                "key": "Idempotency-Key",
+                "value": "{{$guid}}",
+                "type": "text"
+              },
+              {
+                "key": "X-Mock",
+                "value": "true",
+                "type": "text"
+              }
+            ],
+            "url": "{{gatewayUrl}}/gateway/v1/bank-operations/c6/CHECKOUT_RECURRENCE_GET",
+            "description": "Consulta da recorrência de checkout C6.",
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"id\": \"abc123\",\n  \"txid\": \"abc123\",\n  \"e2eid\": \"abc123\",\n  \"chave\": \"{{pixKey}}\",\n  \"data\": \"2026-11-23\",\n  \"valor\": \"10.00\",\n  \"amount\": 1000,\n  \"external_reference_id\": \"pedido123\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('HTTP 200', function () {",
+                  "    pm.expect([200]).to.include(pm.response.code);",
+                  "});"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "PIX_AUTO_REC_PUT",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json",
+                "type": "text"
+              },
+              {
+                "key": "X-Merchant-Id",
+                "value": "{{merchantId}}",
+                "type": "text"
+              },
+              {
+                "key": "Idempotency-Key",
+                "value": "{{$guid}}",
+                "type": "text"
+              },
+              {
+                "key": "X-Mock",
+                "value": "true",
+                "type": "text"
+              }
+            ],
+            "url": "{{gatewayUrl}}/gateway/v1/bank-operations/c6/PIX_AUTO_REC_PUT",
+            "description": "PUT /v2/pix/rec/{id}",
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"id\": \"abc123\",\n  \"txid\": \"abc123\",\n  \"e2eid\": \"abc123\",\n  \"chave\": \"{{pixKey}}\",\n  \"data\": \"2026-11-23\",\n  \"valor\": \"10.00\",\n  \"amount\": 1000,\n  \"external_reference_id\": \"pedido123\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('HTTP 200', function () {",
+                  "    pm.expect([200]).to.include(pm.response.code);",
+                  "});"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "PIX_AUTO_REC_GET",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json",
+                "type": "text"
+              },
+              {
+                "key": "X-Merchant-Id",
+                "value": "{{merchantId}}",
+                "type": "text"
+              },
+              {
+                "key": "Idempotency-Key",
+                "value": "{{$guid}}",
+                "type": "text"
+              },
+              {
+                "key": "X-Mock",
+                "value": "true",
+                "type": "text"
+              }
+            ],
+            "url": "{{gatewayUrl}}/gateway/v1/bank-operations/c6/PIX_AUTO_REC_GET",
+            "description": "GET /v2/pix/rec/{id}",
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"id\": \"abc123\",\n  \"txid\": \"abc123\",\n  \"e2eid\": \"abc123\",\n  \"chave\": \"{{pixKey}}\",\n  \"data\": \"2026-11-23\",\n  \"valor\": \"10.00\",\n  \"amount\": 1000,\n  \"external_reference_id\": \"pedido123\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('HTTP 200', function () {",
+                  "    pm.expect([200]).to.include(pm.response.code);",
+                  "});"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "PIX_AUTO_REC_LIST",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json",
+                "type": "text"
+              },
+              {
+                "key": "X-Merchant-Id",
+                "value": "{{merchantId}}",
+                "type": "text"
+              },
+              {
+                "key": "Idempotency-Key",
+                "value": "{{$guid}}",
+                "type": "text"
+              },
+              {
+                "key": "X-Mock",
+                "value": "true",
+                "type": "text"
+              }
+            ],
+            "url": "{{gatewayUrl}}/gateway/v1/bank-operations/c6/PIX_AUTO_REC_LIST",
+            "description": "GET /v2/pix/rec",
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"id\": \"abc123\",\n  \"txid\": \"abc123\",\n  \"e2eid\": \"abc123\",\n  \"chave\": \"{{pixKey}}\",\n  \"data\": \"2026-11-23\",\n  \"valor\": \"10.00\",\n  \"amount\": 1000,\n  \"external_reference_id\": \"pedido123\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('HTTP 200', function () {",
+                  "    pm.expect([200]).to.include(pm.response.code);",
+                  "});"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "PIX_AUTO_SOLIC_POST",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json",
+                "type": "text"
+              },
+              {
+                "key": "X-Merchant-Id",
+                "value": "{{merchantId}}",
+                "type": "text"
+              },
+              {
+                "key": "Idempotency-Key",
+                "value": "{{$guid}}",
+                "type": "text"
+              },
+              {
+                "key": "X-Mock",
+                "value": "true",
+                "type": "text"
+              }
+            ],
+            "url": "{{gatewayUrl}}/gateway/v1/bank-operations/c6/PIX_AUTO_SOLIC_POST",
+            "description": "POST /v2/pix/solicrec",
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"id\": \"abc123\",\n  \"txid\": \"abc123\",\n  \"e2eid\": \"abc123\",\n  \"chave\": \"{{pixKey}}\",\n  \"data\": \"2026-11-23\",\n  \"valor\": \"10.00\",\n  \"amount\": 1000,\n  \"external_reference_id\": \"pedido123\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('HTTP 200', function () {",
+                  "    pm.expect([200]).to.include(pm.response.code);",
+                  "});"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "PIX_AUTO_SOLIC_GET",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json",
+                "type": "text"
+              },
+              {
+                "key": "X-Merchant-Id",
+                "value": "{{merchantId}}",
+                "type": "text"
+              },
+              {
+                "key": "Idempotency-Key",
+                "value": "{{$guid}}",
+                "type": "text"
+              },
+              {
+                "key": "X-Mock",
+                "value": "true",
+                "type": "text"
+              }
+            ],
+            "url": "{{gatewayUrl}}/gateway/v1/bank-operations/c6/PIX_AUTO_SOLIC_GET",
+            "description": "GET /v2/pix/solicrec/{id}",
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"id\": \"abc123\",\n  \"txid\": \"abc123\",\n  \"e2eid\": \"abc123\",\n  \"chave\": \"{{pixKey}}\",\n  \"data\": \"2026-11-23\",\n  \"valor\": \"10.00\",\n  \"amount\": 1000,\n  \"external_reference_id\": \"pedido123\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('HTTP 200', function () {",
+                  "    pm.expect([200]).to.include(pm.response.code);",
+                  "});"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "PIX_AUTO_COBR_PUT",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json",
+                "type": "text"
+              },
+              {
+                "key": "X-Merchant-Id",
+                "value": "{{merchantId}}",
+                "type": "text"
+              },
+              {
+                "key": "Idempotency-Key",
+                "value": "{{$guid}}",
+                "type": "text"
+              },
+              {
+                "key": "X-Mock",
+                "value": "true",
+                "type": "text"
+              }
+            ],
+            "url": "{{gatewayUrl}}/gateway/v1/bank-operations/c6/PIX_AUTO_COBR_PUT",
+            "description": "PUT /v2/pix/cobr/{txid}",
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"id\": \"abc123\",\n  \"txid\": \"abc123\",\n  \"e2eid\": \"abc123\",\n  \"chave\": \"{{pixKey}}\",\n  \"data\": \"2026-11-23\",\n  \"valor\": \"10.00\",\n  \"amount\": 1000,\n  \"external_reference_id\": \"pedido123\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('HTTP 200', function () {",
+                  "    pm.expect([200]).to.include(pm.response.code);",
+                  "});"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "PIX_AUTO_COBR_GET",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json",
+                "type": "text"
+              },
+              {
+                "key": "X-Merchant-Id",
+                "value": "{{merchantId}}",
+                "type": "text"
+              },
+              {
+                "key": "Idempotency-Key",
+                "value": "{{$guid}}",
+                "type": "text"
+              },
+              {
+                "key": "X-Mock",
+                "value": "true",
+                "type": "text"
+              }
+            ],
+            "url": "{{gatewayUrl}}/gateway/v1/bank-operations/c6/PIX_AUTO_COBR_GET",
+            "description": "GET /v2/pix/cobr/{txid}",
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"id\": \"abc123\",\n  \"txid\": \"abc123\",\n  \"e2eid\": \"abc123\",\n  \"chave\": \"{{pixKey}}\",\n  \"data\": \"2026-11-23\",\n  \"valor\": \"10.00\",\n  \"amount\": 1000,\n  \"external_reference_id\": \"pedido123\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('HTTP 200', function () {",
+                  "    pm.expect([200]).to.include(pm.response.code);",
+                  "});"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "PIX_AUTO_COBR_PATCH",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json",
+                "type": "text"
+              },
+              {
+                "key": "X-Merchant-Id",
+                "value": "{{merchantId}}",
+                "type": "text"
+              },
+              {
+                "key": "Idempotency-Key",
+                "value": "{{$guid}}",
+                "type": "text"
+              },
+              {
+                "key": "X-Mock",
+                "value": "true",
+                "type": "text"
+              }
+            ],
+            "url": "{{gatewayUrl}}/gateway/v1/bank-operations/c6/PIX_AUTO_COBR_PATCH",
+            "description": "PATCH /v2/pix/cobr/{txid}",
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"id\": \"abc123\",\n  \"txid\": \"abc123\",\n  \"e2eid\": \"abc123\",\n  \"chave\": \"{{pixKey}}\",\n  \"data\": \"2026-11-23\",\n  \"valor\": \"10.00\",\n  \"amount\": 1000,\n  \"external_reference_id\": \"pedido123\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('HTTP 200', function () {",
+                  "    pm.expect([200]).to.include(pm.response.code);",
+                  "});"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "PIX_AUTO_RETRY",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json",
+                "type": "text"
+              },
+              {
+                "key": "X-Merchant-Id",
+                "value": "{{merchantId}}",
+                "type": "text"
+              },
+              {
+                "key": "Idempotency-Key",
+                "value": "{{$guid}}",
+                "type": "text"
+              },
+              {
+                "key": "X-Mock",
+                "value": "true",
+                "type": "text"
+              }
+            ],
+            "url": "{{gatewayUrl}}/gateway/v1/bank-operations/c6/PIX_AUTO_RETRY",
+            "description": "POST /v2/pix/cobr/{txid}/retentativa/{data}",
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"id\": \"abc123\",\n  \"txid\": \"abc123\",\n  \"e2eid\": \"abc123\",\n  \"chave\": \"{{pixKey}}\",\n  \"data\": \"2026-11-23\",\n  \"valor\": \"10.00\",\n  \"amount\": 1000,\n  \"external_reference_id\": \"pedido123\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('HTTP 200', function () {",
+                  "    pm.expect([200]).to.include(pm.response.code);",
+                  "});"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "PIX_AUTO_WEBHOOK_REC_PUT",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json",
+                "type": "text"
+              },
+              {
+                "key": "X-Merchant-Id",
+                "value": "{{merchantId}}",
+                "type": "text"
+              },
+              {
+                "key": "Idempotency-Key",
+                "value": "{{$guid}}",
+                "type": "text"
+              },
+              {
+                "key": "X-Mock",
+                "value": "true",
+                "type": "text"
+              }
+            ],
+            "url": "{{gatewayUrl}}/gateway/v1/bank-operations/c6/PIX_AUTO_WEBHOOK_REC_PUT",
+            "description": "PUT /v2/pix/webhookrec",
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"id\": \"abc123\",\n  \"txid\": \"abc123\",\n  \"e2eid\": \"abc123\",\n  \"chave\": \"{{pixKey}}\",\n  \"data\": \"2026-11-23\",\n  \"valor\": \"10.00\",\n  \"amount\": 1000,\n  \"external_reference_id\": \"pedido123\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('HTTP 200', function () {",
+                  "    pm.expect([200]).to.include(pm.response.code);",
+                  "});"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "PIX_AUTO_WEBHOOK_COBR_PUT",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json",
+                "type": "text"
+              },
+              {
+                "key": "X-Merchant-Id",
+                "value": "{{merchantId}}",
+                "type": "text"
+              },
+              {
+                "key": "Idempotency-Key",
+                "value": "{{$guid}}",
+                "type": "text"
+              },
+              {
+                "key": "X-Mock",
+                "value": "true",
+                "type": "text"
+              }
+            ],
+            "url": "{{gatewayUrl}}/gateway/v1/bank-operations/c6/PIX_AUTO_WEBHOOK_COBR_PUT",
+            "description": "PUT /v2/pix/webhookcobr",
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"id\": \"abc123\",\n  \"txid\": \"abc123\",\n  \"e2eid\": \"abc123\",\n  \"chave\": \"{{pixKey}}\",\n  \"data\": \"2026-11-23\",\n  \"valor\": \"10.00\",\n  \"amount\": 1000,\n  \"external_reference_id\": \"pedido123\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('HTTP 200', function () {",
+                  "    pm.expect([200]).to.include(pm.response.code);",
+                  "});"
+                ]
+              }
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "name": "04 Conciliação",
+      "description": "Consulta de jornada, extrato C6, recebíveis, split do marketplace e job de conciliação.",
+      "item": [
+        {
+          "name": "Conciliar jornada no provedor",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "X-Merchant-Id",
+                "value": "{{merchantId}}",
+                "type": "text"
+              }
+            ],
+            "url": "{{gatewayUrl}}/gateway/v1/journeys/{{journeyId}}/refresh",
+            "description": ""
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('HTTP 200', function () {",
+                  "    pm.expect([200]).to.include(pm.response.code);",
+                  "});"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "Cancelar jornada",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "X-Merchant-Id",
+                "value": "{{merchantId}}",
+                "type": "text"
+              }
+            ],
+            "url": "{{gatewayUrl}}/gateway/v1/journeys/{{journeyId}}/cancel",
+            "description": "409 quando o estado ainda exige conciliação antes do cancelamento."
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('HTTP 200, 409', function () {",
+                  "    pm.expect([200, 409]).to.include(pm.response.code);",
+                  "});"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "Criar fatura para liquidação",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json",
+                "type": "text"
+              },
+              {
+                "key": "X-Merchant-Id",
+                "value": "{{merchantId}}",
+                "type": "text"
+              },
+              {
+                "key": "Idempotency-Key",
+                "value": "{{$guid}}",
+                "type": "text"
+              }
+            ],
+            "url": "{{billingUrl}}/billing/v1/invoices",
+            "description": "Depende do lojista aprovado na pasta Recorrência.",
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"operationId\": \"{{$guid}}\",\n  \"merchantId\": \"{{billingMerchantId}}\",\n  \"customerRef\": \"cliente-fatura\",\n  \"amount\": 10000,\n  \"method\": \"BOLETO\",\n  \"dueDate\": \"2026-11-23\",\n  \"conditions\": {\n    \"fineBps\": 0,\n    \"dailyInterestBps\": 0,\n    \"discountCents\": 0,\n    \"discountUntil\": null,\n    \"maxSurchargeBps\": 0\n  },\n  \"contractReference\": \"contract-local\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('HTTP 200', function () {",
+                  "    pm.expect([200]).to.include(pm.response.code);",
+                  "});",
+                  "if (pm.response.code < 300) {",
+                  "    const body = pm.response.json();",
+                  "pm.collectionVariables.set(\"invoiceId\", body.id);",
+                  "}"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "Consultar decisão de retentativa",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "X-Merchant-Id",
+                "value": "{{merchantId}}",
+                "type": "text"
+              }
+            ],
+            "url": "{{billingUrl}}/billing/v1/retry-advice?outcome=TIMEOUT&attempts=1",
+            "description": ""
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('HTTP 200', function () {",
+                  "    pm.expect([200]).to.include(pm.response.code);",
+                  "});"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "Consultar fluxo de caixa",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "X-Merchant-Id",
+                "value": "{{merchantId}}",
+                "type": "text"
+              }
+            ],
+            "url": "{{billingUrl}}/billing/v1/cashflow?from=2026-11-01&to=2026-12-31",
+            "description": ""
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('HTTP 200', function () {",
+                  "    pm.expect([200]).to.include(pm.response.code);",
+                  "});"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "Registrar liquidação confirmada",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json",
+                "type": "text"
+              },
+              {
+                "key": "X-Merchant-Id",
+                "value": "{{merchantId}}",
+                "type": "text"
+              },
+              {
+                "key": "Idempotency-Key",
+                "value": "{{$guid}}",
+                "type": "text"
+              }
+            ],
+            "url": "{{billingUrl}}/billing/v1/internal/settlements",
+            "description": "Somente o usuário provider-worker. Não chame a partir de um webhook público.",
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"provider\": \"c6\",\n  \"eventId\": \"{{$guid}}\",\n  \"invoiceId\": \"{{invoiceId}}\",\n  \"providerOperation\": \"boleto-local\",\n  \"amount\": 10000,\n  \"providerCost\": 0,\n  \"paidOn\": \"2026-11-23\",\n  \"settledAt\": \"2026-11-23T18:00:00Z\",\n  \"depositReference\": \"deposit-local\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "auth": {
+              "type": "basic",
+              "basic": [
+                {
+                  "key": "username",
+                  "value": "provider-worker",
+                  "type": "string"
+                },
+                {
+                  "key": "password",
+                  "value": "{{localPassword}}",
+                  "type": "string"
+                }
+              ]
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('HTTP 200', function () {",
+                  "    pm.expect([200]).to.include(pm.response.code);",
+                  "});"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "Painel financeiro",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "X-Merchant-Id",
+                "value": "{{merchantId}}",
+                "type": "text"
+              }
+            ],
+            "url": "{{billingUrl}}/billing/v1/dashboard?page=1&size=20",
+            "description": ""
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('HTTP 200', function () {",
+                  "    pm.expect([200]).to.include(pm.response.code);",
+                  "});"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "Cadastrar recebedor",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json",
+                "type": "text"
+              },
+              {
+                "key": "X-Merchant-Id",
+                "value": "{{merchantId}}",
+                "type": "text"
+              },
+              {
+                "key": "Idempotency-Key",
+                "value": "{{$guid}}",
+                "type": "text"
+              }
+            ],
+            "url": "{{marketplaceUrl}}/marketplace/v1/recipients",
+            "description": "",
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"name\": \"Recebedor Homologacao\",\n  \"document\": \"12345678901\",\n  \"provider_recipient_id\": \"c6-recipient-1\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('HTTP 200', function () {",
+                  "    pm.expect([200]).to.include(pm.response.code);",
+                  "});",
+                  "if (pm.response.code < 300) {",
+                  "    const body = pm.response.json();",
+                  "pm.collectionVariables.set(\"recipientId\", body.id);",
+                  "}"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "Criar plano de split",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json",
+                "type": "text"
+              },
+              {
+                "key": "X-Merchant-Id",
+                "value": "{{merchantId}}",
+                "type": "text"
+              },
+              {
+                "key": "Idempotency-Key",
+                "value": "{{$guid}}",
+                "type": "text"
+              }
+            ],
+            "url": "{{marketplaceUrl}}/marketplace/v1/split-plans",
+            "description": "",
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"order_id\": \"{{orderId}}\",\n  \"amount\": 10000,\n  \"allocations\": [\n    {\n      \"recipient_id\": \"{{recipientId}}\",\n      \"amount\": 10000\n    }\n  ]\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('HTTP 200', function () {",
+                  "    pm.expect([200]).to.include(pm.response.code);",
+                  "});",
+                  "if (pm.response.code < 300) {",
+                  "    const body = pm.response.json();",
+                  "pm.collectionVariables.set(\"splitId\", body.id);",
+                  "}"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "Prévia de split",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json",
+                "type": "text"
+              },
+              {
+                "key": "X-Merchant-Id",
+                "value": "{{merchantId}}",
+                "type": "text"
+              }
+            ],
+            "url": "{{marketplaceUrl}}/marketplace/v1/split-plans/preview",
+            "description": "",
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"amount\": 10000,\n  \"paymentMethod\": \"PIX\",\n  \"rules\": [\n    {\n      \"recipientId\": \"{{recipientId}}\",\n      \"fixedCents\": 0,\n      \"percentageBps\": 10000\n    }\n  ]\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('HTTP 200', function () {",
+                  "    pm.expect([200]).to.include(pm.response.code);",
+                  "});"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "Solicitar conciliação de split",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json",
+                "type": "text"
+              },
+              {
+                "key": "X-Merchant-Id",
+                "value": "{{merchantId}}",
+                "type": "text"
+              },
+              {
+                "key": "Idempotency-Key",
+                "value": "{{$guid}}",
+                "type": "text"
+              }
+            ],
+            "url": "{{marketplaceUrl}}/marketplace/v1/settlements",
+            "description": "",
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"split_id\": \"{{splitId}}\",\n  \"evidence_reference\": \"extrato-c6-local\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('HTTP 200', function () {",
+                  "    pm.expect([200]).to.include(pm.response.code);",
+                  "});",
+                  "if (pm.response.code < 300) {",
+                  "    const body = pm.response.json();",
+                  "pm.collectionVariables.set(\"settlementId\", body.id);",
+                  "}"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "Listar conciliações de split",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "X-Merchant-Id",
+                "value": "{{merchantId}}",
+                "type": "text"
+              }
+            ],
+            "url": "{{marketplaceUrl}}/marketplace/v1/settlements?page=1&size=20",
+            "description": ""
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('HTTP 200', function () {",
+                  "    pm.expect([200]).to.include(pm.response.code);",
+                  "});"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "Obter conciliação de split",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "X-Merchant-Id",
+                "value": "{{merchantId}}",
+                "type": "text"
+              }
+            ],
+            "url": "{{marketplaceUrl}}/marketplace/v1/settlements/{{settlementId}}",
+            "description": ""
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('HTTP 200', function () {",
+                  "    pm.expect([200]).to.include(pm.response.code);",
+                  "});"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "Executar repasse",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "X-Merchant-Id",
+                "value": "{{merchantId}}",
+                "type": "text"
+              },
+              {
+                "key": "Idempotency-Key",
+                "value": "{{$guid}}",
+                "type": "text"
+              }
+            ],
+            "url": "{{marketplaceUrl}}/marketplace/v1/settlements/{{settlementId}}/payouts",
+            "description": "Contrato reservado. Resposta 501."
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('HTTP 501', function () {",
+                  "    pm.expect([501]).to.include(pm.response.code);",
+                  "});"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "STATEMENT_LIST",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json",
+                "type": "text"
+              },
+              {
+                "key": "X-Merchant-Id",
+                "value": "{{merchantId}}",
+                "type": "text"
+              },
+              {
+                "key": "Idempotency-Key",
+                "value": "{{$guid}}",
+                "type": "text"
+              },
+              {
+                "key": "X-Mock",
+                "value": "true",
+                "type": "text"
+              }
+            ],
+            "url": "{{gatewayUrl}}/gateway/v1/bank-operations/c6/STATEMENT_LIST",
+            "description": "GET /v1/statement/",
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"id\": \"abc123\",\n  \"txid\": \"abc123\",\n  \"e2eid\": \"abc123\",\n  \"chave\": \"{{pixKey}}\",\n  \"data\": \"2026-11-23\",\n  \"valor\": \"10.00\",\n  \"amount\": 1000,\n  \"external_reference_id\": \"pedido123\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('HTTP 200', function () {",
+                  "    pm.expect([200]).to.include(pm.response.code);",
+                  "});"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "STATEMENT_GET",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json",
+                "type": "text"
+              },
+              {
+                "key": "X-Merchant-Id",
+                "value": "{{merchantId}}",
+                "type": "text"
+              },
+              {
+                "key": "Idempotency-Key",
+                "value": "{{$guid}}",
+                "type": "text"
+              },
+              {
+                "key": "X-Mock",
+                "value": "true",
+                "type": "text"
+              }
+            ],
+            "url": "{{gatewayUrl}}/gateway/v1/bank-operations/c6/STATEMENT_GET",
+            "description": "GET /v1/statement/{id}",
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"id\": \"abc123\",\n  \"txid\": \"abc123\",\n  \"e2eid\": \"abc123\",\n  \"chave\": \"{{pixKey}}\",\n  \"data\": \"2026-11-23\",\n  \"valor\": \"10.00\",\n  \"amount\": 1000,\n  \"external_reference_id\": \"pedido123\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('HTTP 200', function () {",
+                  "    pm.expect([200]).to.include(pm.response.code);",
+                  "});"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "BALANCE_GET",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json",
+                "type": "text"
+              },
+              {
+                "key": "X-Merchant-Id",
+                "value": "{{merchantId}}",
+                "type": "text"
+              },
+              {
+                "key": "Idempotency-Key",
+                "value": "{{$guid}}",
+                "type": "text"
+              },
+              {
+                "key": "X-Mock",
+                "value": "true",
+                "type": "text"
+              }
+            ],
+            "url": "{{gatewayUrl}}/gateway/v1/bank-operations/c6/BALANCE_GET",
+            "description": "GET /v1/balance/. Path não confirmado; mock 200, ao vivo 422.",
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"id\": \"abc123\",\n  \"txid\": \"abc123\",\n  \"e2eid\": \"abc123\",\n  \"chave\": \"{{pixKey}}\",\n  \"data\": \"2026-11-23\",\n  \"valor\": \"10.00\",\n  \"amount\": 1000,\n  \"external_reference_id\": \"pedido123\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('HTTP 200', function () {",
+                  "    pm.expect([200]).to.include(pm.response.code);",
+                  "});"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "TRANSACTIONS_LIST",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json",
+                "type": "text"
+              },
+              {
+                "key": "X-Merchant-Id",
+                "value": "{{merchantId}}",
+                "type": "text"
+              },
+              {
+                "key": "Idempotency-Key",
+                "value": "{{$guid}}",
+                "type": "text"
+              },
+              {
+                "key": "X-Mock",
+                "value": "true",
+                "type": "text"
+              }
+            ],
+            "url": "{{gatewayUrl}}/gateway/v1/bank-operations/c6/TRANSACTIONS_LIST",
+            "description": "GET /v1/c6pay/statement/transactions",
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"id\": \"abc123\",\n  \"txid\": \"abc123\",\n  \"e2eid\": \"abc123\",\n  \"chave\": \"{{pixKey}}\",\n  \"data\": \"2026-11-23\",\n  \"valor\": \"10.00\",\n  \"amount\": 1000,\n  \"external_reference_id\": \"pedido123\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('HTTP 200', function () {",
+                  "    pm.expect([200]).to.include(pm.response.code);",
+                  "});"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "RECEIVABLES_LIST",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json",
+                "type": "text"
+              },
+              {
+                "key": "X-Merchant-Id",
+                "value": "{{merchantId}}",
+                "type": "text"
+              },
+              {
+                "key": "Idempotency-Key",
+                "value": "{{$guid}}",
+                "type": "text"
+              },
+              {
+                "key": "X-Mock",
+                "value": "true",
+                "type": "text"
+              }
+            ],
+            "url": "{{gatewayUrl}}/gateway/v1/bank-operations/c6/RECEIVABLES_LIST",
+            "description": "GET /v1/c6pay/statement/receivables",
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"id\": \"abc123\",\n  \"txid\": \"abc123\",\n  \"e2eid\": \"abc123\",\n  \"chave\": \"{{pixKey}}\",\n  \"data\": \"2026-11-23\",\n  \"valor\": \"10.00\",\n  \"amount\": 1000,\n  \"external_reference_id\": \"pedido123\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('HTTP 200', function () {",
+                  "    pm.expect([200]).to.include(pm.response.code);",
+                  "});"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "PIX_GET",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json",
+                "type": "text"
+              },
+              {
+                "key": "X-Merchant-Id",
+                "value": "{{merchantId}}",
+                "type": "text"
+              },
+              {
+                "key": "Idempotency-Key",
+                "value": "{{$guid}}",
+                "type": "text"
+              },
+              {
+                "key": "X-Mock",
+                "value": "true",
+                "type": "text"
+              }
+            ],
+            "url": "{{gatewayUrl}}/gateway/v1/bank-operations/c6/PIX_GET",
+            "description": "GET /v2/pix/pix/{e2eid}",
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"id\": \"abc123\",\n  \"txid\": \"abc123\",\n  \"e2eid\": \"abc123\",\n  \"chave\": \"{{pixKey}}\",\n  \"data\": \"2026-11-23\",\n  \"valor\": \"10.00\",\n  \"amount\": 1000,\n  \"external_reference_id\": \"pedido123\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('HTTP 200', function () {",
+                  "    pm.expect([200]).to.include(pm.response.code);",
+                  "});"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "PIX_LIST",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json",
+                "type": "text"
+              },
+              {
+                "key": "X-Merchant-Id",
+                "value": "{{merchantId}}",
+                "type": "text"
+              },
+              {
+                "key": "Idempotency-Key",
+                "value": "{{$guid}}",
+                "type": "text"
+              },
+              {
+                "key": "X-Mock",
+                "value": "true",
+                "type": "text"
+              }
+            ],
+            "url": "{{gatewayUrl}}/gateway/v1/bank-operations/c6/PIX_LIST",
+            "description": "GET /v2/pix/pix",
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"id\": \"abc123\",\n  \"txid\": \"abc123\",\n  \"e2eid\": \"abc123\",\n  \"chave\": \"{{pixKey}}\",\n  \"data\": \"2026-11-23\",\n  \"valor\": \"10.00\",\n  \"amount\": 1000,\n  \"external_reference_id\": \"pedido123\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('HTTP 200', function () {",
+                  "    pm.expect([200]).to.include(pm.response.code);",
+                  "});"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "WEBHOOK_CREATE",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json",
+                "type": "text"
+              },
+              {
+                "key": "X-Merchant-Id",
+                "value": "{{merchantId}}",
+                "type": "text"
+              },
+              {
+                "key": "Idempotency-Key",
+                "value": "{{$guid}}",
+                "type": "text"
+              },
+              {
+                "key": "X-Mock",
+                "value": "true",
+                "type": "text"
+              }
+            ],
+            "url": "{{gatewayUrl}}/gateway/v1/bank-operations/c6/WEBHOOK_CREATE",
+            "description": "POST /v1/webhooks/",
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"id\": \"abc123\",\n  \"txid\": \"abc123\",\n  \"e2eid\": \"abc123\",\n  \"chave\": \"{{pixKey}}\",\n  \"data\": \"2026-11-23\",\n  \"valor\": \"10.00\",\n  \"amount\": 1000,\n  \"external_reference_id\": \"pedido123\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('HTTP 200', function () {",
+                  "    pm.expect([200]).to.include(pm.response.code);",
+                  "});"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "WEBHOOK_LIST",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json",
+                "type": "text"
+              },
+              {
+                "key": "X-Merchant-Id",
+                "value": "{{merchantId}}",
+                "type": "text"
+              },
+              {
+                "key": "Idempotency-Key",
+                "value": "{{$guid}}",
+                "type": "text"
+              },
+              {
+                "key": "X-Mock",
+                "value": "true",
+                "type": "text"
+              }
+            ],
+            "url": "{{gatewayUrl}}/gateway/v1/bank-operations/c6/WEBHOOK_LIST",
+            "description": "GET /v1/webhooks/",
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"id\": \"abc123\",\n  \"txid\": \"abc123\",\n  \"e2eid\": \"abc123\",\n  \"chave\": \"{{pixKey}}\",\n  \"data\": \"2026-11-23\",\n  \"valor\": \"10.00\",\n  \"amount\": 1000,\n  \"external_reference_id\": \"pedido123\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('HTTP 200', function () {",
+                  "    pm.expect([200]).to.include(pm.response.code);",
+                  "});"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "WEBHOOK_GET",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json",
+                "type": "text"
+              },
+              {
+                "key": "X-Merchant-Id",
+                "value": "{{merchantId}}",
+                "type": "text"
+              },
+              {
+                "key": "Idempotency-Key",
+                "value": "{{$guid}}",
+                "type": "text"
+              },
+              {
+                "key": "X-Mock",
+                "value": "true",
+                "type": "text"
+              }
+            ],
+            "url": "{{gatewayUrl}}/gateway/v1/bank-operations/c6/WEBHOOK_GET",
+            "description": "GET /v1/webhooks/{id}",
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"id\": \"abc123\",\n  \"txid\": \"abc123\",\n  \"e2eid\": \"abc123\",\n  \"chave\": \"{{pixKey}}\",\n  \"data\": \"2026-11-23\",\n  \"valor\": \"10.00\",\n  \"amount\": 1000,\n  \"external_reference_id\": \"pedido123\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('HTTP 200', function () {",
+                  "    pm.expect([200]).to.include(pm.response.code);",
+                  "});"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "WEBHOOK_DELETE",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json",
+                "type": "text"
+              },
+              {
+                "key": "X-Merchant-Id",
+                "value": "{{merchantId}}",
+                "type": "text"
+              },
+              {
+                "key": "Idempotency-Key",
+                "value": "{{$guid}}",
+                "type": "text"
+              },
+              {
+                "key": "X-Mock",
+                "value": "true",
+                "type": "text"
+              }
+            ],
+            "url": "{{gatewayUrl}}/gateway/v1/bank-operations/c6/WEBHOOK_DELETE",
+            "description": "DELETE /v1/webhooks/{id}",
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"id\": \"abc123\",\n  \"txid\": \"abc123\",\n  \"e2eid\": \"abc123\",\n  \"chave\": \"{{pixKey}}\",\n  \"data\": \"2026-11-23\",\n  \"valor\": \"10.00\",\n  \"amount\": 1000,\n  \"external_reference_id\": \"pedido123\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('HTTP 200', function () {",
+                  "    pm.expect([200]).to.include(pm.response.code);",
+                  "});"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "Disparar job de conciliação",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "X-Merchant-Id",
+                "value": "{{merchantId}}",
+                "type": "text"
+              }
+            ],
+            "url": "{{reconciliationUrl}}/internal/v1/reconciliation/run",
+            "description": "Escopo reconciliation/run. O adaptador ainda responde 501."
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('HTTP 501', function () {",
+                  "    pm.expect([501]).to.include(pm.response.code);",
+                  "});"
+                ]
+              }
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "name": "05 Pagamentos C6",
+      "description": "Pix, boleto, bolepix e agendamento pelo gateway, sempre em mock.",
+      "item": [
+        {
+          "name": "PIX_COB_POST",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json",
+                "type": "text"
+              },
+              {
+                "key": "X-Merchant-Id",
+                "value": "{{merchantId}}",
+                "type": "text"
+              },
+              {
+                "key": "Idempotency-Key",
+                "value": "{{$guid}}",
+                "type": "text"
+              },
+              {
+                "key": "X-Mock",
+                "value": "true",
+                "type": "text"
+              }
+            ],
+            "url": "{{gatewayUrl}}/gateway/v1/bank-operations/c6/PIX_COB_POST",
+            "description": "POST /v2/pix/cob",
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"id\": \"abc123\",\n  \"txid\": \"abc123\",\n  \"e2eid\": \"abc123\",\n  \"chave\": \"{{pixKey}}\",\n  \"data\": \"2026-11-23\",\n  \"valor\": \"10.00\",\n  \"amount\": 1000,\n  \"external_reference_id\": \"pedido123\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('HTTP 200', function () {",
+                  "    pm.expect([200]).to.include(pm.response.code);",
+                  "});"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "PIX_COB_GET",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json",
+                "type": "text"
+              },
+              {
+                "key": "X-Merchant-Id",
+                "value": "{{merchantId}}",
+                "type": "text"
+              },
+              {
+                "key": "Idempotency-Key",
+                "value": "{{$guid}}",
+                "type": "text"
+              },
+              {
+                "key": "X-Mock",
+                "value": "true",
+                "type": "text"
+              }
+            ],
+            "url": "{{gatewayUrl}}/gateway/v1/bank-operations/c6/PIX_COB_GET",
+            "description": "GET /v2/pix/cob/{txid}",
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"id\": \"abc123\",\n  \"txid\": \"abc123\",\n  \"e2eid\": \"abc123\",\n  \"chave\": \"{{pixKey}}\",\n  \"data\": \"2026-11-23\",\n  \"valor\": \"10.00\",\n  \"amount\": 1000,\n  \"external_reference_id\": \"pedido123\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('HTTP 200', function () {",
+                  "    pm.expect([200]).to.include(pm.response.code);",
+                  "});"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "PIX_COB_PATCH",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json",
+                "type": "text"
+              },
+              {
+                "key": "X-Merchant-Id",
+                "value": "{{merchantId}}",
+                "type": "text"
+              },
+              {
+                "key": "Idempotency-Key",
+                "value": "{{$guid}}",
+                "type": "text"
+              },
+              {
+                "key": "X-Mock",
+                "value": "true",
+                "type": "text"
+              }
+            ],
+            "url": "{{gatewayUrl}}/gateway/v1/bank-operations/c6/PIX_COB_PATCH",
+            "description": "PATCH /v2/pix/cob/{txid}",
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"id\": \"abc123\",\n  \"txid\": \"abc123\",\n  \"e2eid\": \"abc123\",\n  \"chave\": \"{{pixKey}}\",\n  \"data\": \"2026-11-23\",\n  \"valor\": \"10.00\",\n  \"amount\": 1000,\n  \"external_reference_id\": \"pedido123\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('HTTP 200', function () {",
+                  "    pm.expect([200]).to.include(pm.response.code);",
+                  "});"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "PIX_COB_LIST",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json",
+                "type": "text"
+              },
+              {
+                "key": "X-Merchant-Id",
+                "value": "{{merchantId}}",
+                "type": "text"
+              },
+              {
+                "key": "Idempotency-Key",
+                "value": "{{$guid}}",
+                "type": "text"
+              },
+              {
+                "key": "X-Mock",
+                "value": "true",
+                "type": "text"
+              }
+            ],
+            "url": "{{gatewayUrl}}/gateway/v1/bank-operations/c6/PIX_COB_LIST",
+            "description": "GET /v2/pix/cob",
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"id\": \"abc123\",\n  \"txid\": \"abc123\",\n  \"e2eid\": \"abc123\",\n  \"chave\": \"{{pixKey}}\",\n  \"data\": \"2026-11-23\",\n  \"valor\": \"10.00\",\n  \"amount\": 1000,\n  \"external_reference_id\": \"pedido123\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('HTTP 200', function () {",
+                  "    pm.expect([200]).to.include(pm.response.code);",
+                  "});"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "PIX_COBV_PUT",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json",
+                "type": "text"
+              },
+              {
+                "key": "X-Merchant-Id",
+                "value": "{{merchantId}}",
+                "type": "text"
+              },
+              {
+                "key": "Idempotency-Key",
+                "value": "{{$guid}}",
+                "type": "text"
+              },
+              {
+                "key": "X-Mock",
+                "value": "true",
+                "type": "text"
+              }
+            ],
+            "url": "{{gatewayUrl}}/gateway/v1/bank-operations/c6/PIX_COBV_PUT",
+            "description": "PUT /v2/pix/cobv/{txid}",
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"id\": \"abc123\",\n  \"txid\": \"abc123\",\n  \"e2eid\": \"abc123\",\n  \"chave\": \"{{pixKey}}\",\n  \"data\": \"2026-11-23\",\n  \"valor\": \"10.00\",\n  \"amount\": 1000,\n  \"external_reference_id\": \"pedido123\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('HTTP 200', function () {",
+                  "    pm.expect([200]).to.include(pm.response.code);",
+                  "});"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "PIX_COBV_GET",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json",
+                "type": "text"
+              },
+              {
+                "key": "X-Merchant-Id",
+                "value": "{{merchantId}}",
+                "type": "text"
+              },
+              {
+                "key": "Idempotency-Key",
+                "value": "{{$guid}}",
+                "type": "text"
+              },
+              {
+                "key": "X-Mock",
+                "value": "true",
+                "type": "text"
+              }
+            ],
+            "url": "{{gatewayUrl}}/gateway/v1/bank-operations/c6/PIX_COBV_GET",
+            "description": "GET /v2/pix/cobv/{txid}",
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"id\": \"abc123\",\n  \"txid\": \"abc123\",\n  \"e2eid\": \"abc123\",\n  \"chave\": \"{{pixKey}}\",\n  \"data\": \"2026-11-23\",\n  \"valor\": \"10.00\",\n  \"amount\": 1000,\n  \"external_reference_id\": \"pedido123\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('HTTP 200', function () {",
+                  "    pm.expect([200]).to.include(pm.response.code);",
+                  "});"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "PIX_COBV_PATCH",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json",
+                "type": "text"
+              },
+              {
+                "key": "X-Merchant-Id",
+                "value": "{{merchantId}}",
+                "type": "text"
+              },
+              {
+                "key": "Idempotency-Key",
+                "value": "{{$guid}}",
+                "type": "text"
+              },
+              {
+                "key": "X-Mock",
+                "value": "true",
+                "type": "text"
+              }
+            ],
+            "url": "{{gatewayUrl}}/gateway/v1/bank-operations/c6/PIX_COBV_PATCH",
+            "description": "PATCH /v2/pix/cobv/{txid}",
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"id\": \"abc123\",\n  \"txid\": \"abc123\",\n  \"e2eid\": \"abc123\",\n  \"chave\": \"{{pixKey}}\",\n  \"data\": \"2026-11-23\",\n  \"valor\": \"10.00\",\n  \"amount\": 1000,\n  \"external_reference_id\": \"pedido123\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('HTTP 200', function () {",
+                  "    pm.expect([200]).to.include(pm.response.code);",
+                  "});"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "PIX_COBV_LIST",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json",
+                "type": "text"
+              },
+              {
+                "key": "X-Merchant-Id",
+                "value": "{{merchantId}}",
+                "type": "text"
+              },
+              {
+                "key": "Idempotency-Key",
+                "value": "{{$guid}}",
+                "type": "text"
+              },
+              {
+                "key": "X-Mock",
+                "value": "true",
+                "type": "text"
+              }
+            ],
+            "url": "{{gatewayUrl}}/gateway/v1/bank-operations/c6/PIX_COBV_LIST",
+            "description": "GET /v2/pix/cobv",
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"id\": \"abc123\",\n  \"txid\": \"abc123\",\n  \"e2eid\": \"abc123\",\n  \"chave\": \"{{pixKey}}\",\n  \"data\": \"2026-11-23\",\n  \"valor\": \"10.00\",\n  \"amount\": 1000,\n  \"external_reference_id\": \"pedido123\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('HTTP 200', function () {",
+                  "    pm.expect([200]).to.include(pm.response.code);",
+                  "});"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "PIX_LOTE_PUT",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json",
+                "type": "text"
+              },
+              {
+                "key": "X-Merchant-Id",
+                "value": "{{merchantId}}",
+                "type": "text"
+              },
+              {
+                "key": "Idempotency-Key",
+                "value": "{{$guid}}",
+                "type": "text"
+              },
+              {
+                "key": "X-Mock",
+                "value": "true",
+                "type": "text"
+              }
+            ],
+            "url": "{{gatewayUrl}}/gateway/v1/bank-operations/c6/PIX_LOTE_PUT",
+            "description": "PUT /v2/pix/lotecobv/{id}",
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"id\": \"abc123\",\n  \"txid\": \"abc123\",\n  \"e2eid\": \"abc123\",\n  \"chave\": \"{{pixKey}}\",\n  \"data\": \"2026-11-23\",\n  \"valor\": \"10.00\",\n  \"amount\": 1000,\n  \"external_reference_id\": \"pedido123\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('HTTP 200', function () {",
+                  "    pm.expect([200]).to.include(pm.response.code);",
+                  "});"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "PIX_LOTE_GET",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json",
+                "type": "text"
+              },
+              {
+                "key": "X-Merchant-Id",
+                "value": "{{merchantId}}",
+                "type": "text"
+              },
+              {
+                "key": "Idempotency-Key",
+                "value": "{{$guid}}",
+                "type": "text"
+              },
+              {
+                "key": "X-Mock",
+                "value": "true",
+                "type": "text"
+              }
+            ],
+            "url": "{{gatewayUrl}}/gateway/v1/bank-operations/c6/PIX_LOTE_GET",
+            "description": "GET /v2/pix/lotecobv/{id}",
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"id\": \"abc123\",\n  \"txid\": \"abc123\",\n  \"e2eid\": \"abc123\",\n  \"chave\": \"{{pixKey}}\",\n  \"data\": \"2026-11-23\",\n  \"valor\": \"10.00\",\n  \"amount\": 1000,\n  \"external_reference_id\": \"pedido123\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('HTTP 200', function () {",
+                  "    pm.expect([200]).to.include(pm.response.code);",
+                  "});"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "PIX_LOTE_PATCH",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json",
+                "type": "text"
+              },
+              {
+                "key": "X-Merchant-Id",
+                "value": "{{merchantId}}",
+                "type": "text"
+              },
+              {
+                "key": "Idempotency-Key",
+                "value": "{{$guid}}",
+                "type": "text"
+              },
+              {
+                "key": "X-Mock",
+                "value": "true",
+                "type": "text"
+              }
+            ],
+            "url": "{{gatewayUrl}}/gateway/v1/bank-operations/c6/PIX_LOTE_PATCH",
+            "description": "PATCH /v2/pix/lotecobv/{id}",
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"id\": \"abc123\",\n  \"txid\": \"abc123\",\n  \"e2eid\": \"abc123\",\n  \"chave\": \"{{pixKey}}\",\n  \"data\": \"2026-11-23\",\n  \"valor\": \"10.00\",\n  \"amount\": 1000,\n  \"external_reference_id\": \"pedido123\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('HTTP 200', function () {",
+                  "    pm.expect([200]).to.include(pm.response.code);",
+                  "});"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "PIX_REFUND_PUT",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json",
+                "type": "text"
+              },
+              {
+                "key": "X-Merchant-Id",
+                "value": "{{merchantId}}",
+                "type": "text"
+              },
+              {
+                "key": "Idempotency-Key",
+                "value": "{{$guid}}",
+                "type": "text"
+              },
+              {
+                "key": "X-Mock",
+                "value": "true",
+                "type": "text"
+              }
+            ],
+            "url": "{{gatewayUrl}}/gateway/v1/bank-operations/c6/PIX_REFUND_PUT",
+            "description": "PUT /v2/pix/pix/{e2eid}/devolucao/{id}",
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"id\": \"abc123\",\n  \"txid\": \"abc123\",\n  \"e2eid\": \"abc123\",\n  \"chave\": \"{{pixKey}}\",\n  \"data\": \"2026-11-23\",\n  \"valor\": \"10.00\",\n  \"amount\": 1000,\n  \"external_reference_id\": \"pedido123\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('HTTP 200', function () {",
+                  "    pm.expect([200]).to.include(pm.response.code);",
+                  "});"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "PIX_REFUND_GET",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json",
+                "type": "text"
+              },
+              {
+                "key": "X-Merchant-Id",
+                "value": "{{merchantId}}",
+                "type": "text"
+              },
+              {
+                "key": "Idempotency-Key",
+                "value": "{{$guid}}",
+                "type": "text"
+              },
+              {
+                "key": "X-Mock",
+                "value": "true",
+                "type": "text"
+              }
+            ],
+            "url": "{{gatewayUrl}}/gateway/v1/bank-operations/c6/PIX_REFUND_GET",
+            "description": "GET /v2/pix/pix/{e2eid}/devolucao/{id}",
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"id\": \"abc123\",\n  \"txid\": \"abc123\",\n  \"e2eid\": \"abc123\",\n  \"chave\": \"{{pixKey}}\",\n  \"data\": \"2026-11-23\",\n  \"valor\": \"10.00\",\n  \"amount\": 1000,\n  \"external_reference_id\": \"pedido123\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('HTTP 200', function () {",
+                  "    pm.expect([200]).to.include(pm.response.code);",
+                  "});"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "PIX_WEBHOOK_PUT",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json",
+                "type": "text"
+              },
+              {
+                "key": "X-Merchant-Id",
+                "value": "{{merchantId}}",
+                "type": "text"
+              },
+              {
+                "key": "Idempotency-Key",
+                "value": "{{$guid}}",
+                "type": "text"
+              },
+              {
+                "key": "X-Mock",
+                "value": "true",
+                "type": "text"
+              }
+            ],
+            "url": "{{gatewayUrl}}/gateway/v1/bank-operations/c6/PIX_WEBHOOK_PUT",
+            "description": "PUT /v2/pix/webhook/{chave}",
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"id\": \"abc123\",\n  \"txid\": \"abc123\",\n  \"e2eid\": \"abc123\",\n  \"chave\": \"{{pixKey}}\",\n  \"data\": \"2026-11-23\",\n  \"valor\": \"10.00\",\n  \"amount\": 1000,\n  \"external_reference_id\": \"pedido123\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('HTTP 200', function () {",
+                  "    pm.expect([200]).to.include(pm.response.code);",
+                  "});"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "PIX_WEBHOOK_GET",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json",
+                "type": "text"
+              },
+              {
+                "key": "X-Merchant-Id",
+                "value": "{{merchantId}}",
+                "type": "text"
+              },
+              {
+                "key": "Idempotency-Key",
+                "value": "{{$guid}}",
+                "type": "text"
+              },
+              {
+                "key": "X-Mock",
+                "value": "true",
+                "type": "text"
+              }
+            ],
+            "url": "{{gatewayUrl}}/gateway/v1/bank-operations/c6/PIX_WEBHOOK_GET",
+            "description": "GET /v2/pix/webhook/{chave}",
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"id\": \"abc123\",\n  \"txid\": \"abc123\",\n  \"e2eid\": \"abc123\",\n  \"chave\": \"{{pixKey}}\",\n  \"data\": \"2026-11-23\",\n  \"valor\": \"10.00\",\n  \"amount\": 1000,\n  \"external_reference_id\": \"pedido123\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('HTTP 200', function () {",
+                  "    pm.expect([200]).to.include(pm.response.code);",
+                  "});"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "PIX_WEBHOOK_DELETE",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json",
+                "type": "text"
+              },
+              {
+                "key": "X-Merchant-Id",
+                "value": "{{merchantId}}",
+                "type": "text"
+              },
+              {
+                "key": "Idempotency-Key",
+                "value": "{{$guid}}",
+                "type": "text"
+              },
+              {
+                "key": "X-Mock",
+                "value": "true",
+                "type": "text"
+              }
+            ],
+            "url": "{{gatewayUrl}}/gateway/v1/bank-operations/c6/PIX_WEBHOOK_DELETE",
+            "description": "DELETE /v2/pix/webhook/{chave}",
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"id\": \"abc123\",\n  \"txid\": \"abc123\",\n  \"e2eid\": \"abc123\",\n  \"chave\": \"{{pixKey}}\",\n  \"data\": \"2026-11-23\",\n  \"valor\": \"10.00\",\n  \"amount\": 1000,\n  \"external_reference_id\": \"pedido123\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('HTTP 200', function () {",
+                  "    pm.expect([200]).to.include(pm.response.code);",
+                  "});"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "BOLETO_CREATE",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json",
+                "type": "text"
+              },
+              {
+                "key": "X-Merchant-Id",
+                "value": "{{merchantId}}",
+                "type": "text"
+              },
+              {
+                "key": "Idempotency-Key",
+                "value": "{{$guid}}",
+                "type": "text"
+              },
+              {
+                "key": "X-Mock",
+                "value": "true",
+                "type": "text"
+              }
+            ],
+            "url": "{{gatewayUrl}}/gateway/v1/bank-operations/c6/BOLETO_CREATE",
+            "description": "POST /v1/bank_slips/",
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"id\": \"abc123\",\n  \"txid\": \"abc123\",\n  \"e2eid\": \"abc123\",\n  \"chave\": \"{{pixKey}}\",\n  \"data\": \"2026-11-23\",\n  \"valor\": \"10.00\",\n  \"amount\": 1000,\n  \"external_reference_id\": \"pedido123\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('HTTP 200', function () {",
+                  "    pm.expect([200]).to.include(pm.response.code);",
+                  "});"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "BOLETO_GET",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json",
+                "type": "text"
+              },
+              {
+                "key": "X-Merchant-Id",
+                "value": "{{merchantId}}",
+                "type": "text"
+              },
+              {
+                "key": "Idempotency-Key",
+                "value": "{{$guid}}",
+                "type": "text"
+              },
+              {
+                "key": "X-Mock",
+                "value": "true",
+                "type": "text"
+              }
+            ],
+            "url": "{{gatewayUrl}}/gateway/v1/bank-operations/c6/BOLETO_GET",
+            "description": "GET /v1/bank_slips/{id}",
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"id\": \"abc123\",\n  \"txid\": \"abc123\",\n  \"e2eid\": \"abc123\",\n  \"chave\": \"{{pixKey}}\",\n  \"data\": \"2026-11-23\",\n  \"valor\": \"10.00\",\n  \"amount\": 1000,\n  \"external_reference_id\": \"pedido123\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('HTTP 200', function () {",
+                  "    pm.expect([200]).to.include(pm.response.code);",
+                  "});"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "BOLETO_UPDATE",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json",
+                "type": "text"
+              },
+              {
+                "key": "X-Merchant-Id",
+                "value": "{{merchantId}}",
+                "type": "text"
+              },
+              {
+                "key": "Idempotency-Key",
+                "value": "{{$guid}}",
+                "type": "text"
+              },
+              {
+                "key": "X-Mock",
+                "value": "true",
+                "type": "text"
+              }
+            ],
+            "url": "{{gatewayUrl}}/gateway/v1/bank-operations/c6/BOLETO_UPDATE",
+            "description": "PUT /v1/bank_slips/{id}",
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"id\": \"abc123\",\n  \"txid\": \"abc123\",\n  \"e2eid\": \"abc123\",\n  \"chave\": \"{{pixKey}}\",\n  \"data\": \"2026-11-23\",\n  \"valor\": \"10.00\",\n  \"amount\": 1000,\n  \"external_reference_id\": \"pedido123\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('HTTP 200', function () {",
+                  "    pm.expect([200]).to.include(pm.response.code);",
+                  "});"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "BOLETO_CANCEL",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json",
+                "type": "text"
+              },
+              {
+                "key": "X-Merchant-Id",
+                "value": "{{merchantId}}",
+                "type": "text"
+              },
+              {
+                "key": "Idempotency-Key",
+                "value": "{{$guid}}",
+                "type": "text"
+              },
+              {
+                "key": "X-Mock",
+                "value": "true",
+                "type": "text"
+              }
+            ],
+            "url": "{{gatewayUrl}}/gateway/v1/bank-operations/c6/BOLETO_CANCEL",
+            "description": "PUT /v1/bank_slips/{id}/cancel",
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"id\": \"abc123\",\n  \"txid\": \"abc123\",\n  \"e2eid\": \"abc123\",\n  \"chave\": \"{{pixKey}}\",\n  \"data\": \"2026-11-23\",\n  \"valor\": \"10.00\",\n  \"amount\": 1000,\n  \"external_reference_id\": \"pedido123\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('HTTP 200', function () {",
+                  "    pm.expect([200]).to.include(pm.response.code);",
+                  "});"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "BOLEPIX_CREATE",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json",
+                "type": "text"
+              },
+              {
+                "key": "X-Merchant-Id",
+                "value": "{{merchantId}}",
+                "type": "text"
+              },
+              {
+                "key": "Idempotency-Key",
+                "value": "{{$guid}}",
+                "type": "text"
+              },
+              {
+                "key": "X-Mock",
+                "value": "true",
+                "type": "text"
+              }
+            ],
+            "url": "{{gatewayUrl}}/gateway/v1/bank-operations/c6/BOLEPIX_CREATE",
+            "description": "POST /v2/bank_slips/",
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"id\": \"abc123\",\n  \"txid\": \"abc123\",\n  \"e2eid\": \"abc123\",\n  \"chave\": \"{{pixKey}}\",\n  \"data\": \"2026-11-23\",\n  \"valor\": \"10.00\",\n  \"amount\": 1000,\n  \"external_reference_id\": \"pedido123\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('HTTP 200', function () {",
+                  "    pm.expect([200]).to.include(pm.response.code);",
+                  "});"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "BOLEPIX_GET",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json",
+                "type": "text"
+              },
+              {
+                "key": "X-Merchant-Id",
+                "value": "{{merchantId}}",
+                "type": "text"
+              },
+              {
+                "key": "Idempotency-Key",
+                "value": "{{$guid}}",
+                "type": "text"
+              },
+              {
+                "key": "X-Mock",
+                "value": "true",
+                "type": "text"
+              }
+            ],
+            "url": "{{gatewayUrl}}/gateway/v1/bank-operations/c6/BOLEPIX_GET",
+            "description": "GET /v2/bank_slips/{id}",
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"id\": \"abc123\",\n  \"txid\": \"abc123\",\n  \"e2eid\": \"abc123\",\n  \"chave\": \"{{pixKey}}\",\n  \"data\": \"2026-11-23\",\n  \"valor\": \"10.00\",\n  \"amount\": 1000,\n  \"external_reference_id\": \"pedido123\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('HTTP 200', function () {",
+                  "    pm.expect([200]).to.include(pm.response.code);",
+                  "});"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "BOLEPIX_CANCEL",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json",
+                "type": "text"
+              },
+              {
+                "key": "X-Merchant-Id",
+                "value": "{{merchantId}}",
+                "type": "text"
+              },
+              {
+                "key": "Idempotency-Key",
+                "value": "{{$guid}}",
+                "type": "text"
+              },
+              {
+                "key": "X-Mock",
+                "value": "true",
+                "type": "text"
+              }
+            ],
+            "url": "{{gatewayUrl}}/gateway/v1/bank-operations/c6/BOLEPIX_CANCEL",
+            "description": "PUT /v2/bank_slips/{id}/cancel",
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"id\": \"abc123\",\n  \"txid\": \"abc123\",\n  \"e2eid\": \"abc123\",\n  \"chave\": \"{{pixKey}}\",\n  \"data\": \"2026-11-23\",\n  \"valor\": \"10.00\",\n  \"amount\": 1000,\n  \"external_reference_id\": \"pedido123\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('HTTP 200', function () {",
+                  "    pm.expect([200]).to.include(pm.response.code);",
+                  "});"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "SCHEDULE_BOLETO_CREATE",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json",
+                "type": "text"
+              },
+              {
+                "key": "X-Merchant-Id",
+                "value": "{{merchantId}}",
+                "type": "text"
+              },
+              {
+                "key": "Idempotency-Key",
+                "value": "{{$guid}}",
+                "type": "text"
+              },
+              {
+                "key": "X-Mock",
+                "value": "true",
+                "type": "text"
+              }
+            ],
+            "url": "{{gatewayUrl}}/gateway/v1/bank-operations/c6/SCHEDULE_BOLETO_CREATE",
+            "description": "Agendamento de boleto. Path não confirmado; mock 200, ao vivo 422.",
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"id\": \"abc123\",\n  \"txid\": \"abc123\",\n  \"e2eid\": \"abc123\",\n  \"chave\": \"{{pixKey}}\",\n  \"data\": \"2026-11-23\",\n  \"valor\": \"10.00\",\n  \"amount\": 1000,\n  \"external_reference_id\": \"pedido123\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('HTTP 200', function () {",
+                  "    pm.expect([200]).to.include(pm.response.code);",
+                  "});"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "SCHEDULE_PIX_CREATE",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json",
+                "type": "text"
+              },
+              {
+                "key": "X-Merchant-Id",
+                "value": "{{merchantId}}",
+                "type": "text"
+              },
+              {
+                "key": "Idempotency-Key",
+                "value": "{{$guid}}",
+                "type": "text"
+              },
+              {
+                "key": "X-Mock",
+                "value": "true",
+                "type": "text"
+              }
+            ],
+            "url": "{{gatewayUrl}}/gateway/v1/bank-operations/c6/SCHEDULE_PIX_CREATE",
+            "description": "Agendamento de Pix. Path não confirmado; mock 200, ao vivo 422.",
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"id\": \"abc123\",\n  \"txid\": \"abc123\",\n  \"e2eid\": \"abc123\",\n  \"chave\": \"{{pixKey}}\",\n  \"data\": \"2026-11-23\",\n  \"valor\": \"10.00\",\n  \"amount\": 1000,\n  \"external_reference_id\": \"pedido123\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('HTTP 200', function () {",
+                  "    pm.expect([200]).to.include(pm.response.code);",
+                  "});"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "SCHEDULE_GET",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json",
+                "type": "text"
+              },
+              {
+                "key": "X-Merchant-Id",
+                "value": "{{merchantId}}",
+                "type": "text"
+              },
+              {
+                "key": "Idempotency-Key",
+                "value": "{{$guid}}",
+                "type": "text"
+              },
+              {
+                "key": "X-Mock",
+                "value": "true",
+                "type": "text"
+              }
+            ],
+            "url": "{{gatewayUrl}}/gateway/v1/bank-operations/c6/SCHEDULE_GET",
+            "description": "GET /v1/schedule_payments/{id}. Path não confirmado.",
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"id\": \"abc123\",\n  \"txid\": \"abc123\",\n  \"e2eid\": \"abc123\",\n  \"chave\": \"{{pixKey}}\",\n  \"data\": \"2026-11-23\",\n  \"valor\": \"10.00\",\n  \"amount\": 1000,\n  \"external_reference_id\": \"pedido123\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('HTTP 200', function () {",
+                  "    pm.expect([200]).to.include(pm.response.code);",
+                  "});"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "SCHEDULE_CANCEL",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json",
+                "type": "text"
+              },
+              {
+                "key": "X-Merchant-Id",
+                "value": "{{merchantId}}",
+                "type": "text"
+              },
+              {
+                "key": "Idempotency-Key",
+                "value": "{{$guid}}",
+                "type": "text"
+              },
+              {
+                "key": "X-Mock",
+                "value": "true",
+                "type": "text"
+              }
+            ],
+            "url": "{{gatewayUrl}}/gateway/v1/bank-operations/c6/SCHEDULE_CANCEL",
+            "description": "DELETE /v1/schedule_payments/{id}. Path não confirmado.",
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"id\": \"abc123\",\n  \"txid\": \"abc123\",\n  \"e2eid\": \"abc123\",\n  \"chave\": \"{{pixKey}}\",\n  \"data\": \"2026-11-23\",\n  \"valor\": \"10.00\",\n  \"amount\": 1000,\n  \"external_reference_id\": \"pedido123\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('HTTP 200', function () {",
+                  "    pm.expect([200]).to.include(pm.response.code);",
+                  "});"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "DDA_LIST",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json",
+                "type": "text"
+              },
+              {
+                "key": "X-Merchant-Id",
+                "value": "{{merchantId}}",
+                "type": "text"
+              },
+              {
+                "key": "Idempotency-Key",
+                "value": "{{$guid}}",
+                "type": "text"
+              },
+              {
+                "key": "X-Mock",
+                "value": "true",
+                "type": "text"
+              }
+            ],
+            "url": "{{gatewayUrl}}/gateway/v1/bank-operations/c6/DDA_LIST",
+            "description": "Consulta DDA. Path não confirmado.",
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"id\": \"abc123\",\n  \"txid\": \"abc123\",\n  \"e2eid\": \"abc123\",\n  \"chave\": \"{{pixKey}}\",\n  \"data\": \"2026-11-23\",\n  \"valor\": \"10.00\",\n  \"amount\": 1000,\n  \"external_reference_id\": \"pedido123\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('HTTP 200', function () {",
+                  "    pm.expect([200]).to.include(pm.response.code);",
+                  "});"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "Capturar cobrança do pedido",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json",
+                "type": "text"
+              },
+              {
+                "key": "X-Merchant-Id",
+                "value": "{{merchantId}}",
+                "type": "text"
+              },
+              {
+                "key": "Idempotency-Key",
+                "value": "{{$guid}}",
+                "type": "text"
+              }
+            ],
+            "url": "{{gatewayUrl}}/gateway/v1/charges/{{chargeId}}/capture",
+            "description": "",
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"amount\": 10000\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('HTTP 501', function () {",
+                  "    pm.expect([501]).to.include(pm.response.code);",
+                  "});"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "Cancelar ou estornar cobrança do pedido",
+          "request": {
+            "method": "DELETE",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json",
+                "type": "text"
+              },
+              {
+                "key": "X-Merchant-Id",
+                "value": "{{merchantId}}",
+                "type": "text"
+              },
+              {
+                "key": "Idempotency-Key",
+                "value": "{{$guid}}",
+                "type": "text"
+              }
+            ],
+            "url": "{{gatewayUrl}}/gateway/v1/charges/{{chargeId}}",
+            "description": "",
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"amount\": 10000\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('HTTP 501', function () {",
+                  "    pm.expect([501]).to.include(pm.response.code);",
+                  "});"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "Capturar pagamento",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "X-Merchant-Id",
+                "value": "{{merchantId}}",
+                "type": "text"
+              }
+            ],
+            "url": "{{gatewayUrl}}/v1/payments/{{paymentId}}/captures",
+            "description": ""
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('HTTP 501', function () {",
+                  "    pm.expect([501]).to.include(pm.response.code);",
+                  "});"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "Estornar pagamento",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "X-Merchant-Id",
+                "value": "{{merchantId}}",
+                "type": "text"
+              }
+            ],
+            "url": "{{gatewayUrl}}/v1/payments/{{paymentId}}/refunds",
+            "description": ""
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('HTTP 501', function () {",
+                  "    pm.expect([501]).to.include(pm.response.code);",
+                  "});"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "Desfazer pagamento",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "X-Merchant-Id",
+                "value": "{{merchantId}}",
+                "type": "text"
+              }
+            ],
+            "url": "{{gatewayUrl}}/v1/payments/{{paymentId}}/voids",
+            "description": ""
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('HTTP 501', function () {",
+                  "    pm.expect([501]).to.include(pm.response.code);",
+                  "});"
+                ]
+              }
+            }
+          ]
+        }
+      ]
+    }
+  ]
+}

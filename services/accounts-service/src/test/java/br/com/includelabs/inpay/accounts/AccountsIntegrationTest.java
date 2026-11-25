@@ -118,10 +118,17 @@ class AccountsIntegrationTest {
     @Test
     void bankConfigurationRemainsDisabledAndIdempotent() throws Exception {
         var catalog = json.readTree(get("/accounts/v1/banks").body());
-        assertEquals(12, catalog.size());
+        assertEquals(13, catalog.size());
+        var mockReady =
+                Set.of("c6", "itau", "santander", "bradesco", "bb", "caixa", "banrisul");
         for (var bank : catalog) {
             assertFalse(bank.path("enabled").asBoolean());
-            assertEquals("NOT_IMPLEMENTED", bank.path("status").asText());
+            if (mockReady.contains(bank.path("id").asText())) {
+                assertEquals("MOCK_READY", bank.path("status").asText());
+                assertFalse(bank.path("implementedOperations").isEmpty());
+            } else {
+                assertEquals("NOT_IMPLEMENTED", bank.path("status").asText());
+            }
         }
         String body =
                 """

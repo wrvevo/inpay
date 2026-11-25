@@ -93,5 +93,45 @@
     "safrapay",
     8108,
     "connectors-safrapay"
+  ],
+  "bank-mock-server": [
+    "bankmock",
+    8098,
+    "operations"
+  ],
+  "connector-c6": [
+    "c6",
+    8111,
+    "connectors-c6"
+  ],
+  "connector-itau": [
+    "itau",
+    8112,
+    "connectors-itau"
+  ],
+  "connector-santander": [
+    "santander",
+    8113,
+    "connectors-santander"
+  ],
+  "connector-bb": [
+    "bb",
+    8114,
+    "connectors-bb"
+  ],
+  "connector-bradesco": [
+    "bradesco",
+    8115,
+    "connectors-bradesco"
+  ],
+  "connector-caixa": [
+    "caixa",
+    8116,
+    "connectors-caixa"
+  ],
+  "connector-banrisul": [
+    "banrisul",
+    8117,
+    "connectors-banrisul"
   ]
 }

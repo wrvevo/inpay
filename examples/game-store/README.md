@@ -7,8 +7,10 @@ não há entrega de licenças nem renovação automática neste checkout.
 O PHP chama `/gateway/v1/journeys`; o Gateway persiste a jornada no PostgreSQL e chama uma
 aplicação conectora via HTTP. O Gateway não depende do JAR Cielo. A loja não recebe PAN/CVV
 nem credenciais do adquirente. O armazenamento JSON com lock é exclusivo do laboratório.
-Esta implementação leve foi escolhida porque Magento requer banco, busca e outros serviços;
-não é um módulo Magento nem substitui uma loja de produção.
+O módulo Magento correspondente está em `examples/magento` (`InPay_Gateway`), com os mesmos
+meios habilitados. Esta vitrine sobe com o demo para a loja e o painel ficarem acessíveis
+sem o banco e o OpenSearch que um Magento completo exige. Os stubs `X-Mock` dos conectores
+não são alterados por esta loja.
 
 ## Rodar com Docker Compose
 
@@ -21,7 +23,8 @@ export DEMO_CONNECTOR_AUTHORIZATION="$(python3 -c 'import os,base64; print("Basi
 docker compose -f docker-compose.yml -f docker-compose.demo.yml up --build -d
 ```
 
-Loja: http://localhost:8099 ; administração: http://localhost:8099/?page=admin ;
+Loja: http://localhost:8099 ; painel da loja: http://localhost:8099/admin ;
+Swagger do gateway: http://localhost:8084/swagger-ui/index.html ;
 painel geral: http://localhost:3080. A senha da loja é `STORE_ADMIN_PASSWORD`.
 Os dados da loja ficam no volume `game-store-data`. O simulador mantém dados temporários;
 reiniciá-lo perde seus pagamentos. Para recomeçar use novos pedidos; não interprete pedidos

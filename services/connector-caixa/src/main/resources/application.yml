@@ -1,0 +1,31 @@
+spring:
+  application:
+    name: connector-caixa
+  profiles:
+    default: aws
+server:
+  port: 8116
+management:
+  endpoints:
+    web:
+      exposure:
+        include: health,info,prometheus
+  endpoint:
+    health:
+      probes:
+        enabled: true
+      show-details: never
+inpay:
+  bank:
+    id: caixa
+    enabled: false
+    mock-enabled: ${BANK_MOCK_ENABLED:true}
+    mock-base-url: ${BANK_MOCK_BASE_URL:http://127.0.0.1:8099}
+    live-base-url: ${BANK_LIVE_BASE_URL:}
+    confirm-unverified-paths: false
+  security:
+    issuer: ${COGNITO_ISSUER:}
+    allowed-clients: ${COGNITO_ALLOWED_CLIENTS:}
+    trusted-services: ${COGNITO_TRUSTED_SERVICES:}
+    client-tenants: ${COGNITO_CLIENT_TENANTS:}
+    audience: ${COGNITO_AUDIENCE:}

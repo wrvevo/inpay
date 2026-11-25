@@ -1,0 +1,13 @@
+{
+  "request": {
+    "method": "PUT",
+    "urlPathPattern": "/c6/pix/v2/cob/.*"
+  },
+  "response": {
+    "status": 200,
+    "headers": {
+      "Content-Type": "application/json"
+    },
+    "body": "{\"mocked\":true,\"bank\":\"c6\",\"operation\":\"PIX_COB_PUT\",\"status\":\"ATIVA\"}"
+  }
+}

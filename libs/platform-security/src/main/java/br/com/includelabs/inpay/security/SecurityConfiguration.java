@@ -86,7 +86,21 @@ public class SecurityConfiguration {
                 "SCOPE_connectors-pagbank/execute",
                 "SCOPE_connectors-pagbank/read",
                 "SCOPE_connectors-safrapay/execute",
-                "SCOPE_connectors-safrapay/read"
+                "SCOPE_connectors-safrapay/read",
+                "SCOPE_connectors-c6/execute",
+                "SCOPE_connectors-c6/read",
+                "SCOPE_connectors-itau/execute",
+                "SCOPE_connectors-itau/read",
+                "SCOPE_connectors-santander/execute",
+                "SCOPE_connectors-santander/read",
+                "SCOPE_connectors-bb/execute",
+                "SCOPE_connectors-bb/read",
+                "SCOPE_connectors-bradesco/execute",
+                "SCOPE_connectors-bradesco/read",
+                "SCOPE_connectors-caixa/execute",
+                "SCOPE_connectors-caixa/read",
+                "SCOPE_connectors-banrisul/execute",
+                "SCOPE_connectors-banrisul/read"
             };
 
     /**

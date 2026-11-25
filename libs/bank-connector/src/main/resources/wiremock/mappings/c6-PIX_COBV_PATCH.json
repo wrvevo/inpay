@@ -1,0 +1,20 @@
+{
+  "request": {
+    "method": "PATCH",
+    "urlPathPattern": "^/c6/pix/v2/cobv/[^/]+$"
+  },
+  "priority": 19,
+  "response": {
+    "status": 200,
+    "headers": {
+      "Content-Type": "application/json"
+    },
+    "jsonBody": {
+      "mocked": true,
+      "bank": "c6",
+      "operation": "PIX_COBV_PATCH",
+      "status": "ATIVA",
+      "pixCopiaECola": "000201mocked"
+    }
+  }
+}

@@ -165,6 +165,30 @@ export function Developers() {
               className="resource"
               target="_blank"
               rel="noreferrer"
+              href="http://localhost:8084/swagger-ui/index.html"
+            >
+              Swagger do Gateway <ExternalLink size={16} />
+            </a>
+            <a
+              className="resource"
+              target="_blank"
+              rel="noreferrer"
+              href="http://localhost:8099/"
+            >
+              Loja Magento demo <ExternalLink size={16} />
+            </a>
+            <a
+              className="resource"
+              target="_blank"
+              rel="noreferrer"
+              href="http://localhost:8099/admin"
+            >
+              Painel da loja <ExternalLink size={16} />
+            </a>
+            <a
+              className="resource"
+              target="_blank"
+              rel="noreferrer"
               href="https://github.com/wrvevo/inpay/blob/main/docs/CONNECTORS.md"
             >
               Contratos dos connectors <ExternalLink size={16} />

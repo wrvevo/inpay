@@ -1,0 +1,6 @@
+inpay:
+  local-password: ${LOCAL_PASSWORD:local-only-change-me}
+  local-merchant: 11111111-1111-1111-1111-111111111111
+  bank:
+    mock-enabled: true
+    enabled: false
