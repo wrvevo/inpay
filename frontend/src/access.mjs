@@ -34,44 +34,108 @@ function person(realm, role, name, email, document, menus, stores) {
   return { id: email, realm, role, name, email, document, password: PASSWORD, menus: [...menus], stores: [...stores] };
 }
 
+function company(tradeName) {
+  return {
+    legalName: "InPay Comércio de Laboratório Ltda",
+    tradeName,
+    situation: "ATIVA",
+    situationLabel: "ATIVO",
+    openedOn: "2020-03-12",
+    legalNature: "Sociedade Empresária Limitada",
+    size: "ME",
+    branch: "MATRIZ",
+    mainActivity: "Comércio varejista de artigos de tecnologia",
+    email: "contato@inpay.local",
+    phone: "11999990000",
+    address: {
+      zip: "01310100",
+      street: "Avenida Paulista",
+      number: "1000",
+      complement: "Conjunto 101",
+      district: "Bela Vista",
+      city: "São Paulo",
+      state: "SP",
+    },
+    partners: [
+      { name: "Ana Ribeiro", role: "Sócia-administradora" },
+      { name: "Carlos Mendes", role: "Sócio" },
+    ],
+    source: "Cadastro de laboratório",
+    consultedAt: "2026-11-26T12:00:00.000Z",
+  };
+}
+
 function cases() {
   return [
     {
       id: STORES[0].id,
       storeId: STORES[0].id,
       cnpj: CNPJ,
-      legalName: "InPay Comércio de Laboratório Ltda",
       storeName: "Loja Centro",
-      email: "contato@inpay.local",
-      phone: "11999990000",
-      address: "Rua do Laboratório, 100",
-      payments: ["pix", "credit_card", "boleto"],
+      ...company("InPay Lab Centro"),
+      payments: ["pix", "credit_card"],
+      connectors: { pix: "pagbank", credit_card: "cielo" },
+      connectorSettings: {
+        pagbank: { clientId: "pagbank-lab", baseUrl: "https://sandbox.api.pagseguro.com", secretRef: "secrets/pagbank" },
+        cielo: { merchantId: "cielo-lab", baseUrl: "https://apisandbox.cieloecommerce.cielo.com.br", secretRef: "secrets/cielo" },
+      },
       antifraud: "INPAY_RISK",
-      settlementAlias: "conta-liquidacao-local",
-      splitEnabled: false,
+      gatewayMode: "HOMOLOGACAO",
+      journeySubmitted: false,
       status: "EM_HOMOLOGACAO",
       accountsPrepared: false,
+      demo: null,
     },
     {
       id: STORES[1].id,
       storeId: STORES[1].id,
       cnpj: CNPJ,
-      legalName: "InPay Comércio de Laboratório Ltda",
       storeName: "Loja Sul",
-      email: "contato@inpay.local",
-      phone: "11999990000",
-      address: "Rua do Laboratório, 100",
-      payments: ["pix", "credit_card", "boleto"],
-      antifraud: "INPAY_RISK",
-      settlementAlias: "conta-liquidacao-local",
-      splitEnabled: false,
-      status: "RASCUNHO",
+      ...company("InPay Lab Sul"),
+      payments: ["pix", "boleto"],
+      connectors: { pix: "stone", boleto: "getnet" },
+      connectorSettings: {
+        stone: { host: "sandbox.stone.com.br", secretRef: "secrets/stone" },
+        getnet: { clientId: "getnet-lab", merchantId: "loja-lab", baseUrl: "https://api-homologacao.getnet.com.br", secretRef: "secrets/getnet" },
+      },
+      antifraud: "SERASA_EXPERIAN",
+      gatewayMode: "HOMOLOGACAO",
+      journeySubmitted: true,
+      status: "EM_HOMOLOGACAO",
       accountsPrepared: false,
+      demo: null,
     },
   ];
 }
 
-const memory = { users: seed(), cases: cases(), resets: new Map() };
+function field(key, label, value = "", required = true, secret = false) {
+  return { key, label, value, required, secret };
+}
+
+function acquirerSeed() {
+  const card = ["credit_card", "debit_card", "pix", "boleto"];
+  const bank = ["pix", "boleto"];
+  const secret = field("secretRef", "Referência do segredo no servidor", "", false, true);
+  return [
+    { id: "cielo", name: "Cielo", methods: card, integration: "INTEGRADO", active: true, fields: [field("merchantId", "Merchant ID"), field("baseUrl", "URL base", "https://apisandbox.cieloecommerce.cielo.com.br"), field("queryUrl", "URL de consulta", "https://apiquerysandbox.cieloecommerce.cielo.com.br", false), secret] },
+    { id: "rede", name: "Rede", methods: card, integration: "INTEGRADO", active: true, fields: [field("clientId", "Client ID"), field("baseUrl", "URL base", "https://api.userede.com.br/desenvolvedores"), field("tokenUrl", "URL do token", "https://api.userede.com.br/desenvolvedores/v1/token", false), secret] },
+    { id: "getnet", name: "Getnet", methods: card, integration: "INTEGRADO", active: true, fields: [field("clientId", "Client ID"), field("merchantId", "Merchant ID"), field("baseUrl", "URL base", "https://api-homologacao.getnet.com.br"), field("channel", "Canal", "digital", false), secret] },
+    { id: "stone", name: "Stone", methods: card, integration: "INTEGRADO", active: true, fields: [field("host", "Host"), field("baseUrl", "URL base", "https://sandbox.openbank.stone.com.br", false), secret] },
+    { id: "bin", name: "Bin / Fiserv", methods: card, integration: "INTEGRADO", active: true, fields: [field("merchantId", "Merchant ID"), field("baseUrl", "URL base", "https://sandbox.bin.com.br"), field("keyStore", "Keystore", "", false), secret] },
+    { id: "global-payments", name: "Global Payments", methods: card, integration: "INTEGRADO", active: true, fields: [field("merchantId", "Merchant ID"), field("baseUrl", "URL base", "https://api.sandbox.globalpay.com"), secret] },
+    { id: "pagbank", name: "PagBank", methods: card, integration: "INTEGRADO", active: true, fields: [field("clientId", "Client ID"), field("baseUrl", "URL base", "https://sandbox.api.pagseguro.com"), secret] },
+    { id: "safrapay", name: "Safrapay", methods: card, integration: "INTEGRADO", active: true, fields: [field("merchantId", "Merchant ID"), field("baseUrl", "URL base", "https://api-sandbox.safrapay.com.br"), secret] },
+    { id: "c6", name: "C6 Bank", methods: bank, integration: "INTEGRADO", active: true, fields: [field("clientId", "Client ID"), field("pixKey", "Chave PIX"), field("baseUrl", "URL base", "https://baas-api-sandbox.c6bank.info"), secret] },
+    { id: "itau", name: "Itaú", methods: bank, integration: "INTEGRADO", active: true, fields: [field("clientId", "Client ID"), field("pixBaseUrl", "URL PIX", "https://devportal.itau.com.br/sandboxapi/pix_recebimentos_ext_v2/v2"), field("boletoBaseUrl", "URL boleto", "https://devportal.itau.com.br/sandboxapi/cash_management_ext_v2/v2", false), secret] },
+    { id: "santander", name: "Santander", methods: bank, integration: "INTEGRADO", active: true, fields: [field("clientId", "Client ID"), field("baseUrl", "URL base", "https://trust-sandbox.api.santander.com.br"), secret] },
+    { id: "bb", name: "Banco do Brasil", methods: bank, integration: "EM_INTEGRACAO", active: false, fields: [field("clientId", "Client ID"), field("baseUrl", "URL base", ""), secret] },
+    { id: "bradesco", name: "Bradesco", methods: bank, integration: "EM_INTEGRACAO", active: false, fields: [field("clientId", "Client ID"), field("baseUrl", "URL base", ""), secret] },
+    { id: "caixa", name: "Caixa", methods: bank, integration: "EM_INTEGRACAO", active: false, fields: [field("clientId", "Client ID"), field("baseUrl", "URL base", ""), secret] },
+    { id: "banrisul", name: "Banrisul", methods: bank, integration: "EM_INTEGRACAO", active: false, fields: [field("clientId", "Client ID"), field("baseUrl", "URL base", ""), secret] },
+  ];
+}
+
+const memory = { users: seed(), cases: cases(), acquirers: acquirerSeed(), resets: new Map() };
 
 export function grantPanel(actor, targetRole, menus) {
   if (!menus.every((item) => MENUS.includes(item))) throw new Error("Menu desconhecido.");
@@ -152,8 +216,99 @@ export function usersOf(actor) {
   return memory.users.filter((item) => item.realm === actor.realm).map(publicUser);
 }
 
+function copyCase(item) {
+  return {
+    ...item,
+    payments: [...(item.payments || [])],
+    connectors: { ...(item.connectors || {}) },
+    connectorSettings: Object.fromEntries(
+      Object.entries(item.connectorSettings || {}).map(([id, values]) => [id, { ...values }]),
+    ),
+    partners: [...(item.partners || [])],
+    address: { ...(item.address || {}) },
+    demo: item.demo
+      ? {
+          ...item.demo,
+          connectors: { ...(item.demo.connectors || {}) },
+          payments: [...(item.demo.payments || [])],
+          connectorSettings: Object.fromEntries(
+            Object.entries(item.demo.connectorSettings || {}).map(([id, values]) => [id, { ...values }]),
+          ),
+        }
+      : null,
+  };
+}
+
+function copyAcquirer(item) {
+  return { ...item, methods: [...item.methods], fields: item.fields.map((field) => ({ ...field })) };
+}
+
+function acquirerById(id) {
+  return memory.acquirers.find((item) => item.id === id);
+}
+
+function journeyReady(item) {
+  const address = item.address || {};
+  if (!item.legalName || !item.situation || !address.street || !address.city) return false;
+  if (!item.antifraud || !item.payments?.length) return false;
+  return item.payments.every((method) => {
+    const acquirer = acquirerById(item.connectors?.[method]);
+    if (!acquirer || !acquirer.active || !acquirer.methods.includes(method)) return false;
+    const saved = item.connectorSettings?.[acquirer.id] || {};
+    return acquirer.fields
+      .filter((field) => field.required && !field.secret)
+      .every((field) => String(saved[field.key] || "").trim());
+  });
+}
+
+export function acquirerCatalog() {
+  return memory.acquirers.map(copyAcquirer);
+}
+
+export function activeAcquirers(method) {
+  return memory.acquirers
+    .filter((item) => item.active && (!method || item.methods.includes(method)))
+    .map(copyAcquirer);
+}
+
+export function setAcquirerActive(role, id, active) {
+  if (role !== "ADMIN") throw new Error("Só o administrador da homologação altera o catálogo.");
+  const item = acquirerById(id);
+  if (!item) throw new Error("Adquirente não encontrado.");
+  item.active = Boolean(active);
+  return copyAcquirer(item);
+}
+
 export function homologationCases() {
-  return memory.cases.map((item) => ({ ...item, payments: [...item.payments] }));
+  return memory.cases.map(copyCase);
+}
+
+export function startHomologation(role, input) {
+  if (!["PDV", "ADMIN"].includes(role)) throw new Error("Sem permissão para iniciar.");
+  const cnpj = String(input.cnpj || "").replace(/\D/g, "");
+  if (cnpj.length !== 14) throw new Error("CNPJ inválido.");
+  if (!input.storeName || !input.legalName) throw new Error("A consulta do CNPJ está incompleta.");
+  const id = crypto.randomUUID();
+  const next = {
+    ...input,
+    id,
+    storeId: id,
+    cnpj,
+    storeName: String(input.storeName).trim(),
+    payments: [],
+    connectors: {},
+    connectorSettings: {},
+    antifraud: input.antifraud || "INPAY_RISK",
+    gatewayMode: "HOMOLOGACAO",
+    journeySubmitted: false,
+    status: "EM_HOMOLOGACAO",
+    accountsPrepared: false,
+    demo: null,
+    partners: [...(input.partners || [])],
+    address: { ...(input.address || {}) },
+  };
+  memory.cases.push(next);
+  return copyCase(next);
 }
 
 export function saveCase(input, role) {
@@ -161,27 +316,78 @@ export function saveCase(input, role) {
   const cnpj = String(input.cnpj || "").replace(/\D/g, "");
   if (cnpj.length !== 14) throw new Error("CNPJ inválido.");
   const id = input.id || crypto.randomUUID();
-  const next = { ...input, id, cnpj, payments: [...(input.payments || [])], accountsPrepared: false };
+  const current = memory.cases.find((item) => item.id === id);
+  const next = {
+    ...(current || {}),
+    ...input,
+    id,
+    cnpj,
+    payments: [...(input.payments || [])],
+    connectors: { ...(input.connectors || {}) },
+    connectorSettings: Object.fromEntries(
+      Object.entries(input.connectorSettings || {}).map(([key, values]) => [key, { ...values }]),
+    ),
+    partners: [...(input.partners || [])],
+    address: { ...(input.address || {}) },
+    gatewayMode: "HOMOLOGACAO",
+  };
   const index = memory.cases.findIndex((item) => item.id === id);
   if (index >= 0) memory.cases[index] = next;
   else memory.cases.push(next);
-  return next;
+  return copyCase(next);
 }
 
 export function submitCase(id, role) {
   if (!["PDV", "ADMIN"].includes(role)) throw new Error("Sem permissão.");
   const item = memory.cases.find((entry) => entry.id === id);
+  if (!item) throw new Error("Loja não encontrada.");
+  if (!journeyReady(item)) {
+    throw new Error("Conclua o cadastro, o antifraude e a configuração essencial de cada adquirente antes de enviar.");
+  }
   item.status = "EM_HOMOLOGACAO";
-  return { ...item };
+  item.journeySubmitted = true;
+  item.accountsPrepared = false;
+  item.demo = null;
+  return copyCase(item);
 }
 
 export function decideCase(id, role, approve) {
   if (!["BACKOFFICE", "ADMIN"].includes(role)) throw new Error("Sem permissão para aprovar.");
   const item = memory.cases.find((entry) => entry.id === id);
-  if (item.status !== "EM_HOMOLOGACAO") throw new Error("A loja não está em homologação.");
+  if (!item || item.status !== "EM_HOMOLOGACAO" || !item.journeySubmitted) {
+    throw new Error("A jornada ainda não foi enviada para aprovação.");
+  }
   item.status = approve ? "APROVADA" : "RECUSADA";
   item.accountsPrepared = approve;
-  return { ...item };
+  item.journeySubmitted = approve;
+  item.demo = approve
+    ? {
+        id: crypto.randomUUID(),
+        name: `${item.storeName} · Demo`,
+        mode: "SIMULACAO",
+        cnpj: item.cnpj,
+        company: item.legalName,
+        payments: [...item.payments],
+        connectors: { ...item.connectors },
+        connectorSettings: Object.fromEntries(
+          Object.entries(item.connectorSettings || {}).map(([key, values]) => [key, { ...values }]),
+        ),
+        antifraud: item.antifraud,
+      }
+    : null;
+  return copyCase(item);
+}
+
+export function openAnotherStore(sourceId, storeName, role) {
+  if (!["PDV", "ADMIN"].includes(role)) throw new Error("Sem permissão para abrir loja.");
+  const source = memory.cases.find((item) => item.id === sourceId);
+  if (!source || !String(storeName || "").trim()) throw new Error("Informe o nome da nova loja.");
+  return startHomologation(role, {
+    ...copyCase(source),
+    storeName: String(storeName).trim(),
+    cnpj: source.cnpj,
+    legalName: source.legalName,
+  });
 }
 
 export function cloneCase(sourceId, targetStoreId, role) {

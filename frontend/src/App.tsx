@@ -235,7 +235,13 @@ export default function App() {
     );
   if (!user) return <Login onLogin={enter} />;
   if (user.realm === "HOMOLOGATION") {
-    return <HomologationApp user={user} onLogout={logout} />;
+    return (
+      <HomologationApp
+        user={user}
+        onLogout={logout}
+        onUser={(next) => enter(next, false)}
+      />
+    );
   }
   return (
     <>
