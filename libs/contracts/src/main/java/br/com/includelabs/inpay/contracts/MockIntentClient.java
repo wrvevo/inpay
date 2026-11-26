@@ -25,7 +25,8 @@ public final class MockIntentClient {
         return !System.getenv().getOrDefault("INPAY_INTENT_MOCK_URL", "").isBlank();
     }
 
-    public static Reply execute(String provider, String intent) throws IOException, InterruptedException {
+    public static Reply execute(String provider, String intent)
+            throws IOException, InterruptedException {
         URI base = URI.create(System.getenv().getOrDefault("INPAY_INTENT_MOCK_URL", ""));
         if (!"http".equals(base.getScheme())
                 || base.getHost() == null
