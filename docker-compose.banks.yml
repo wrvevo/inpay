@@ -20,6 +20,8 @@ services:
       target: spring-service
     environment:
       SPRING_PROFILES_ACTIVE: local
+      JAVA_TOOL_OPTIONS: "-XX:MaxRAMPercentage=60 -XX:InitialRAMPercentage=10"
+      OTEL_SDK_DISABLED: "true"
       SERVER_PORT: "8111"
       LOCAL_PASSWORD: ${LOCAL_PASSWORD:-inpay@123}
       BANK_MOCK_BASE_URL: http://bank-mock-server:8099
@@ -29,6 +31,7 @@ services:
       C6_ENABLED: "false"
     ports:
       - 127.0.0.1:8131:8111
+    mem_limit: ${BANK_MEMORY_LIMIT:-384m}
     depends_on:
       - bank-mock-server
   connector-itau:
@@ -39,6 +42,8 @@ services:
       target: spring-service
     environment:
       SPRING_PROFILES_ACTIVE: local
+      JAVA_TOOL_OPTIONS: "-XX:MaxRAMPercentage=60 -XX:InitialRAMPercentage=10"
+      OTEL_SDK_DISABLED: "true"
       SERVER_PORT: "8112"
       LOCAL_PASSWORD: ${LOCAL_PASSWORD:-inpay@123}
       BANK_MOCK_BASE_URL: http://bank-mock-server:8099
@@ -48,6 +53,7 @@ services:
       ITAU_ENABLED: "false"
     ports:
       - 127.0.0.1:8132:8112
+    mem_limit: ${BANK_MEMORY_LIMIT:-384m}
     depends_on:
       - bank-mock-server
   connector-santander:
@@ -58,14 +64,18 @@ services:
       target: spring-service
     environment:
       SPRING_PROFILES_ACTIVE: local
+      JAVA_TOOL_OPTIONS: "-XX:MaxRAMPercentage=60 -XX:InitialRAMPercentage=10"
+      OTEL_SDK_DISABLED: "true"
       SERVER_PORT: "8113"
       LOCAL_PASSWORD: ${LOCAL_PASSWORD:-inpay@123}
       BANK_MOCK_BASE_URL: http://bank-mock-server:8099
       INPAY_INTENT_MOCK_URL: http://bank-mock-server:8099
       BANK_MOCK_ENABLED: "true"
       BANK_ENABLED: "false"
+      SANTANDER_ENABLED: "false"
     ports:
       - 127.0.0.1:8133:8113
+    mem_limit: ${BANK_MEMORY_LIMIT:-384m}
     depends_on:
       - bank-mock-server
   connector-bb:
@@ -76,6 +86,8 @@ services:
       target: spring-service
     environment:
       SPRING_PROFILES_ACTIVE: local
+      JAVA_TOOL_OPTIONS: "-XX:MaxRAMPercentage=60 -XX:InitialRAMPercentage=10"
+      OTEL_SDK_DISABLED: "true"
       SERVER_PORT: "8114"
       LOCAL_PASSWORD: ${LOCAL_PASSWORD:-inpay@123}
       BANK_MOCK_BASE_URL: http://bank-mock-server:8099
@@ -84,6 +96,7 @@ services:
       BANK_ENABLED: "false"
     ports:
       - 127.0.0.1:8134:8114
+    mem_limit: ${BANK_MEMORY_LIMIT:-384m}
     depends_on:
       - bank-mock-server
   connector-bradesco:
@@ -94,6 +107,8 @@ services:
       target: spring-service
     environment:
       SPRING_PROFILES_ACTIVE: local
+      JAVA_TOOL_OPTIONS: "-XX:MaxRAMPercentage=60 -XX:InitialRAMPercentage=10"
+      OTEL_SDK_DISABLED: "true"
       SERVER_PORT: "8115"
       LOCAL_PASSWORD: ${LOCAL_PASSWORD:-inpay@123}
       BANK_MOCK_BASE_URL: http://bank-mock-server:8099
@@ -102,6 +117,7 @@ services:
       BANK_ENABLED: "false"
     ports:
       - 127.0.0.1:8135:8115
+    mem_limit: ${BANK_MEMORY_LIMIT:-384m}
     depends_on:
       - bank-mock-server
   connector-caixa:
@@ -112,6 +128,8 @@ services:
       target: spring-service
     environment:
       SPRING_PROFILES_ACTIVE: local
+      JAVA_TOOL_OPTIONS: "-XX:MaxRAMPercentage=60 -XX:InitialRAMPercentage=10"
+      OTEL_SDK_DISABLED: "true"
       SERVER_PORT: "8116"
       LOCAL_PASSWORD: ${LOCAL_PASSWORD:-inpay@123}
       BANK_MOCK_BASE_URL: http://bank-mock-server:8099
@@ -120,6 +138,7 @@ services:
       BANK_ENABLED: "false"
     ports:
       - 127.0.0.1:8136:8116
+    mem_limit: ${BANK_MEMORY_LIMIT:-384m}
     depends_on:
       - bank-mock-server
   connector-banrisul:
@@ -130,6 +149,8 @@ services:
       target: spring-service
     environment:
       SPRING_PROFILES_ACTIVE: local
+      JAVA_TOOL_OPTIONS: "-XX:MaxRAMPercentage=60 -XX:InitialRAMPercentage=10"
+      OTEL_SDK_DISABLED: "true"
       SERVER_PORT: "8117"
       LOCAL_PASSWORD: ${LOCAL_PASSWORD:-inpay@123}
       BANK_MOCK_BASE_URL: http://bank-mock-server:8099
@@ -138,5 +159,6 @@ services:
       BANK_ENABLED: "false"
     ports:
       - 127.0.0.1:8137:8117
+    mem_limit: ${BANK_MEMORY_LIMIT:-384m}
     depends_on:
       - bank-mock-server

@@ -35,6 +35,7 @@ def request(url, method, body=None, headers=None):
 def main():
     parser = argparse.ArgumentParser()
     parser.add_argument("--running", action="store_true", help="Require running local Compose stack")
+    parser.add_argument("--cards", action="store_true", help="Test running card connectors")
     args = parser.parse_args()
     rows = [json.loads(line) for line in
             (ROOT / "services/bank-mock-server/src/main/resources/intent-mappings.jsonl").read_text().splitlines()
@@ -42,7 +43,7 @@ def main():
     intents = {row["request"]["urlPath"]: row for row in rows}
     assert len(intents) == len(rows), "duplicate intent mapping"
     native = {}
-    for bank, cap in (("c6", "C6"), ("itau", "Itau")):
+    for bank, cap in (("c6", "C6"), ("itau", "Itau"), ("santander", "Santander")):
         source = ROOT / f"services/connector-{bank}/src/main/java/{PACKAGE}/{bank}/domain/{cap}Operation.java"
         operations = re.findall(r"^\s+([A-Z][A-Z0-9_]+)\(" + cap + r"Product\.", source.read_text(), re.M)
         assert operations, bank
@@ -86,19 +87,28 @@ def main():
         password = os.environ.get("LOCAL_PASSWORD", "inpay@123")
         auth = base64.b64encode(("developer:" + password).encode()).decode()
         headers = {"Authorization": "Basic " + auth, "X-Mock": "true", "Content-Type": "application/json"}
-        for bank, port in (("c6", 8131), ("itau", 8132)):
+        for bank, port in (("c6", 8131), ("itau", 8132), ("santander", 8133)):
             for operation in native[bank]:
                 headers["Idempotency-Key"] = str(uuid.uuid4())
                 status, body = request(f"http://127.0.0.1:{port}/internal/v1/bank/operations/{operation}", "POST", b"{}", headers)
                 assert status == 200 and body["status"] == 200 and body["mocked"] is True, (bank, operation, status)
             headers["X-Mock"] = "false"
-            status, _ = request(f"http://127.0.0.1:{port}/internal/v1/bank/operations/PIX_COB_GET", "POST", b"{}", headers)
+            status, _ = request(f"http://127.0.0.1:{port}/internal/v1/bank/operations/PIX_COB_GET", "POST", b'{"txid":"synthetic"}', headers)
             assert status == 503, (bank, status)
             headers["X-Mock"] = "true"
             headers["Idempotency-Key"] = str(uuid.uuid4())
             status, body = request(
                 f"http://127.0.0.1:8084/gateway/v1/bank-operations/{bank}/PIX_COB_GET",
                 "POST", b"{}", headers)
+            assert status == 200 and body["mocked"] is True and body["status"] == 200, (bank, status)
+        for bank, port in zip(BANKS[3:], range(8134, 8138)):
+            for operation, method, path in operations:
+                payload = {key: "synthetic" for key in re.findall(r"\{([^}]+)\}", path)}
+                headers["Idempotency-Key"] = str(uuid.uuid4())
+                status, body = request(f"http://127.0.0.1:{port}/internal/v1/bank/operations/{operation}", "POST", json.dumps(payload).encode(), headers)
+                assert status == 200 and body["status"] == 200 and body["mocked"] is True, (bank, operation, status)
+            headers["Idempotency-Key"] = str(uuid.uuid4())
+            status, body = request(f"http://127.0.0.1:8084/gateway/v1/bank-operations/{bank}/PIX_COB_GET", "POST", b'{"txid":"synthetic"}', headers)
             assert status == 200 and body["mocked"] is True and body["status"] == 200, (bank, status)
         for partner, port in (("clearsale", 8128), ("serasa-experian", 8129)):
             url = f"http://127.0.0.1:{port}/internal/v1/assessments"
@@ -107,6 +117,17 @@ def main():
                 status, body = request(url, "POST", json.dumps(probe).encode(), headers)
                 assert status == 200 and body["decision"] == decision and body["mock"] is True, (partner, decision, status)
                 assert body["policyVersion"].endswith("-wiremock-v1"), partner
+    if args.cards:
+        password = os.environ.get("LOCAL_PASSWORD", "inpay@123")
+        auth = base64.b64encode(("developer:" + password).encode()).decode()
+        headers = {"Authorization": "Basic " + auth, "X-Mock": "true"}
+        for provider, port in zip(CARD_PROVIDERS, range(8101, 8109)):
+            for operation in card_ops + (cielo_ops if provider == "cielo" else []):
+                status, body = request(f"http://127.0.0.1:{port}/internal/v1/provider-mocks/{operation}", "POST", b"", headers)
+                assert status == 200 and body["mocked"] is True and body["productionApproved"] is False, (provider, operation, status)
+            status, _ = request(f"http://127.0.0.1:{port}/internal/v1/provider-mocks/AUTHORIZE", "POST", b"", {"Authorization": "Basic " + auth, "X-Mock": "false"})
+            assert status == 503, (provider, status)
+        print("Card mock connector HTTP checks passed.")
     print(f"Catalog: {len(operations) * len(BANKS)} legacy bank mappings; {sum(map(len, native.values()))} native bank intents; {len(PARTNERS) * len(RISK)} partner intents.")
     print(f"Card provider intents: {len(card_ops) * len(CARD_PROVIDERS)} common and {len(cielo_ops)} Cielo collection.")
     print("Runtime checks passed." if args.running else "Static coverage only; no integration test executed.")

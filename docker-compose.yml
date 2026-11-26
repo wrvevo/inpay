@@ -16,6 +16,7 @@ services:
       MARKETPLACE_URL: http://marketplace-service:8112
       BILLING_URL: http://billing-service:8113
       ACCOUNTS_URL: http://accounts-service:8111
+      PAINEL_URL: http://painel-gerencial:8130
     restart: unless-stopped
   postgres:
     image: postgres:17.6

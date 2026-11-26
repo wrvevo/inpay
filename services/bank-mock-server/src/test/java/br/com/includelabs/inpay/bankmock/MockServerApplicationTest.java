@@ -16,7 +16,7 @@ class MockServerApplicationTest {
     void packagedMappingsAnswerBankAndRiskIntentsAndRejectUnknownPaths() throws Exception {
         WireMockServer server = new MockServerApplication().bankWireMock(0);
         try {
-            assertEquals(445, server.getStubMappings().size());
+            assertEquals(483, server.getStubMappings().size());
             HttpClient client = HttpClient.newHttpClient();
             assertResponse(client, server, "/c6/pix/v2/cob/synthetic", "PUT", 200, "PIX_COB_PUT");
             assertResponse(client, server, "/intents/c6/BOLEPIX_CREATE", "POST", 200, "mocked");
@@ -37,6 +37,7 @@ class MockServerApplicationTest {
                     "POST",
                     503,
                     "PROVIDER_UNAVAILABLE");
+            assertResponse(client, server, "/intents/santander/PAYMENT_CREATE", "POST", 200, "mocked");
             assertResponse(client, server, "/intents/rede/AUTHORIZE", "POST", 200, "MOCK_AUTHORIZE");
             assertResponse(client, server, "/intents/cielo/ZERO_AUTH", "POST", 200, "MOCK_ZERO_AUTH");
             assertResponse(client, server, "/intents/itau/UNDECLARED", "POST", 404, "");

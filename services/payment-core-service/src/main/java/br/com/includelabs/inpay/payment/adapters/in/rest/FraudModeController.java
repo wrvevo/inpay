@@ -72,8 +72,7 @@ public class FraudModeController {
         try {
             String token =
                     Base64.getEncoder()
-                            .encodeToString(
-                                    ("inpay:" + password).getBytes(StandardCharsets.UTF_8));
+                            .encodeToString(("inpay:" + password).getBytes(StandardCharsets.UTF_8));
             HttpRequest request =
                     HttpRequest.newBuilder(URI.create(fraudUrl + "/internal/v1/fraud-mode"))
                             .timeout(Duration.ofSeconds(2))
