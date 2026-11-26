@@ -1,11 +1,11 @@
 package br.com.includelabs.inpay.itau.application;
 
+import br.com.includelabs.inpay.contracts.MockIntentClient;
 import br.com.includelabs.inpay.itau.domain.ItauOperation;
 import br.com.includelabs.inpay.itau.domain.ItauProduct;
 import br.com.includelabs.inpay.itau.domain.ItauReply;
 import br.com.includelabs.inpay.itau.domain.ItauRequestPlan;
 import br.com.includelabs.inpay.itau.domain.port.ItauBankPort;
-import br.com.includelabs.inpay.contracts.MockIntentClient;
 import java.util.ArrayList;
 import java.util.LinkedHashMap;
 import java.util.List;
