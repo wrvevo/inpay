@@ -42,6 +42,12 @@ public class OnboardingRepository {
         return rows.getFirst();
     }
 
+    public OnboardingCase getByDemo(UUID tenant, UUID demoId) {
+        var rows = jdbc.query("SELECT payload::text FROM onboarding_case WHERE tenant=? AND payload->>'demoId'=?", (rs,n) -> json.readValue(rs.getString(1), OnboardingCase.class), tenant, demoId.toString());
+        if (rows.isEmpty()) throw new ApiErrors.NoSuchResource();
+        return rows.getFirst();
+    }
+
     public void insert(UUID tenant, OnboardingCase item) {
         jdbc.update(
                 "INSERT INTO onboarding_case(tenant,id,payload) VALUES(?,?,?::jsonb)",

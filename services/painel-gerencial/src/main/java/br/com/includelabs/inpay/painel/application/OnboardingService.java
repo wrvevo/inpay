@@ -152,7 +152,7 @@ public class OnboardingService {
             }
         }
         return update(tenant, item.transition(
-                approve ? "CADASTRAL_SANDBOX_APPROVED" : "DRAFT", "", actor,
+                approve ? "CADASTRAL_SANDBOX_APPROVED" : "DRAFT", approve ? item.submittedBy() : "", actor,
                 approve ? item.partners() : Map.of(), "", null, Map.of()), actor,
                 approve ? "SANDBOX_CADASTRAL_APPROVED" : "RETURNED_TO_DRAFT");
     }
@@ -192,10 +192,10 @@ public class OnboardingService {
     }
 
     public Map<String, Object> demo(UUID tenant, UUID demoId) {
-        var item = repo.list(tenant).stream()
-                .filter(row -> demoId.equals(row.demoId()))
-                .filter(row -> Set.of("SANDBOX_READY", "TECHNICAL_REVIEW", "SANDBOX_APPROVED").contains(row.state()))
-                .findFirst().orElseThrow(() -> new IllegalArgumentException("Demo unavailable"));
+        var item = repo.getByDemo(tenant, demoId);
+        if (!Set.of("SANDBOX_READY", "TECHNICAL_REVIEW", "SANDBOX_APPROVED").contains(item.state())) {
+            throw new IllegalArgumentException("Demo unavailable");
+        }
         requireDocuments(tenant, item.id(), true);
         return Map.of("demoId", demoId, "storeId", item.storeId(), "bindings", item.bindings(),
                 "mode", "SYNTHETIC", "productionEnabled", false);
