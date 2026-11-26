@@ -82,6 +82,11 @@ def main():
             status, _ = request(f"http://127.0.0.1:{port}/internal/v1/bank/operations/PIX_COB_GET", "POST", b"{}", headers)
             assert status == 503, (bank, status)
             headers["X-Mock"] = "true"
+            headers["Idempotency-Key"] = str(uuid.uuid4())
+            status, body = request(
+                f"http://127.0.0.1:8084/gateway/v1/bank-operations/{bank}/PIX_COB_GET",
+                "POST", b"{}", headers)
+            assert status == 200 and body["mocked"] is True and body["status"] == 200, (bank, status)
         for partner, port in (("clearsale", 8128), ("serasa-experian", 8129)):
             url = f"http://127.0.0.1:{port}/internal/v1/assessments"
             probes = ({}, {"vpnOrProxy": True}, {"knownCompromised": True}) if partner == "clearsale" else ({}, {"addressMismatch": True}, {"documentInconsistent": True})
