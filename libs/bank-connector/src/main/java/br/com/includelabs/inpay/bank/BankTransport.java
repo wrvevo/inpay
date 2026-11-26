@@ -85,8 +85,7 @@ public final class BankTransport {
         }
         var future = client.sendAsync(request.build(), HttpResponse.BodyHandlers.ofByteArray());
         try {
-            HttpResponse<byte[]> response =
-                    future.get(budget.toMillis(), TimeUnit.MILLISECONDS);
+            HttpResponse<byte[]> response = future.get(budget.toMillis(), TimeUnit.MILLISECONDS);
             boolean transientFailure =
                     response.statusCode() == 408
                             || response.statusCode() == 429
