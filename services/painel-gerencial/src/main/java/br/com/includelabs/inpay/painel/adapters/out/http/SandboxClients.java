@@ -67,7 +67,7 @@ public class SandboxClients {
         if (!"SANDBOX_CONFIGURED".equals(reply.path("status").asText())
                 || reply.path("productionEnabled").asBoolean(true)
                 || !item.storeId().toString().equals(reply.path("storeId").asText())
-                || !json.valueToTree(item.bindings()).equals(reply.path("bindings"))
+                || !json.readTree(json.writeValueAsString(item.bindings())).equals(reply.path("bindings"))
                 || reply.path("id").asText().isBlank()) {
             throw new IllegalStateException("Accounts receipt not confirmed");
         }

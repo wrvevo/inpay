@@ -5,6 +5,9 @@ export LOCAL_PASSWORD=ci-local-only-change-me
 export STORE_ADMIN_PASSWORD=ci-store-only-change-me
 export DEMO_CONNECTOR_AUTHORIZATION="Basic $(printf 'inpay:%s' "$LOCAL_PASSWORD" | base64 -w0)"
 export COMPOSE_PARALLEL_LIMIT=2
+export INPAY_DOCUMENT_KEY=$(openssl rand -base64 32)
+echo "::add-mask::$INPAY_DOCUMENT_KEY"
+export INPAY_DOCUMENT_KEY_ID=ci INPAY_DOCUMENT_RETENTION_DAYS=30 INPAY_DOCUMENT_SYNTHETIC_FIXTURE=true
 export C6_ENABLED=false ITAU_ENABLED=false SANTANDER_ENABLED=false BANK_ENABLED=false
 export CIELO_ENABLED=false REDE_ENABLED=false GETNET_ENABLED=false STONE_ENABLED=false BIN_ENABLED=false GLOBAL_PAYMENTS_ENABLED=false PAGBANK_ENABLED=false SAFRAPAY_ENABLED=false
 export CLEARSALE_ENABLED=false SERASA_ENABLED=false SERASA_EXPERIAN_ENABLED=false
@@ -50,3 +53,10 @@ python3 scripts/verify-wiremock-intents.py --cards --card-start 4 --card-end 8
 wait_http http://127.0.0.1:8099/
 wait_http http://127.0.0.1:3080/healthz
 python3 scripts/docker-store-e2e.py
+# Real HTTP orchestration with synthetic files and independent reviewers.
+"${C[@]}" stop marketplace-service credits-service billing-service
+"${C[@]}" up -d --no-build --wait --wait-timeout 240 connector-c6 connector-itau connector-clearsale connector-serasa-experian connector-cielo
+python3 scripts/docker-onboarding-e2e.py create
+"${C[@]}" restart painel-gerencial
+wait_http http://127.0.0.1:8130/actuator/health
+python3 scripts/docker-onboarding-e2e.py verify
