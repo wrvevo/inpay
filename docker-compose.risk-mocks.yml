@@ -21,3 +21,51 @@ services:
       INPAY_BANK_GATEWAY_URLS_CAIXA: http://connector-caixa:8116
       INPAY_BANK_GATEWAY_URLS_BANRISUL: http://connector-banrisul:8117
       INPAY_BANK_GATEWAY_PASSWORD: ${LOCAL_PASSWORD:-inpay@123}
+  connector-cielo:
+    environment:
+      INPAY_INTENT_MOCK_URL: http://bank-mock-server:8099
+    depends_on:
+      bank-mock-server:
+        condition: service_started
+  connector-rede:
+    environment:
+      INPAY_INTENT_MOCK_URL: http://bank-mock-server:8099
+    depends_on:
+      bank-mock-server:
+        condition: service_started
+  connector-getnet:
+    environment:
+      INPAY_INTENT_MOCK_URL: http://bank-mock-server:8099
+    depends_on:
+      bank-mock-server:
+        condition: service_started
+  connector-stone:
+    environment:
+      INPAY_INTENT_MOCK_URL: http://bank-mock-server:8099
+    depends_on:
+      bank-mock-server:
+        condition: service_started
+  connector-bin:
+    environment:
+      INPAY_INTENT_MOCK_URL: http://bank-mock-server:8099
+    depends_on:
+      bank-mock-server:
+        condition: service_started
+  connector-global-payments:
+    environment:
+      INPAY_INTENT_MOCK_URL: http://bank-mock-server:8099
+    depends_on:
+      bank-mock-server:
+        condition: service_started
+  connector-pagbank:
+    environment:
+      INPAY_INTENT_MOCK_URL: http://bank-mock-server:8099
+    depends_on:
+      bank-mock-server:
+        condition: service_started
+  connector-safrapay:
+    environment:
+      INPAY_INTENT_MOCK_URL: http://bank-mock-server:8099
+    depends_on:
+      bank-mock-server:
+        condition: service_started

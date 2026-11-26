@@ -15,6 +15,7 @@ BANK = ROOT / "libs/bank-connector/src/main"
 PACKAGE = "br/com/includelabs/inpay"
 BANKS = ("c6", "itau", "santander", "bb", "bradesco", "caixa", "banrisul")
 PARTNERS = ("clearsale", "serasa-experian")
+CARD_PROVIDERS = ("cielo", "rede", "getnet", "stone", "bin", "global-payments", "pagbank", "safrapay")
 RISK = ("ASSESSMENT_ACCEPT", "ASSESSMENT_REVIEW", "ASSESSMENT_REJECT",
         "CUSTOMER_REVIEW", "DOCUMENT_PENDING", "PROVIDER_UNAVAILABLE")
 
@@ -53,6 +54,18 @@ def main():
     for partner in PARTNERS:
         for intent in RISK:
             assert f"/intents/{partner}/{intent}" in intents
+    card_source = ROOT / f"libs/connector-runtime/src/main/java/{PACKAGE}/connector/domain/ProviderOperation.java"
+    card_ops = re.findall(r"^\s+([A-Z][A-Z0-9_]+)[,;]?\s*$", card_source.read_text(), re.M)
+    assert card_ops
+    for provider in CARD_PROVIDERS:
+        for operation in card_ops:
+            route = f"/intents/{provider}/{operation}"
+            assert route in intents and intents[route]["response"]["jsonBody"]["productionApproved"] is False
+    cielo_source = ROOT / f"services/connector-cielo/src/main/java/{PACKAGE}/cielo/domain/CieloOperation.java"
+    cielo_ops = re.findall(r"^\s+([A-Z][A-Z0-9_]+)[,;]", cielo_source.read_text(), re.M)
+    assert cielo_ops
+    for operation in cielo_ops:
+        assert f"/intents/cielo/{operation}" in intents
     bank_source = (BANK / f"java/{PACKAGE}/bank/BankOperation.java").read_text()
     operations = re.findall(r'^\s+([A-Z][A-Z0-9_]+)\("([A-Z]+)", "([^"]+)",', bank_source, re.M)
     assert operations
@@ -95,6 +108,7 @@ def main():
                 assert status == 200 and body["decision"] == decision and body["mock"] is True, (partner, decision, status)
                 assert body["policyVersion"].endswith("-wiremock-v1"), partner
     print(f"Catalog: {len(operations) * len(BANKS)} legacy bank mappings; {sum(map(len, native.values()))} native bank intents; {len(PARTNERS) * len(RISK)} partner intents.")
+    print(f"Card provider intents: {len(card_ops) * len(CARD_PROVIDERS)} common and {len(cielo_ops)} Cielo collection.")
     print("Runtime checks passed." if args.running else "Static coverage only; no integration test executed.")
 
 
