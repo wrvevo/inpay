@@ -58,12 +58,15 @@ test("starting homologation opens the gateway and approval creates the demo stor
         cielo: { merchantId: "cielo-lab", baseUrl: "https://apisandbox.cieloecommerce.cielo.com.br" },
       },
       antifraud: "INPAY_RISK",
+      documents: { company: true, representative: true, address: true, bank: true },
     },
     "PDV",
   );
   submitCase(created.id, "PDV");
+  assert.throws(() => saveCase({ ...created, status: "APROVADA" }, "PDV"));
   const approved = decideCase(created.id, "ADMIN", true);
   assert.equal(approved.status, "APROVADA");
+  assert.equal(approved.accountsPrepared, false);
   assert.equal(approved.demo.name, "Agência Demo · Demo");
   assert.equal(approved.demo.connectors.credit_card, "cielo");
   assert.equal(approved.demo.connectorSettings.cielo.merchantId, "cielo-lab");
