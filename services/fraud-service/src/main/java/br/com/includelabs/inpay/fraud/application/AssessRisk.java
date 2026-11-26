@@ -6,6 +6,7 @@ import br.com.includelabs.inpay.fraud.domain.InPayRiskEngine;
 import br.com.includelabs.inpay.fraud.domain.RiskPolicy;
 import br.com.includelabs.inpay.fraud.domain.RiskSignals;
 import br.com.includelabs.inpay.fraud.domain.port.AssessmentStore;
+import br.com.includelabs.inpay.fraud.domain.port.ExternalRiskPort;
 import br.com.includelabs.inpay.fraud.domain.port.FraudModeSource;
 import br.com.includelabs.inpay.fraud.domain.port.LearningStore;
 import java.util.UUID;
@@ -16,16 +17,19 @@ public final class AssessRisk {
     private final AssessmentStore assessmentStore;
     private final LearningStore learningStore;
     private final FraudModeSource modes;
+    private final ExternalRiskPort external;
 
     public AssessRisk(
             InPayRiskEngine engine,
             AssessmentStore assessmentStore,
             LearningStore learningStore,
-            FraudModeSource modes) {
+            FraudModeSource modes,
+            ExternalRiskPort external) {
         this.engine = engine;
         this.assessmentStore = assessmentStore;
         this.learningStore = learningStore;
         this.modes = modes;
+        this.external = external;
     }
 
     public record Result(UUID assessmentId, RiskPolicy.Assessment assessment) {}
@@ -66,27 +70,19 @@ public final class AssessRisk {
                 signals, behavior, device, identity, counts.confirmed(), counts.legitimate());
     }
 
-    private static RiskPolicy.Assessment externalAssessment(
+    private RiskPolicy.Assessment externalAssessment(
             String mode,
             RiskPolicy.Signals signals,
             RiskSignals.Device device,
             RiskSignals.Identity identity) {
-        AntifraudStubs.Verdict verdict =
-                AntifraudStubs.evaluate(
-                        mode,
-                        new AntifraudStubs.Probe(
-                                signals.knownCompromised(),
-                                device != null && device.vpnOrProxy(),
-                                signals.declinesLastHour(),
-                                identity != null && identity.cpfStatus().equals("INVALID"),
-                                identity != null && identity.disposableEmail(),
-                                identity != null && !identity.deliveryMatchesBilling()));
-        return new RiskPolicy.Assessment(
-                verdict.score(),
-                RiskPolicy.Decision.valueOf(verdict.decision()),
-                verdict.policyVersion(),
-                verdict.reasons(),
+        return external.evaluate(
                 mode,
-                0);
+                new AntifraudStubs.Probe(
+                        signals.knownCompromised(),
+                        device != null && device.vpnOrProxy(),
+                        signals.declinesLastHour(),
+                        identity != null && identity.cpfStatus().equals("INVALID"),
+                        identity != null && identity.disposableEmail(),
+                        identity != null && !identity.deliveryMatchesBilling()));
     }
 }

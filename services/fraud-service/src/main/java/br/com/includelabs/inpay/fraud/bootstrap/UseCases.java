@@ -1,11 +1,14 @@
 package br.com.includelabs.inpay.fraud.bootstrap;
 
+import br.com.includelabs.inpay.fraud.adapters.out.http.LocalPartnerRiskAdapter;
 import br.com.includelabs.inpay.fraud.application.AssessRisk;
 import br.com.includelabs.inpay.fraud.domain.InPayRiskEngine;
 import br.com.includelabs.inpay.fraud.domain.RiskPolicy;
 import br.com.includelabs.inpay.fraud.domain.port.AssessmentStore;
+import br.com.includelabs.inpay.fraud.domain.port.ExternalRiskPort;
 import br.com.includelabs.inpay.fraud.domain.port.FraudModeSource;
 import br.com.includelabs.inpay.fraud.domain.port.LearningStore;
+import org.springframework.beans.factory.ObjectProvider;
 import org.springframework.context.annotation.*;
 
 /**
@@ -22,7 +25,17 @@ public class UseCases {
      *     sucesso
      */
     @Bean
-    AssessRisk assessRisk(AssessmentStore store, LearningStore learning, FraudModeSource modes) {
-        return new AssessRisk(new InPayRiskEngine(new RiskPolicy()), store, learning, modes);
+    AssessRisk assessRisk(
+            AssessmentStore store,
+            LearningStore learning,
+            FraudModeSource modes,
+            ObjectProvider<ExternalRiskPort> partners) {
+        return new AssessRisk(
+                new InPayRiskEngine(new RiskPolicy()),
+                store,
+                learning,
+                modes,
+                partners.getIfAvailable(
+                        () -> (mode, probe) -> LocalPartnerRiskAdapter.unavailable(mode)));
     }
 }

@@ -69,3 +69,12 @@ services:
     depends_on:
       bank-mock-server:
         condition: service_started
+  fraud-service:
+    environment:
+      INPAY_CLEARSALE_MOCK_URL: http://connector-clearsale:8128
+      INPAY_SERASA_MOCK_URL: http://connector-serasa-experian:8129
+    depends_on:
+      connector-clearsale:
+        condition: service_started
+      connector-serasa-experian:
+        condition: service_started
