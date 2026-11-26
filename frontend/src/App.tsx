@@ -41,6 +41,7 @@ import { Developers, Settings } from "./pages/Settings";
 import { Login } from "./pages/Login";
 import { RiskDesk, ProviderSetup } from "./pages/GatewayAdmin";
 import { TeamAccess } from "./pages/TeamAccess";
+import ConnectedHomologation from "./pages/ConnectedHomologation";
 import { HomologationApp, Profile } from "./pages/Homologation";
 import { Modal } from "./components/UI";
 import type { Session } from "./api";
@@ -218,6 +219,7 @@ export default function App() {
     );
   if (!user) return <Login onLogin={enter} />;
   if (user.realm === "HOMOLOGATION") {
+    if (user.token) return <ConnectedHomologation user={user} onLogout={logout} />;
     return (
       <HomologationApp
         user={user}

@@ -14,7 +14,11 @@ jobs:
           java-version: '21'
           cache: maven
       - run: python3 scripts/verify-wiremock-intents.py
-      - run: mvn -B spotless:check verify
+      - name: Check formatting (report all changes)
+        run: mvn -B spotless:apply && git diff --exit-code --no-color
+      - name: Verify Java modules
+        if: always()
+        run: mvn -B spotless:check verify
 
   frontend:
     runs-on: ubuntu-24.04

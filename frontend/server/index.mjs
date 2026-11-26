@@ -57,6 +57,11 @@ export function createPanelServer(env = process.env, fetchUpstream = fetch) {
           return json(response, 400, { error: "Unexpected query" });
         const target = resolveRoute(request.method, url.pathname, env);
         if (!target) return json(response, 404, { error: "Route unavailable" });
+        const onboarding = url.pathname.startsWith("/api/painel/homologation/v2/");
+        if (onboarding && !request.headers.authorization?.startsWith("Bearer "))
+          return json(response, 401, { error: "Named operator required" });
+        const documentUpload = onboarding && /\/cases\/[0-9a-f-]+\/documents$/.test(url.pathname);
+        const documentDownload = onboarding && /\/documents\/[0-9a-f-]+\/download$/.test(url.pathname);
         let authorization = upstreamAuthorization(request.headers, env);
         // Fixed fixture identity for the LOCAL customer portal only. JWTs are never replaced.
         if (
@@ -78,10 +83,10 @@ export function createPanelServer(env = process.env, fetchUpstream = fetch) {
         )
           return json(response, 400, { error: "Invalid tenant" });
         let body;
-        if (request.method === "POST") {
+        if (["POST", "PUT"].includes(request.method)) {
           if (!request.headers["content-type"]?.startsWith("application/json"))
             return json(response, 415, { error: "JSON required" });
-          body = await readBounded(request, 32768);
+          body = await readBounded(request, documentUpload ? 3 * 1024 * 1024 : 32768);
           try {
             JSON.parse(body.toString());
           } catch {
@@ -92,7 +97,7 @@ export function createPanelServer(env = process.env, fetchUpstream = fetch) {
           method: request.method,
           body,
           redirect: "error",
-          signal: AbortSignal.timeout(12000),
+          signal: AbortSignal.timeout(onboarding ? 90000 : 12000),
           headers: {
             Authorization: authorization,
             "Content-Type": "application/json",
@@ -110,7 +115,7 @@ export function createPanelServer(env = process.env, fetchUpstream = fetch) {
           });
         }
         const bytes = upstream.body
-          ? await readBounded(upstream.body, 1048576)
+          ? await readBounded(upstream.body, documentDownload ? 3 * 1024 * 1024 : 1048576)
           : Buffer.alloc(0);
         const data = bytes.length ? JSON.parse(bytes.toString()) : {};
         return json(response, upstream.status, data);
