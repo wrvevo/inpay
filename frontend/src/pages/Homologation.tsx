@@ -171,10 +171,12 @@ export function HomologationApp({
       group: "JORNADA DA LOJA",
       items: [
         ["cadastro", "Cadastro do CNPJ", Building2],
+        ["documentos", "Documentos e privacidade", ClipboardCheck],
         ["antifraude", "Antifraude", ShieldCheck],
-        ["meios", "Meios e adquirentes", CreditCard],
-        ["revisao", "Enviar jornada", ClipboardCheck],
-        ["demo", "Loja demo", Store],
+        ["meios", "Accounts · meios e adquirentes", CreditCard],
+        ["revisao", "Revisão cadastral", ClipboardCheck],
+        ["demo", "Loja demo e testes", Store],
+        ["ativacao", "Ativação da loja", ShieldCheck],
       ],
     },
     ...(user.role === "ADMIN"
@@ -264,6 +266,12 @@ export function HomologationApp({
         }}
       />
     );
+  } else if (page === "adquirentes") {
+    content = <AcquirerDesk />;
+  } else if (page === "equipe") {
+    content = <TeamDesk user={user} onChange={() => refresh()} />;
+  } else if (page === "perfil") {
+    content = <Profile user={user} onUser={onUser} />;
   } else if (!current) {
     content = (
       <section className="card">
@@ -272,15 +280,19 @@ export function HomologationApp({
       </section>
     );
   } else if (page === "cadastro") {
-    content = <CompanyScreen current={current} canEdit={canEdit} onSave={(patch) => save(patch, "Cadastro atualizado com a consulta.")} />;
+    content = <CompanyScreen current={current} canEdit={canEdit && !current.journeySubmitted} onSave={(patch) => save(patch, "Cadastro atualizado com a consulta.")} />;
+  } else if (page === "documentos") {
+    content = <DocumentChecklist key={current.id} current={current} canEdit={canEdit && !current.journeySubmitted} onSave={(documents) => save({ documents })} />;
+  } else if (page === "ativacao") {
+    content = <ActivationScreen current={current} />;
   } else if (page === "antifraude") {
-    content = <AntifraudScreen key={current.id} current={current} canEdit={canEdit} onSave={(antifraud) => save({ antifraud })} />;
+    content = <AntifraudScreen key={current.id} current={current} canEdit={canEdit && !current.journeySubmitted} onSave={(antifraud) => save({ antifraud })} />;
   } else if (page === "meios") {
     content = (
       <RoutesScreen
         key={current.id}
         current={current}
-        canEdit={canEdit}
+        canEdit={canEdit && !current.journeySubmitted}
         onSave={(payments, connectors, connectorSettings) => save({ payments, connectors, connectorSettings })}
       />
     );
@@ -294,19 +306,15 @@ export function HomologationApp({
         onDecide={(approve) =>
           run(
             () => decideCase(current.id, user.role, approve),
-            approve ? "Homologação aprovada. A loja demo foi criada com esta configuração." : "Jornada recusada. A loja continua no gateway em homologação.",
+            approve ? "Revisão de laboratório aprovada. Configuração demo registrada; ativação real permanece bloqueada." : "Jornada recusada. A loja continua no gateway em homologação.",
           )
         }
       />
     );
   } else if (page === "demo") {
     content = <DemoScreen current={current} />;
-  } else if (page === "adquirentes") {
-    content = <AcquirerDesk />;
-  } else if (page === "equipe") {
-    content = <TeamDesk user={user} onChange={() => refresh()} />;
   } else {
-    content = <Profile user={user} onUser={onUser} />;
+    content = <Notice>Selecione uma etapa da homologação.</Notice>;
   }
 
   const dock = [
@@ -768,6 +776,7 @@ function ReviewScreen({
   onSubmit: () => void;
   onDecide: (approve: boolean) => void;
 }) {
+  const documentsReady = ["company", "representative", "address", "bank"].every((key) => current.documents?.[key] === true);
   const missing = (current.payments || []).filter((method: string) => !current.connectors?.[method]);
   return (
     <>
@@ -787,15 +796,16 @@ function ReviewScreen({
             </li>
           ))}
         </ul>
+        {!documentsReady && <Notice>Checklist documental de laboratório incompleto.</Notice>}
         {missing.length > 0 && <Notice>Falta o adquirente de {missing.join(", ")}.</Notice>}
         {!current.payments?.length && <Notice>Nenhum meio de pagamento foi escolhido.</Notice>}
         <div className="actions">
           {canEdit && current.status !== "APROVADA" && (
-            <button className="primary" onClick={onSubmit}>Enviar jornada para aprovação</button>
+            <button className="primary" disabled={!documentsReady || current.journeySubmitted} onClick={onSubmit}>Enviar jornada para aprovação</button>
           )}
           {canDecide && current.journeySubmitted && current.status === "EM_HOMOLOGACAO" && (
             <>
-              <button className="primary" onClick={() => onDecide(true)}>Aprovar e criar loja demo</button>
+              <button className="primary" disabled={!documentsReady} onClick={() => onDecide(true)}>Aprovar configuração demo</button>
               <button onClick={() => onDecide(false)}>Recusar jornada</button>
             </>
           )}
@@ -806,6 +816,35 @@ function ReviewScreen({
       </section>
     </>
   );
+}
+
+function DocumentChecklist({ current, canEdit, onSave }: { current: any; canEdit: boolean; onSave: (documents: Record<string, boolean>) => void }) {
+  const [checks, setChecks] = useState<Record<string, boolean>>(current.documents || {});
+  const labels = [["company", "Contrato social / registro empresarial"], ["representative", "Identificação e poderes do representante"], ["address", "Comprovante de endereço"], ["bank", "Titularidade da conta de liquidação"]];
+  return <>
+    <Heading title="Documentos e privacidade" subtitle="Checklist de documentação fictícia para o laboratório." />
+    <Notice>Não envie documentos reais ou dados pessoais. O armazenamento seguro, análise documental e controle de retenção ainda precisam de API autenticada. O checklist não constitui verificação de identidade nem conformidade LGPD.</Notice>
+    <section className="card form">
+      {labels.map(([id, label]) => <label key={id}><input type="checkbox" checked={Boolean(checks[id])} disabled={!canEdit} onChange={(event) => setChecks({ ...checks, [id]: event.target.checked })} /> {label}</label>)}
+      {canEdit && <button className="primary" onClick={() => onSave(checks)}>Salvar checklist fictício</button>}
+    </section>
+  </>;
+}
+
+function ActivationScreen({ current }: { current: any }) {
+  return <>
+    <Heading title="Ativação da loja" subtitle={current.storeName} />
+    <section className="card">
+      <dl className="dossier">
+        <div><dt>Revisão de laboratório</dt><dd>{STATUS[current.status] || current.status}</dd></div>
+        <div><dt>Accounts</dt><dd>Provisionamento real não confirmado</dd></div>
+        <div><dt>Loja demo</dt><dd>{current.demo ? "Configuração simulada registrada" : "Aguardando revisão"}</dd></div>
+        <div><dt>Testes de integração</dt><dd>Sem evidência vinculada à loja</dd></div>
+        <div><dt>Produção</dt><dd>Bloqueada</dd></div>
+      </dl>
+      <Notice>A ativação requer aprovação documental real, configuração persistida no Accounts, evidência de testes e autorização de produção. Nenhum destes estados é confirmado por uma simulação.</Notice>
+    </section>
+  </>;
 }
 
 function DemoScreen({ current }: { current: any }) {
@@ -843,7 +882,7 @@ function DemoScreen({ current }: { current: any }) {
             );
           })}
         </ul>
-        <Notice>Use esta loja para simular a integração. Nenhuma credencial de adquirente foi gravada aqui.</Notice>
+        <Notice>Esta é uma configuração em memória, não uma instância provisionada. O laboratório InPlay Games existente não recebe automaticamente esta configuração. Nenhuma credencial real deve ser gravada aqui.</Notice>
       </section>
     </>
   );
