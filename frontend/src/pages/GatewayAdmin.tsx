@@ -2,9 +2,10 @@ import { useState } from "react";
 import { Heading, Notice } from "../components/UI";
 
 const riskDefaults = { review: 40, reject: 70, mode: "INPAY_RISK" };
-const providerDefaults = {
-  clearsale: { enabled: false, mock: true, sellerCode: "loja-lab" },
-  serasa: { enabled: false, mock: true, contractCode: "contrato-lab" },
+type ProviderConfig = { enabled: boolean; mock: boolean; code: string };
+const providerDefaults: Record<"clearsale" | "serasa", ProviderConfig> = {
+  clearsale: { enabled: false, mock: true, code: "loja-lab" },
+  serasa: { enabled: false, mock: true, code: "contrato-lab" },
 };
 
 export function RiskDesk() {
@@ -73,8 +74,7 @@ export function ProviderSetup({ provider }: { provider: "clearsale" | "serasa" }
             setSaved({
               enabled: form.get("enabled") === "on",
               mock: true,
-              sellerCode: String(form.get("code") || ""),
-              contractCode: String(form.get("code") || ""),
+              code: String(form.get("code") || ""),
             });
           }}
         >
@@ -84,7 +84,7 @@ export function ProviderSetup({ provider }: { provider: "clearsale" | "serasa" }
           </label>
           <label>
             {provider === "clearsale" ? "Código do estabelecimento" : "Código do contrato"}
-            <input name="code" required defaultValue={provider === "clearsale" ? saved.sellerCode : saved.contractCode} />
+            <input name="code" required defaultValue={saved.code} />
           </label>
           <p>X-Mock permanece ligado. A chamada real continua desabilitada.</p>
           {saved.enabled && <Notice>Configuração salva neste navegador para a sessão de laboratório.</Notice>}
