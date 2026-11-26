@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
 set -euo pipefail
-# Isolated synthetic-only stack. Do not run against a production project.
+# Ambiente isolado com dados sintéticos. Não executar contra produção.
 export LOCAL_PASSWORD=ci-local-only-change-me
 export STORE_ADMIN_PASSWORD=ci-store-only-change-me
 export DEMO_CONNECTOR_AUTHORIZATION="Basic $(printf 'inpay:%s' "$LOCAL_PASSWORD" | base64 -w0)"
@@ -16,6 +16,7 @@ banks=(connector-c6 connector-itau connector-santander connector-bb connector-br
 cards=(connector-cielo connector-rede connector-getnet connector-stone connector-bin connector-global-payments connector-pagbank connector-safrapay)
 risk=(connector-clearsale connector-serasa-experian)
 mkdir -p test-results
+# Preserva evidências e remove apenas os recursos do projeto Docker isolado.
 cleanup() {
   local code=$?
   trap - EXIT
@@ -23,6 +24,7 @@ cleanup() {
   "${C[@]}" logs --no-color --tail=150 > test-results/compose.log || true
   if [ "$code" -ne 0 ]; then
     cat test-results/compose-ps.txt
+    "${C[@]}" logs --no-color --tail=100 payment-core-service connector-c6 connector-itau connector-santander painel-gerencial game-store || true
     tail -n 150 test-results/compose.log
   fi
   "${C[@]}" down -v --remove-orphans || true
@@ -30,8 +32,9 @@ cleanup() {
 }
 trap cleanup EXIT
 "${C[@]}" config --quiet
-# Build once per image and use the shared Maven build layer. Split execution to bound memory.
+# Reutiliza a camada Maven entre imagens e divide a execução para limitar memória.
 "${C[@]}" build bank-mock-server payment-core-service "${banks[@]}" "${risk[@]}" fraud-service game-store connector-simulator "${cards[@]}" accounts-service marketplace-service credits-service billing-service painel-gerencial inpay-panel
+# Aguarda o endpoint responder com sucesso antes de iniciar a próxima etapa.
 wait_http() {
   local url="$1"
   for ((i=0;i<120;i++)); do
@@ -46,7 +49,7 @@ wait_http http://127.0.0.1:8199/__admin/mappings
 for p in {8131..8137} 8128 8129; do wait_http "http://127.0.0.1:$p/actuator/health"; done
 python3 scripts/verify-wiremock-intents.py --running
 "${C[@]}" stop "${banks[@]}" "${risk[@]}"
-# Four card services at a time; all receive the central WireMock endpoint.
+# Inicia quatro adquirentes por vez, todos com o WireMock central.
 "${C[@]}" up -d --no-build --wait --wait-timeout 240 "${cards[@]:0:4}"
 python3 scripts/verify-wiremock-intents.py --cards --card-start 0 --card-end 4
 "${C[@]}" stop "${cards[@]:0:4}"
@@ -57,7 +60,7 @@ python3 scripts/verify-wiremock-intents.py --cards --card-start 4 --card-end 8
 wait_http http://127.0.0.1:8099/
 wait_http http://127.0.0.1:3080/healthz
 python3 scripts/docker-store-e2e.py
-# Real HTTP orchestration with synthetic files and independent reviewers.
+# Valida a orquestração HTTP com documentos sintéticos e revisores independentes.
 "${C[@]}" stop marketplace-service credits-service billing-service
 "${C[@]}" up -d --no-build --wait --wait-timeout 240 connector-c6 connector-itau connector-clearsale connector-serasa-experian connector-cielo
 python3 scripts/docker-onboarding-e2e.py create

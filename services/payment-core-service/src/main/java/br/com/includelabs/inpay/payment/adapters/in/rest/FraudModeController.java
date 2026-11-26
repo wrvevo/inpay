@@ -41,6 +41,7 @@ public class FraudModeController {
         this.password = password;
     }
 
+    /** Consulta o modo antifraude ativo no Gateway. */
     @GetMapping
     @PreAuthorize("hasAuthority('SCOPE_payments/read')")
     @Operation(
@@ -52,6 +53,7 @@ public class FraudModeController {
         return body(holder.current(), false);
     }
 
+    /** Altera o modo e informa se a sincronização com o serviço de risco ocorreu. */
     @PutMapping
     @PreAuthorize("hasAuthority('SCOPE_payments/create')")
     @Operation(
@@ -62,10 +64,12 @@ public class FraudModeController {
         return body(mode, sync(mode));
     }
 
+    /** Monta o contrato de resposta sem expor credenciais. */
     private Map<String, Object> body(String mode, boolean synced) {
         return Map.of("mode", mode, "providers", FraudMode.all(), "syncedWithFraudService", synced);
     }
 
+    /** Replica o modo selecionado no serviço de risco e sinaliza indisponibilidade. */
     private boolean sync(String mode) {
         if (password.isBlank() || fraudUrl.isBlank()) {
             return false;

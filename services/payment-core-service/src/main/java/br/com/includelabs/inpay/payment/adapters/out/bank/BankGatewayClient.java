@@ -23,6 +23,7 @@ public class BankGatewayClient {
 
     private final BankGatewaySettings settings;
     private final HttpClient client;
+    private final HttpClient mockClient;
     private final ObjectMapper mapper = new ObjectMapper();
 
     /** Configura o transporte e os endereços dos conectores bancários. */
@@ -40,6 +41,11 @@ public class BankGatewayClient {
     private BankGatewayClient(BankGatewaySettings settings, HttpClient client) {
         this.settings = settings;
         this.client = client;
+        this.mockClient =
+                HttpClient.newBuilder()
+                        .connectTimeout(MOCK_BUDGET)
+                        .followRedirects(HttpClient.Redirect.NEVER)
+                        .build();
     }
 
     /** Encaminha a operação ao banco com o orçamento de tempo definido. */
@@ -50,8 +56,9 @@ public class BankGatewayClient {
             String operationId,
             Map<String, Object> payload) {
         String base = settings.url(bank);
-        Duration budget =
-                "true".equalsIgnoreCase(mock == null ? "" : mock.trim()) ? MOCK_BUDGET : BUDGET;
+        boolean simulated = "true".equalsIgnoreCase(mock == null ? "" : mock.trim());
+        Duration budget = simulated ? MOCK_BUDGET : BUDGET;
+        HttpClient transport = simulated ? mockClient : client;
         LOG.info(
                 "Gateway bank dispatch started bank={} operation={} mock={} ",
                 bank,
@@ -81,9 +88,18 @@ public class BankGatewayClient {
                 request.header("X-Mock", mock.trim());
             }
             request.POST(HttpRequest.BodyPublishers.ofString(body, StandardCharsets.UTF_8));
-            var future = client.sendAsync(request.build(), HttpResponse.BodyHandlers.ofString());
-            HttpResponse<String> response =
-                    future.get(budget.toMillis(), java.util.concurrent.TimeUnit.MILLISECONDS);
+            var future = transport.sendAsync(request.build(), HttpResponse.BodyHandlers.ofString());
+            HttpResponse<String> response;
+            try {
+                response = future.get(budget.toMillis(), java.util.concurrent.TimeUnit.MILLISECONDS);
+            } catch (InterruptedException exception) {
+                future.cancel(true);
+                Thread.currentThread().interrupt();
+                throw exception;
+            } catch (Exception exception) {
+                future.cancel(true);
+                throw exception;
+            }
             LOG.info(
                     "Gateway bank dispatch finished bank={} operation={} status={}",
                     bank,

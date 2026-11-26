@@ -26,6 +26,7 @@ public final class BankTransport {
     private final BankCircuit mockCircuit;
     private final Duration mockBudget;
     private final HttpClient client;
+    private final HttpClient mockClient;
     private final ObjectMapper mapper;
     private final MeterRegistry meters;
 
@@ -47,6 +48,11 @@ public final class BankTransport {
         this.client =
                 HttpClient.newBuilder()
                         .connectTimeout(MAX_BUDGET)
+                        .followRedirects(HttpClient.Redirect.NEVER)
+                        .build();
+        this.mockClient =
+                HttpClient.newBuilder()
+                        .connectTimeout(mockBudget)
                         .followRedirects(HttpClient.Redirect.NEVER)
                         .build();
         this.mapper = new ObjectMapper();
@@ -87,7 +93,8 @@ public final class BankTransport {
                     operation.method(),
                     HttpRequest.BodyPublishers.ofString(body, StandardCharsets.UTF_8));
         }
-        var future = client.sendAsync(request.build(), HttpResponse.BodyHandlers.ofByteArray());
+        HttpClient transport = mocked ? mockClient : client;
+        var future = transport.sendAsync(request.build(), HttpResponse.BodyHandlers.ofByteArray());
         try {
             HttpResponse<byte[]> response = future.get(budget.toMillis(), TimeUnit.MILLISECONDS);
             boolean transientFailure =

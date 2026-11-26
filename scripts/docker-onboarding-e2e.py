@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""Synthetic end-to-end onboarding; all HTTP calls hit the running Docker stack."""
+"""Valida a homologação sintética com chamadas HTTP reais entre os contêineres."""
 import base64
 import json
 import os
@@ -19,6 +19,7 @@ FIXTURE = base64.b64encode(b"%PDF-1.4\n% INPAY-SYNTHETIC-DOCUMENT\n%%EOF\n").dec
 STATE = Path("test-results/onboarding-case.json")
 
 def call(path, token=None, method="GET", body=None, status=200, base=PANEL):
+    """Executa uma chamada autenticada e exige o status esperado pelo cenário."""
     headers = {"Content-Type": "application/json", "X-Merchant-Id": TENANT}
     if token:
         headers["Authorization"] = token
@@ -34,6 +35,7 @@ def call(path, token=None, method="GET", body=None, status=200, base=PANEL):
     return json.loads(data) if data else {}
 
 def login(identity):
+    """Autentica um operador de laboratório e retorna seu token."""
     data = call("/auth/login", method="POST", body={"realm":"HOMOLOGATION",
         "login":identity + "@inpay.local","password":"inpay@123"})
     return "Bearer " + data["token"]
@@ -45,6 +47,7 @@ if sys.argv[1] == "create":
         "legalName":"Empresa de Teste","storeName":"Demo CI","address":"Endereço fictício"})
     path = API+"/cases/"+item["id"]
     def step(name, token, body=None, status=200):
+        """Executa uma transição do processo com o operador selecionado."""
         return call(path+"/"+name,token,"POST",body or {},status)
     bindings = {"pix":"c6","credit_card":"cielo"}
     call(path+"/bindings",admin,"PUT",{"bindings":bindings})
@@ -82,9 +85,11 @@ else:
     assert config["productionEnabled"] is False
     opener=urllib.request.build_opener(urllib.request.HTTPCookieProcessor(CookieJar()))
     def shop(path="/",data=None):
+        """Navega na loja demo preservando a sessão do comprador."""
         req=urllib.request.Request("http://127.0.0.1:8099"+path,data=None if data is None else urllib.parse.urlencode(data).encode())
         return opener.open(req,timeout=30).read().decode()
     def field(page,name):
+        """Extrai um campo oculto do formulário da loja."""
         return re.search(r'name="'+name+r'" value="([^"]+)"',page).group(1)
     page=shop("/?demo="+item["demoId"])
     csrf=field(page,"csrf")

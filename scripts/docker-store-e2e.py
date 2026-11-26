@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""Synthetic checkout, refresh, cancellation, and real HTTP Accounts/Marketplace checks."""
+"""Valida checkout, consulta, cancelamento e APIs dos módulos no ambiente Docker."""
 import base64
 import json
 import os
@@ -10,21 +10,25 @@ from http.cookiejar import CookieJar
 
 STORE = "http://127.0.0.1:8099"
 AUTH = "Basic " + base64.b64encode(("inpay:" + os.environ["LOCAL_PASSWORD"]).encode()).decode()
+CREDITS_AUTH = "Basic " + base64.b64encode(("developer:" + os.environ["LOCAL_PASSWORD"]).encode()).decode()
 TENANT = "11111111-1111-1111-1111-111111111111"
 opener = urllib.request.build_opener(urllib.request.HTTPCookieProcessor(CookieJar()))
 
 def shop(path="/", data=None):
+    """Navega na loja preservando cookies e formulários da sessão."""
     request = urllib.request.Request(STORE + path, data=None if data is None else urllib.parse.urlencode(data).encode())
     with opener.open(request, timeout=30) as response:
         assert response.status == 200
         return response.read().decode()
 
 def field(page, name):
+    """Extrai os campos ocultos usados na proteção CSRF e idempotência."""
     match = re.search(r'name="' + name + r'" value="([^"]+)"', page)
     assert match, name
     return match.group(1)
 
 def order_status(page, key):
+    """Localiza o estado do pedido específico, sem confundir pedidos anteriores."""
     for row in re.findall(r"<tr>.*?</tr>", page, flags=re.S):
         if 'name="order" value="' + key + '"' in row:
             return re.search(r'class="status">([^<]+)</span>', row).group(1)
@@ -46,7 +50,7 @@ for method in ("credit_card", "debit_card", "pix", "boleto", "transfer"):
 for port, path in ((8111, "/accounts/v1/banks"), (8112, "/marketplace/v1/recipients"),
                    (8110, "/credits/v1/admin"), (8130, "/homologation/v1/cases")):
     request = urllib.request.Request(f"http://127.0.0.1:{port}{path}",
-                                     headers={"Authorization": AUTH, "X-Merchant-Id": TENANT})
+                                     headers={"Authorization": CREDITS_AUTH if port == 8110 else AUTH, "X-Merchant-Id": TENANT})
     with urllib.request.urlopen(request, timeout=10) as response:
         assert response.status == 200
         assert isinstance(json.load(response), (dict, list))

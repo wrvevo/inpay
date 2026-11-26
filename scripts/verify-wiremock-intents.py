@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""Check every declared operation has an explicit mapping; optionally exercise local HTTP."""
+"""Valida os mapeamentos declarados e, opcionalmente, as chamadas HTTP locais."""
 import argparse
 import base64
 import json
@@ -21,6 +21,7 @@ RISK = ("ASSESSMENT_ACCEPT", "ASSESSMENT_REVIEW", "ASSESSMENT_REJECT",
 
 
 def request(url, method, body=None, headers=None):
+    """Executa uma requisição e retorna o status e a resposta JSON, inclusive em falhas HTTP."""
     req = urllib.request.Request(url, data=body, method=method, headers=headers or {})
     try:
         with urllib.request.urlopen(req, timeout=5) as response:
@@ -33,6 +34,7 @@ def request(url, method, body=None, headers=None):
 
 
 def main():
+    """Verifica o catálogo estático e as integrações de acordo com as opções informadas."""
     parser = argparse.ArgumentParser()
     parser.add_argument("--running", action="store_true", help="Require running local Compose stack")
     parser.add_argument("--cards", action="store_true", help="Test running card connectors")
@@ -103,7 +105,7 @@ def main():
             status, body = request(
                 f"http://127.0.0.1:8084/gateway/v1/bank-operations/{bank}/PIX_COB_GET",
                 "POST", b"{}", headers)
-            assert status == 200 and body["mocked"] is True and body["status"] == 200, (bank, status)
+            assert status == 200 and body["mocked"] is True and body["status"] == 200, (bank, status, body)
         for bank, port in zip(BANKS[3:], range(8134, 8138)):
             for operation, method, path in operations:
                 payload = {key: "synthetic" for key in re.findall(r"\{([^}]+)\}", path)}
@@ -112,7 +114,7 @@ def main():
                 assert status == 200 and body["status"] == 200 and body["mocked"] is True, (bank, operation, status)
             headers["Idempotency-Key"] = str(uuid.uuid4())
             status, body = request(f"http://127.0.0.1:8084/gateway/v1/bank-operations/{bank}/PIX_COB_GET", "POST", b'{"txid":"synthetic"}', headers)
-            assert status == 200 and body["mocked"] is True and body["status"] == 200, (bank, status)
+            assert status == 200 and body["mocked"] is True and body["status"] == 200, (bank, status, body)
         for partner, port in (("clearsale", 8128), ("serasa-experian", 8129)):
             url = f"http://127.0.0.1:{port}/internal/v1/assessments"
             probes = ({}, {"vpnOrProxy": True}, {"knownCompromised": True}) if partner == "clearsale" else ({}, {"addressMismatch": True}, {"documentInconsistent": True})

@@ -20,9 +20,11 @@ with sqlite3.connect(DB) as connection:
 
 class Handler(BaseHTTPRequestHandler):
     def log_message(self, *args):
+        """Evita registrar dados da requisição no console de laboratório."""
         pass
 
     def reply(self, status, data):
+        """Envia a resposta JSON marcada explicitamente como simulação."""
         content = json.dumps(data).encode()
         self.send_response(status)
         self.send_header('Content-Type', 'application/json')
@@ -32,12 +34,15 @@ class Handler(BaseHTTPRequestHandler):
         self.wfile.write(content)
 
     def do_GET(self):
+        """Encaminha a consulta ao contrato comum de operações."""
         self.handle_operation()
 
     def do_POST(self):
+        """Encaminha a operação de escrita ao contrato comum."""
         self.handle_operation()
 
     def handle_operation(self):
+        """Valida a autenticação e executa a operação sintética no SQLite."""
         if self.path == '/health':
             return self.reply(200, {'simulation': True})
         if self.headers.get('Authorization') != AUTH:
