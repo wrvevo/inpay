@@ -36,6 +36,8 @@ def main():
     parser = argparse.ArgumentParser()
     parser.add_argument("--running", action="store_true", help="Require running local Compose stack")
     parser.add_argument("--cards", action="store_true", help="Test running card connectors")
+    parser.add_argument("--card-start", type=int, default=0)
+    parser.add_argument("--card-end", type=int, default=8)
     args = parser.parse_args()
     rows = [json.loads(line) for line in
             (ROOT / "services/bank-mock-server/src/main/resources/intent-mappings.jsonl").read_text().splitlines()
@@ -52,6 +54,7 @@ def main():
             route = f"/intents/{bank}/{operation}"
             assert route in intents, route
             assert intents[route]["response"]["jsonBody"]["operation"] == operation
+    assert sum(map(len, native.values())) == 131, native
     for partner in PARTNERS:
         for intent in RISK:
             assert f"/intents/{partner}/{intent}" in intents
@@ -121,7 +124,7 @@ def main():
         password = os.environ.get("LOCAL_PASSWORD", "inpay@123")
         auth = base64.b64encode(("developer:" + password).encode()).decode()
         headers = {"Authorization": "Basic " + auth, "X-Mock": "true"}
-        for provider, port in zip(CARD_PROVIDERS, range(8101, 8109)):
+        for provider, port in list(zip(CARD_PROVIDERS, range(8101, 8109)))[args.card_start:args.card_end]:
             for operation in card_ops + (cielo_ops if provider == "cielo" else []):
                 status, body = request(f"http://127.0.0.1:{port}/internal/v1/provider-mocks/{operation}", "POST", b"", headers)
                 assert status == 200 and body["mocked"] is True and body["productionApproved"] is False, (provider, operation, status)
@@ -130,7 +133,7 @@ def main():
         print("Card mock connector HTTP checks passed.")
     print(f"Catalog: {len(operations) * len(BANKS)} legacy bank mappings; {sum(map(len, native.values()))} native bank intents; {len(PARTNERS) * len(RISK)} partner intents.")
     print(f"Card provider intents: {len(card_ops) * len(CARD_PROVIDERS)} common and {len(cielo_ops)} Cielo collection.")
-    print("Runtime checks passed." if args.running else "Static coverage only; no integration test executed.")
+    print("Bank and risk HTTP checks passed." if args.running else "Static catalog checks passed.")
 
 
 if __name__ == "__main__":

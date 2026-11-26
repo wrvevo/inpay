@@ -1,5 +1,8 @@
 name: verify
 on: [push, pull_request]
+concurrency:
+  group: verify-${{ github.event.pull_request.number || github.ref }}
+  cancel-in-progress: true
 jobs:
   java:
     runs-on: ubuntu-24.04
@@ -30,3 +33,17 @@ jobs:
       - run: npm run build
       - run: npx playwright install --with-deps chromium
       - run: npm run test:e2e
+
+  docker-e2e:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 60
+    steps:
+      - uses: actions/checkout@v4
+      - name: Run isolated Docker integration suite
+        run: bash scripts/docker-e2e.sh
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: docker-e2e-results
+          path: test-results/
+          if-no-files-found: warn
