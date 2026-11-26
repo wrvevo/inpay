@@ -91,7 +91,8 @@ public class BankGatewayClient {
             var future = transport.sendAsync(request.build(), HttpResponse.BodyHandlers.ofString());
             HttpResponse<String> response;
             try {
-                response = future.get(budget.toMillis(), java.util.concurrent.TimeUnit.MILLISECONDS);
+                response =
+                        future.get(budget.toMillis(), java.util.concurrent.TimeUnit.MILLISECONDS);
             } catch (InterruptedException exception) {
                 future.cancel(true);
                 Thread.currentThread().interrupt();

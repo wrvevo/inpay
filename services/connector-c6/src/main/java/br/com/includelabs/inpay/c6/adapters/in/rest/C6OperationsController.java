@@ -28,8 +28,8 @@ public class C6OperationsController {
         return Map.of("bank", "c6", "data", useCase.catalog());
     }
 
-    @PostMapping({
     /** Encaminha a operação, a chave idempotente e a opção de simulação. */
+    @PostMapping({
         "/internal/v1/c6/operations/{operation}",
         "/internal/v1/bank/operations/{operation}"
     })
