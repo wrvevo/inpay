@@ -3,37 +3,49 @@ package br.com.includelabs.inpay.clearsale.adapters.in.rest;
 import br.com.includelabs.inpay.clearsale.bootstrap.ClearSaleSettings;
 import br.com.includelabs.inpay.contracts.AntifraudStubs;
 import br.com.includelabs.inpay.contracts.FraudMode;
+import br.com.includelabs.inpay.contracts.MockIntentClient;
 import java.util.Map;
+import java.util.Set;
 import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestHeader;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.server.ResponseStatusException;
+import tools.jackson.databind.ObjectMapper;
 
 /** Conector ClearSale. A chamada real permanece desligada; X-Mock devolve o stub. */
 @RestController
 public class ClearSaleController {
     private final ClearSaleSettings settings;
 
+    /** Inicializa as configurações do conector ClearSale. */
     public ClearSaleController(ClearSaleSettings settings) {
         this.settings = settings;
     }
 
+    /** Expõe os metadados do módulo de integração. */
     @GetMapping("/internal/v1/module")
     @PreAuthorize("hasAuthority('SCOPE_connectors-clearsale/read')")
     public Map<String, String> module() {
         return Map.of("module", "connector-clearsale", "stage", "mock", "provider", "clearsale");
     }
 
+    /** Avalia os sinais de risco no ambiente configurado. */
     @PostMapping("/internal/v1/assessments")
     @PreAuthorize("hasAuthority('SCOPE_connectors-clearsale/execute')")
     public Map<String, Object> assess(
             @RequestHeader(value = "X-Mock", required = false) String mock,
             @RequestBody(required = false) Map<String, Object> body) {
-        boolean simulated = mock == null || mock.equalsIgnoreCase("true");
+        if (mock != null && !mock.equalsIgnoreCase("true") && !mock.equalsIgnoreCase("false")) {
+            throw new ResponseStatusException(
+                    HttpStatus.BAD_REQUEST, "X-Mock must be true or false");
+        }
+        boolean simulated = "true".equalsIgnoreCase(mock);
         if (!simulated && !settings.enabled()) {
             throw new ResponseStatusException(HttpStatus.SERVICE_UNAVAILABLE, "clearsale disabled");
         }
@@ -42,6 +54,9 @@ public class ClearSaleController {
                     HttpStatus.UNPROCESSABLE_ENTITY, "live path not verified");
         }
         AntifraudStubs.Verdict verdict = AntifraudStubs.evaluate(FraudMode.CLEARSALE, probe(body));
+        if (MockIntentClient.configured()) {
+            return wireMock("ASSESSMENT_" + verdict.decision());
+        }
         return Map.of(
                 "provider",
                 "clearsale",
@@ -57,6 +72,62 @@ public class ClearSaleController {
                 true);
     }
 
+    /** Consulta uma intenção de revisão cadastral exclusivamente sintética. */
+    @PostMapping("/internal/v1/customer-reviews/{intent}")
+    @PreAuthorize("hasAuthority('SCOPE_connectors-clearsale/execute')")
+    @SuppressWarnings("unchecked")
+    public ResponseEntity<Map<String, Object>> customerReview(
+            @PathVariable String intent,
+            @RequestHeader(value = "X-Mock", required = false) String mock) {
+        if (!"true".equalsIgnoreCase(mock) || !MockIntentClient.configured()) {
+            throw new ResponseStatusException(HttpStatus.SERVICE_UNAVAILABLE, "Mock unavailable");
+        }
+        if (!Set.of("CUSTOMER_REVIEW", "DOCUMENT_PENDING", "PROVIDER_UNAVAILABLE")
+                .contains(intent)) {
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Unknown review intent");
+        }
+        try {
+            var response = MockIntentClient.execute("clearsale", intent);
+            Map<String, Object> body = new ObjectMapper().readValue(response.body(), Map.class);
+            if (!Boolean.TRUE.equals(body.get("mock"))
+                    || !Boolean.FALSE.equals(body.get("productionApproved"))
+                    || !intent.equals(body.get("stage"))
+                    || !"clearsale".equals(body.get("provider"))
+                    || !Set.of(200, 422, 503).contains(response.status())) {
+                throw new IllegalStateException("Invalid partner response");
+            }
+            return ResponseEntity.status(response.status()).body(body);
+        } catch (InterruptedException failure) {
+            Thread.currentThread().interrupt();
+        } catch (Exception failure) {
+            // A synthetic review cannot authorize a real account.
+        }
+        throw new ResponseStatusException(HttpStatus.SERVICE_UNAVAILABLE, "Mock unavailable");
+    }
+
+    /** Encaminha a intenção ao WireMock e valida a resposta. */
+    @SuppressWarnings("unchecked")
+    private Map<String, Object> wireMock(String intent) {
+        try {
+            var reply = MockIntentClient.execute("clearsale", intent);
+            if (reply.status() != 200) {
+                throw new IllegalStateException("Mock unavailable");
+            }
+            Map<String, Object> body = new ObjectMapper().readValue(reply.body(), Map.class);
+            if (!Boolean.TRUE.equals(body.get("mock"))
+                    || !"clearsale".equals(body.get("provider"))) {
+                throw new IllegalStateException("Invalid mock response");
+            }
+            return body;
+        } catch (InterruptedException failure) {
+            Thread.currentThread().interrupt();
+        } catch (Exception failure) {
+            // Never fall back to a live provider or approve on a mock failure.
+        }
+        throw new ResponseStatusException(HttpStatus.SERVICE_UNAVAILABLE, "Mock unavailable");
+    }
+
+    /** Converte os sinais de entrada no contrato comum de avaliação. */
     private static AntifraudStubs.Probe probe(Map<String, Object> body) {
         return new AntifraudStubs.Probe(
                 flag(body, "knownCompromised"),
@@ -67,11 +138,13 @@ public class ClearSaleController {
                 flag(body, "addressMismatch"));
     }
 
+    /** Extrai um sinal booleano da requisição. */
     private static boolean flag(Map<String, Object> body, String key) {
         Object value = body == null ? null : body.get(key);
         return Boolean.TRUE.equals(value) || "true".equalsIgnoreCase(String.valueOf(value));
     }
 
+    /** Extrai um sinal numérico da requisição. */
     private static int number(Map<String, Object> body, String key) {
         Object value = body == null ? null : body.get(key);
         if (value instanceof Number number) {

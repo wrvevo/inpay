@@ -20,10 +20,15 @@ public record C6Settings(
         @DefaultValue("inpay") String partnerName,
         @DefaultValue("0.2.0") String partnerVersion) {
 
+    /** Verifica se as credenciais necessárias estão configuradas. */
     public boolean credentialsPresent() {
-        return !clientId.isBlank() && !clientSecret.isBlank() && !certificate.isBlank() && !privateKey.isBlank();
+        return !clientId.isBlank()
+                && !clientSecret.isBlank()
+                && !certificate.isBlank()
+                && !privateKey.isBlank();
     }
 
+    /** Representa a configuração sem expor credenciais sensíveis. */
     @Override
     public String toString() {
         return "C6Settings[enabled=" + enabled + ", sandbox=" + baseUrl + "]";

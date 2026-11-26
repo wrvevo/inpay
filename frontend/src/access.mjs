@@ -100,7 +100,7 @@ function cases() {
       },
       antifraud: "SERASA_EXPERIAN",
       gatewayMode: "HOMOLOGACAO",
-      journeySubmitted: true,
+      journeySubmitted: false,
       status: "EM_HOMOLOGACAO",
       accountsPrepared: false,
       demo: null,
@@ -216,9 +216,16 @@ export function usersOf(actor) {
   return memory.users.filter((item) => item.realm === actor.realm).map(publicUser);
 }
 
+const DOCUMENT_CHECKS = ["company", "representative", "address", "bank"];
+
+function documentChecklist(input) {
+  return Object.fromEntries(DOCUMENT_CHECKS.map((key) => [key, input?.[key] === true]));
+}
+
 function copyCase(item) {
   return {
     ...item,
+    documents: documentChecklist(item.documents),
     payments: [...(item.payments || [])],
     connectors: { ...(item.connectors || {}) },
     connectorSettings: Object.fromEntries(
@@ -249,7 +256,8 @@ function acquirerById(id) {
 
 function journeyReady(item) {
   const address = item.address || {};
-  if (!item.legalName || !item.situation || !address.street || !address.city) return false;
+  if (!item.legalName || item.situation !== "ATIVA" || !address.street || !address.city) return false;
+  if (!DOCUMENT_CHECKS.every((key) => item.documents?.[key] === true)) return false;
   if (!item.antifraud || !item.payments?.length) return false;
   return item.payments.every((method) => {
     const acquirer = acquirerById(item.connectors?.[method]);
@@ -291,6 +299,7 @@ export function startHomologation(role, input) {
   const id = crypto.randomUUID();
   const next = {
     ...input,
+    documents: documentChecklist(),
     id,
     storeId: id,
     cnpj,
@@ -317,6 +326,9 @@ export function saveCase(input, role) {
   if (cnpj.length !== 14) throw new Error("CNPJ inválido.");
   const id = input.id || crypto.randomUUID();
   const current = memory.cases.find((item) => item.id === id);
+  if (!current || current.journeySubmitted || current.status === "APROVADA") {
+    throw new Error("Loja inexistente ou jornada bloqueada para revisão.");
+  }
   const next = {
     ...(current || {}),
     ...input,
@@ -329,6 +341,12 @@ export function saveCase(input, role) {
     ),
     partners: [...(input.partners || [])],
     address: { ...(input.address || {}) },
+    documents: documentChecklist(input.documents),
+    storeId: current.storeId,
+    status: current.status,
+    journeySubmitted: false,
+    accountsPrepared: false,
+    demo: null,
     gatewayMode: "HOMOLOGACAO",
   };
   const index = memory.cases.findIndex((item) => item.id === id);
@@ -340,9 +358,9 @@ export function saveCase(input, role) {
 export function submitCase(id, role) {
   if (!["PDV", "ADMIN"].includes(role)) throw new Error("Sem permissão.");
   const item = memory.cases.find((entry) => entry.id === id);
-  if (!item) throw new Error("Loja não encontrada.");
+  if (!item || item.journeySubmitted || item.status === "APROVADA") throw new Error("Loja não encontrada ou jornada bloqueada.");
   if (!journeyReady(item)) {
-    throw new Error("Conclua o cadastro, o antifraude e a configuração essencial de cada adquirente antes de enviar.");
+    throw new Error("Conclua cadastro ativo, checklist documental fictício, antifraude e configuração dos adquirentes.");
   }
   item.status = "EM_HOMOLOGACAO";
   item.journeySubmitted = true;
@@ -357,8 +375,9 @@ export function decideCase(id, role, approve) {
   if (!item || item.status !== "EM_HOMOLOGACAO" || !item.journeySubmitted) {
     throw new Error("A jornada ainda não foi enviada para aprovação.");
   }
+  if (approve && !journeyReady(item)) throw new Error("Revalide os requisitos da jornada.");
   item.status = approve ? "APROVADA" : "RECUSADA";
-  item.accountsPrepared = approve;
+  item.accountsPrepared = false;
   item.journeySubmitted = approve;
   item.demo = approve
     ? {
@@ -397,6 +416,7 @@ export function cloneCase(sourceId, targetStoreId, role) {
   if (!source || !target || source.cnpj !== target.cnpj || source.storeId === target.storeId) {
     throw new Error("A cópia exige outra loja do mesmo CNPJ.");
   }
+  if (target.journeySubmitted || target.status === "APROVADA") throw new Error("Loja bloqueada para revisão.");
   target.legalName = source.legalName;
   target.email = source.email;
   target.phone = source.phone;
@@ -406,6 +426,9 @@ export function cloneCase(sourceId, targetStoreId, role) {
   target.settlementAlias = source.settlementAlias;
   target.splitEnabled = source.splitEnabled;
   target.status = "RASCUNHO";
+  target.documents = documentChecklist();
+  target.journeySubmitted = false;
+  target.demo = null;
   target.accountsPrepared = false;
   return { ...target, payments: [...target.payments] };
 }

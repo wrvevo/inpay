@@ -20,26 +20,46 @@ public final class BankTransport {
 
     private static final Logger LOG = LogManager.getLogger(BankTransport.class);
 
+    private static final Duration MOCK_BUDGET = Duration.ofSeconds(2);
+
     private final BankCircuit circuit;
+    private final BankCircuit mockCircuit;
+    private final Duration mockBudget;
     private final HttpClient client;
+    private final HttpClient mockClient;
     private final ObjectMapper mapper;
     private final MeterRegistry meters;
 
+    /** Configura o transporte HTTP e a instrumentação do conector. */
     public BankTransport(BankSettings settings) {
         this(settings, null);
     }
 
+    /** Configura o transporte HTTP e a instrumentação do conector. */
     public BankTransport(BankSettings settings, MeterRegistry meters) {
+        this(settings, meters, MOCK_BUDGET);
+    }
+
+    /** Configura o transporte HTTP e a instrumentação do conector. */
+    BankTransport(BankSettings settings, MeterRegistry meters, Duration mockBudget) {
+        this.mockBudget = mockBudget;
+        this.mockCircuit = new BankCircuit(settings.failureThreshold(), settings.openDuration());
         this.circuit = new BankCircuit(settings.failureThreshold(), settings.openDuration());
         this.client =
                 HttpClient.newBuilder()
                         .connectTimeout(MAX_BUDGET)
                         .followRedirects(HttpClient.Redirect.NEVER)
                         .build();
+        this.mockClient =
+                HttpClient.newBuilder()
+                        .connectTimeout(mockBudget)
+                        .followRedirects(HttpClient.Redirect.NEVER)
+                        .build();
         this.mapper = new ObjectMapper();
         this.meters = meters;
     }
 
+    /** Encaminha a requisição ao ambiente configurado com limites de tempo. */
     public BankResult send(
             BankId bank, BankOperation operation, boolean mocked, URI uri, String body) {
         long started = System.nanoTime();
@@ -49,7 +69,9 @@ public final class BankTransport {
                 operation.name(),
                 mocked,
                 uri.getHost());
-        BankCircuit.Lease lease = circuit.acquire();
+        BankCircuit activeCircuit = mocked ? mockCircuit : circuit;
+        Duration budget = mocked ? mockBudget : MAX_BUDGET;
+        BankCircuit.Lease lease = activeCircuit.acquire();
         if (lease == null) {
             return finish(
                     bank,
@@ -61,7 +83,7 @@ public final class BankTransport {
         }
         HttpRequest.Builder request =
                 HttpRequest.newBuilder(uri)
-                        .timeout(MAX_BUDGET)
+                        .timeout(budget)
                         .header("Accept", "application/json")
                         .header("Content-Type", "application/json");
         if (body == null || body.isBlank()) {
@@ -71,15 +93,15 @@ public final class BankTransport {
                     operation.method(),
                     HttpRequest.BodyPublishers.ofString(body, StandardCharsets.UTF_8));
         }
-        var future = client.sendAsync(request.build(), HttpResponse.BodyHandlers.ofByteArray());
+        HttpClient transport = mocked ? mockClient : client;
+        var future = transport.sendAsync(request.build(), HttpResponse.BodyHandlers.ofByteArray());
         try {
-            HttpResponse<byte[]> response =
-                    future.get(MAX_BUDGET.toMillis(), TimeUnit.MILLISECONDS);
+            HttpResponse<byte[]> response = future.get(budget.toMillis(), TimeUnit.MILLISECONDS);
             boolean transientFailure =
                     response.statusCode() == 408
                             || response.statusCode() == 429
                             || response.statusCode() >= 500;
-            circuit.complete(lease, !transientFailure);
+            activeCircuit.complete(lease, !transientFailure);
             BankResult result =
                     new BankResult(
                             bank.slug(),
@@ -98,7 +120,7 @@ public final class BankTransport {
         } catch (InterruptedException exception) {
             Thread.currentThread().interrupt();
             future.cancel(true);
-            circuit.complete(lease, false);
+            activeCircuit.complete(lease, false);
             LOG.error(
                     "External bank call interrupted bank={} operation={}",
                     bank.slug(),
@@ -113,9 +135,9 @@ public final class BankTransport {
                     BankResult.unavailable(bank.slug(), operation.name(), mocked));
         } catch (Exception exception) {
             future.cancel(true);
-            circuit.complete(lease, false);
+            activeCircuit.complete(lease, false);
             LOG.error(
-                    "External bank call failed within 100ms budget bank={} operation={}",
+                    "External bank call failed within configured budget bank={} operation={}",
                     bank.slug(),
                     operation.name(),
                     exception);
@@ -129,6 +151,7 @@ public final class BankTransport {
         }
     }
 
+    /** Registra a conclusão e retorna o resultado normalizado. */
     private BankResult finish(
             BankId bank,
             BankOperation operation,
@@ -158,6 +181,7 @@ public final class BankTransport {
         return result;
     }
 
+    /** Decodifica o corpo da resposta em uma estrutura de dados. */
     @SuppressWarnings("unchecked")
     private Map<String, Object> decode(byte[] bytes) {
         if (bytes == null || bytes.length == 0 || bytes.length > 1_048_576) {

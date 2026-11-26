@@ -48,9 +48,32 @@ function seed(): array
     return ["products" => $products, "orders" => []];
 }
 /** Lock de arquivo evita gravações concorrentes perdidas. Somente para laboratório local. */
+function loadDemo(): void {
+    $id = $_GET["demo"] ?? ($_SESSION["demo_id"] ?? null);
+    if ($id === null) return;
+    if (!is_string($id) || !preg_match('/^[0-9a-f-]{36}$/D', $id) || getenv("STORE_MODE") !== "local-simulator") {
+        http_response_code(403); exit("Demo indisponível");
+    }
+    $base = getenv("INPAY_ONBOARDING_URL");
+    if (!$base) { http_response_code(503); exit("Homologação indisponível"); }
+    $headers = "Authorization: " . getenv("INPAY_AUTHORIZATION") . "\r\nX-Merchant-Id: " . getenv("INPAY_TENANT");
+    $ctx = stream_context_create(["http"=>["method"=>"GET","header"=>$headers,"timeout"=>5,"follow_location"=>0]]);
+    $raw = @file_get_contents(rtrim($base,"/")."/homologation/v2/demo/".$id,false,$ctx);
+    $config = $raw === false ? null : json_decode($raw,true);
+    if (!is_array($config) || ($config["demoId"]??null)!==$id || ($config["mode"]??null)!=="SYNTHETIC" || ($config["productionEnabled"]??true)!==false || !is_array($config["bindings"]??null)) {
+        http_response_code(403); exit("Demo não liberada");
+    }
+    if (($_SESSION["demo_id"]??null)!==$id) {
+        session_regenerate_id(true); $_SESSION["cart"]=[]; unset($_SESSION["checkout_key"],$_SESSION["admin"]); $_SESSION["owner"]=bin2hex(random_bytes(16));
+    }
+    $_SESSION["demo_id"]=$id; $_SESSION["demo_config"]=$config;
+}
+loadDemo();
+
 function repository(callable $work): mixed
 {
     $path = getenv("STORE_DATA") ?: dirname(__DIR__) . "/data/store.json";
+    if (isset($_SESSION["demo_id"])) $path=dirname($path)."/demo-".$_SESSION["demo_id"].".json";
     if (!is_dir(dirname($path))) {
         mkdir(dirname($path), 0700, true);
     }
@@ -90,6 +113,11 @@ function paymentMethods(): array
         "boleto" => ["Boleto", "boleto"],
         "transfer" => ["Transferência bancária", "transfer"],
     ];
+    if (isset($_SESSION["demo_config"])) {
+        $bindings=$_SESSION["demo_config"]["bindings"]; $out=[];
+        foreach ($methods as $key=>$method) if(isset($bindings[$key])) $out[$key]=[$method[0]." · ".$bindings[$key],$method[1]];
+        return $out;
+    }
     foreach (
         [
             "cielo" => "Cielo",

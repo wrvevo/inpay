@@ -41,62 +41,40 @@ import { Developers, Settings } from "./pages/Settings";
 import { Login } from "./pages/Login";
 import { RiskDesk, ProviderSetup } from "./pages/GatewayAdmin";
 import { TeamAccess } from "./pages/TeamAccess";
+import ConnectedHomologation from "./pages/ConnectedHomologation";
 import { HomologationApp, Profile } from "./pages/Homologation";
 import { Modal } from "./components/UI";
 import type { Session } from "./api";
-const navigation = [
-  { group: "TIME INPAY", items: [["billing", "Gestão financeira", Wallet]] },
-  {
-    group: "INPAY ACCOUNTS",
-    items: [["accounts", "Contas financeiras", Building2]],
-  },
-  {
-    group: "INPAY MARKETPLACE",
-    items: [["commerce", "Vendedores e repasses", ShoppingBag]],
-  },
-  {
-    group: "INPAY CREDITS",
-    items: [
-      ["credits", "Créditos e benefícios", Wallet],
-      ["my-credit", "Meu crédito e compras", ShoppingBag],
-    ],
-  },
-  {
-    group: "VISÃO DO NEGÓCIO",
-    items: [
-      ["overview", "Visão geral", LayoutDashboard],
-      ["journey", "Jornada do pagamento", GitBranch],
-    ],
-  },
-  {
-    group: "INPAY GATEWAY",
-    items: [
-      ["transactions", "Transações", CreditCard],
-      ["links", "Links de pagamento", Link2],
-      ["subscriptions", "Assinaturas", Repeat],
-      ["customers", "Clientes", Users],
-      ["recipients", "Recebedores", Building2],
-      ["split", "Split de pagamentos", SplitIcon],
-    ],
-  },
-  {
-    group: "GESTÃO E CONTROLE",
-    items: [
-      ["finance", "Financeiro", Wallet],
-      ["fraud", "Antifraude", ShieldCheck],
-      ["risk", "Gestão InRisk", ShieldCheck],
-      ["clearsale", "ClearSale", ShieldCheck],
-      ["serasa", "Serasa Experian", ShieldCheck],
-      ["disputes", "Contestações", Activity],
-      ["methods", "Meios de pagamento", CreditCard],
-      ["routing", "Roteamento", GitBranch],
-      ["developers", "Desenvolvedores", Code2],
-      ["team", "Equipe e permissões", Users],
-      ["profile", "Meus dados", Users],
-      ["settings", "Configurações", SettingsIcon],
-    ],
-  },
-];
+// Product menus share the existing shell and page IDs, not responsibilities.
+const products = [{ id: "gateway", label: "InPay Gateway", groups: [{ group: "OPERAÇÃO DE PAGAMENTOS", items: [["overview", "Visão geral", LayoutDashboard],
+["transactions", "Transações", CreditCard],
+["links", "Links de pagamento", Link2],
+["subscriptions", "Assinaturas", Repeat],
+["disputes", "Contestações", Activity]] },
+{ group: "RISCO E INTEGRAÇÃO", items: [["fraud", "Antifraude", ShieldCheck],
+["risk", "Gestão InRisk", ShieldCheck],
+["clearsale", "ClearSale", ShieldCheck],
+["serasa", "Serasa Experian", ShieldCheck],
+["routing", "Roteamento", GitBranch],
+["developers", "Desenvolvedores", Code2],
+["journey", "Jornada do pagamento", GitBranch]] }] },
+{ id: "accounts", label: "InPay Accounts", groups: [{ group: "CONTAS E CONFIGURAÇÃO", items: [["accounts", "Contas financeiras e bancos", Building2],
+["methods", "Meios e adquirentes (templates)", CreditCard],
+["customers", "Clientes", Users],
+["finance", "Financeiro", Wallet]] }] },
+{ id: "marketplace", label: "InPay Marketplace", groups: [{ group: "GESTÃO COMERCIAL", items: [["commerce", "Vendedores e repasses", ShoppingBag],
+["recipients", "Recebedores", Building2],
+["split", "Split de pagamentos", SplitIcon]] }] },
+{ id: "credits", label: "InPay Credits", groups: [{ group: "BENEFÍCIOS", items: [["credits", "Créditos e benefícios", Wallet],
+["my-credit", "Meu crédito e compras", ShoppingBag]] }] },
+{ id: "billing", label: "InPay Billing · interno", groups: [{ group: "TIME INPAY", items: [["billing", "Gestão financeira", Wallet]] }] }];
+const sharedNavigation = [{ group: "ACESSO", items: [["team", "Equipe e permissões", Users],
+["profile", "Meus dados", Users],
+["settings", "Configurações", SettingsIcon]] }];
+const navigation = [...products.flatMap((product) => product.groups), ...sharedNavigation];
+function productFor(page: string) {
+  return products.find((product) => product.groups.some((group) => group.items.some(([id]) => id === page)));
+}
 const validPages = navigation.flatMap((g) => g.items.map((i) => String(i[0])));
 const MENU_OF: Record<string, string> = {
   overview: "overview",
@@ -127,6 +105,7 @@ function readUser() {
 /** The mode/tenant key destroys page state on context changes to prevent data mixing. */
 export default function App() {
   const [page, setPage] = useState(currentPage);
+  const [workspace, setWorkspace] = useState(() => productFor(currentPage())?.id || "gateway");
   const [menu, setMenu] = useState(false);
   const [help, setHelp] = useState(false);
   const [search, setSearch] = useState("");
@@ -146,54 +125,59 @@ export default function App() {
     if (redirect) {
       location.hash = next.realm === "HOMOLOGATION" ? "homologation" : "overview";
       setPage("overview");
+      setWorkspace("gateway");
     }
   }
   function logout() {
     sessionStorage.removeItem("inpay-user");
     setUser(null);
+    setSession({ mode: "demo", token: "", tenant: "11111111-1111-1111-1111-111111111111" });
   }
   useEffect(() => {
     const listener = () => {
-      setPage(currentPage());
+      const next = currentPage();
+      setPage(next);
+      const product = productFor(next);
+      if (product) setWorkspace(product.id);
       setMenu(false);
     };
     window.addEventListener("hashchange", listener);
     return () => window.removeEventListener("hashchange", listener);
   }, []);
+  function canAccess(id: string) {
+    if (!user || user.realm !== "PANEL") return false;
+    if (user.role === "ADMIN") return true;
+    const key = MENU_OF[id];
+    return Boolean(key && user.menus?.includes(key));
+  }
+  const availableProducts = products.filter((product) =>
+    product.groups.some((group) => group.items.some(([id]) => canAccess(String(id)))),
+  );
+  const activeProduct = (canAccess(page) ? productFor(page) : undefined) || availableProducts.find((product) => product.id === workspace) || availableProducts[0];
+  const visibleNavigation = [...(activeProduct?.groups || []), ...sharedNavigation]
+    .map((group) => ({ ...group, items: group.items.filter(([id]) => canAccess(String(id))) }))
+    .filter((group) => group.items.length);
   function navigate(next: string) {
+    if (!validPages.includes(next) || !canAccess(next)) return;
+    const target = productFor(next);
+    if (target) setWorkspace(target.id);
     location.hash = next;
     setPage(next);
     setSearch("");
     setMenu(false);
     window.scrollTo(0, 0);
   }
-  const visibleNavigation = (
-    page === "my-credit"
-      ? [
-          {
-            group: "MINHA CONTA",
-            items: [
-              ["my-credit", "Meu crédito e compras", ShoppingBag],
-              ["settings", "Acesso e configurações", SettingsIcon],
-            ],
-          },
-        ]
-      : navigation
-  )
-    .map((group) => ({
-      ...group,
-      items: group.items.filter(([id]) => {
-        if (!user || user.role === "ADMIN") return true;
-        const key = MENU_OF[String(id)];
-        return key ? user.menus.includes(key) : false;
-      }),
-    }))
-    .filter((group) => group.items.length);
+  function switchProduct(id: string) {
+    const target = availableProducts.find((product) => product.id === id);
+    const first = target?.groups.flatMap((group) => group.items).find(([pageId]) => canAccess(String(pageId)));
+    if (first) navigate(String(first[0]));
+  }
   const activeName = navigation
     .flatMap((g) => g.items)
     .find((i) => i[0] === page)?.[1];
   let content;
-  if (page === "billing") content = <Billing session={session} />;
+  if (!canAccess(page)) content = <section className="card"><h2>Acesso restrito</h2><p>Selecione uma área liberada para sua conta.</p></section>;
+  else if (page === "billing") content = <Billing session={session} />;
   else if (page === "accounts")
     content = <ProductModule product="accounts" session={session} />;
   else if (page === "commerce")
@@ -235,6 +219,7 @@ export default function App() {
     );
   if (!user) return <Login onLogin={enter} />;
   if (user.realm === "HOMOLOGATION") {
+    if (user.token) return <ConnectedHomologation user={user} onLogout={logout} />;
     return (
       <HomologationApp
         user={user}
@@ -256,22 +241,20 @@ export default function App() {
         />
       )}
       <aside className={menu ? "sidebar open" : "sidebar"}>
-        <a className="brand" href="#overview" aria-label="InPay início">
+        <a className="brand" href="#overview" aria-label="InPay início" onClick={(event) => { event.preventDefault(); if (activeProduct) switchProduct(activeProduct.id); }}>
           <span className="brand-symbol">in</span>InPay
           <span className="brand-dot">.</span>
         </a>
-        <button className="workspace" onClick={() => navigate("settings")}>
+        <div className="workspace">
           <span className="workspace-logo">IL</span>
-          <span>
-            <strong>Include Labs</strong>
-            <small>
-              {session.mode === "demo"
-                ? "Workspace demonstrativo"
-                : "Contexto conectado"}
-            </small>
-          </span>
-          <ChevronDown size={15} />
-        </button>
+          <label>
+            Aplicação
+            <select aria-label="Aplicação InPay" value={activeProduct?.id || ""} onChange={(event) => switchProduct(event.target.value)}>
+              {!activeProduct && <option value="">Sem aplicações</option>}
+              {availableProducts.map((product) => <option key={product.id} value={product.id}>{product.label}</option>)}
+            </select>
+          </label>
+        </div>
         <nav aria-label="Menu principal">
           {visibleNavigation.map((group) => (
             <div className="nav-group" key={group.group}>
@@ -326,7 +309,7 @@ export default function App() {
             >
               <Menu />
             </button>
-            <span>Painel gerencial</span>
+            <span>{activeProduct?.label || "Painel gerencial"}</span>
             <span>/</span>
             <strong>{String(activeName)}</strong>
             {user?.stores?.length > 1 && (

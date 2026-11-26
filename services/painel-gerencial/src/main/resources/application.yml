@@ -16,6 +16,8 @@ management:
         enabled: true
       show-details: never
 inpay:
+  onboarding:
+    enabled: ${INPAY_ONBOARDING_ENABLED:false}
   local-password: ${LOCAL_PASSWORD:inpay@123}
   security:
     issuer: ${COGNITO_ISSUER:}

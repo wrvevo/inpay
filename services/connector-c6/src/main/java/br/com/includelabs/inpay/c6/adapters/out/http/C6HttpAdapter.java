@@ -40,13 +40,17 @@ public final class C6HttpAdapter implements C6BankPort {
     private volatile Instant tokenUntil = Instant.EPOCH;
     private int failures;
 
+    /** Inicializa o cliente HTTP conforme as configurações do C6. */
     public C6HttpAdapter(C6Settings settings) {
         this.settings = settings;
-        this.client = HttpClient.newBuilder().connectTimeout(BUDGET).sslContext(ssl(settings)).build();
+        this.client =
+                HttpClient.newBuilder().connectTimeout(BUDGET).sslContext(ssl(settings)).build();
     }
 
+    /** Executa a operação bancária com autenticação e controle de resposta. */
     @Override
-    public C6Reply send(C6Operation operation, String path, Map<String, Object> body, boolean form) {
+    public C6Reply send(
+            C6Operation operation, String path, Map<String, Object> body, boolean form) {
         if (failures >= 5) {
             LOG.warn("C6 circuit open operation={}", operation.name());
             return new C6Reply(operation.name(), 503, true, false, Map.of("error", "CIRCUIT_OPEN"));
@@ -55,7 +59,9 @@ public final class C6HttpAdapter implements C6BankPort {
             String url = settings.baseUrl().replaceAll("/+$", "") + path;
             String access = operation == C6Operation.AUTH_TOKEN ? "" : accessToken();
             String payload =
-                    form ? String.valueOf(body.getOrDefault("form", "")) : mapper.writeValueAsString(body);
+                    form
+                            ? String.valueOf(body.getOrDefault("form", ""))
+                            : mapper.writeValueAsString(body);
             HttpRequest.Builder request =
                     HttpRequest.newBuilder(URI.create(url))
                             .timeout(BUDGET)
@@ -73,7 +79,10 @@ public final class C6HttpAdapter implements C6BankPort {
             } else {
                 request.method(operation.method(), HttpRequest.BodyPublishers.ofString(payload));
             }
-            LOG.info("C6 external call started operation={} host={}", operation.name(), URI.create(url).getHost());
+            LOG.info(
+                    "C6 external call started operation={} host={}",
+                    operation.name(),
+                    URI.create(url).getHost());
             HttpResponse<byte[]> response =
                     client.send(request.build(), HttpResponse.BodyHandlers.ofByteArray());
             boolean failure = response.statusCode() >= 500 || response.statusCode() == 429;
@@ -82,8 +91,16 @@ public final class C6HttpAdapter implements C6BankPort {
             } else {
                 failures = 0;
             }
-            LOG.info("C6 external call finished operation={} status={}", operation.name(), response.statusCode());
-            return new C6Reply(operation.name(), response.statusCode(), failure, false, decode(response.body()));
+            LOG.info(
+                    "C6 external call finished operation={} status={}",
+                    operation.name(),
+                    response.statusCode());
+            return new C6Reply(
+                    operation.name(),
+                    response.statusCode(),
+                    failure,
+                    false,
+                    decode(response.body()));
         } catch (InterruptedException exception) {
             Thread.currentThread().interrupt();
             failures++;
@@ -92,10 +109,12 @@ public final class C6HttpAdapter implements C6BankPort {
         } catch (Exception exception) {
             failures++;
             LOG.error("C6 external call failed operation={}", operation.name(), exception);
-            return new C6Reply(operation.name(), 503, true, false, Map.of("error", "PROVIDER_UNAVAILABLE"));
+            return new C6Reply(
+                    operation.name(), 503, true, false, Map.of("error", "PROVIDER_UNAVAILABLE"));
         }
     }
 
+    /** Obtém o token de acesso exigido pela integração do C6. */
     private String accessToken() throws Exception {
         if (tokenUntil.isAfter(Instant.now().plusSeconds(5)) && !token.isBlank()) {
             return token;
@@ -104,7 +123,8 @@ public final class C6HttpAdapter implements C6BankPort {
                 "grant_type=client_credentials&client_id="
                         + java.net.URLEncoder.encode(settings.clientId(), StandardCharsets.UTF_8)
                         + "&client_secret="
-                        + java.net.URLEncoder.encode(settings.clientSecret(), StandardCharsets.UTF_8);
+                        + java.net.URLEncoder.encode(
+                                settings.clientSecret(), StandardCharsets.UTF_8);
         C6Reply reply = send(C6Operation.AUTH_TOKEN, "/v1/auth", Map.of("form", form), true);
         Object value = reply.body().get("access_token");
         if (value == null) {
@@ -115,6 +135,7 @@ public final class C6HttpAdapter implements C6BankPort {
         return token;
     }
 
+    /** Decodifica o corpo da resposta sem registrar dados sensíveis. */
     @SuppressWarnings("unchecked")
     private Map<String, Object> decode(byte[] bytes) {
         if (bytes == null || bytes.length == 0) {
@@ -132,6 +153,7 @@ public final class C6HttpAdapter implements C6BankPort {
         }
     }
 
+    /** Configura o contexto TLS a partir dos certificados informados. */
     private static SSLContext ssl(C6Settings settings) {
         try {
             if (settings.certificate().isBlank() || settings.privateKey().isBlank()) {
@@ -146,7 +168,8 @@ public final class C6HttpAdapter implements C6BankPort {
             KeyStore store = KeyStore.getInstance("PKCS12");
             store.load(null, null);
             store.setKeyEntry("c6", key, new char[0], new Certificate[] {certificate});
-            KeyManagerFactory keys = KeyManagerFactory.getInstance(KeyManagerFactory.getDefaultAlgorithm());
+            KeyManagerFactory keys =
+                    KeyManagerFactory.getInstance(KeyManagerFactory.getDefaultAlgorithm());
             keys.init(store, new char[0]);
             SSLContext context = SSLContext.getInstance("TLS");
             context.init(keys.getKeyManagers(), null, null);
@@ -157,6 +180,7 @@ public final class C6HttpAdapter implements C6BankPort {
         }
     }
 
+    /** Converte a chave PEM no formato aceito pelo cliente TLS. */
     private static PrivateKey privateKey(String pem) throws Exception {
         String base64 =
                 pem.replace("-----BEGIN PRIVATE KEY-----", "")

@@ -7,21 +7,28 @@ services:
       INPAY_JOURNEY_AUTHORIZATION: ${DEMO_CONNECTOR_AUTHORIZATION:?Defina Basic base64(inpay:LOCAL_PASSWORD)}
     depends_on:
       connector-simulator:
-        condition: service_started
+        condition: service_healthy
   connector-simulator:
     build: ./examples/connector-simulator
     environment:
       LOCAL_PASSWORD: ${LOCAL_PASSWORD:-inpay@123}
+      SIMULATOR_DB: /tmp/inpay-simulator.sqlite
     ports:
       - 127.0.0.1:8120:8120
     read_only: true
     tmpfs:
-      - /tmp
+      - /tmp:mode=1777
+    healthcheck:
+      test: ["CMD", "python", "-c", "import urllib.request; urllib.request.urlopen('http://127.0.0.1:8120/health', timeout=3)"]
+      interval: 5s
+      timeout: 5s
+      retries: 12
   game-store:
     build: ./examples/game-store
     environment:
       STORE_MODE: local-simulator
       STORE_ADMIN_PASSWORD: ${STORE_ADMIN_PASSWORD:?Defina a senha administrativa local}
+      INPAY_ONBOARDING_URL: http://painel-gerencial:8130
       INPAY_URL: http://payment-core-service:8084
       INPAY_AUTHORIZATION: ${DEMO_CONNECTOR_AUTHORIZATION:?Defina Basic base64(inpay:LOCAL_PASSWORD)}
       INPAY_TENANT: 11111111-1111-1111-1111-111111111111

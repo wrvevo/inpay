@@ -22,10 +22,12 @@ public class C6ResultPublisherAdapter implements C6ResultPublisher {
     private final KafkaTemplate<String, String> kafka;
     private final ObjectMapper mapper = new ObjectMapper();
 
+    /** Inicializa o produtor Kafka responsável pelos resultados. */
     public C6ResultPublisherAdapter(KafkaTemplate<String, String> kafka) {
         this.kafka = kafka;
     }
 
+    /** Publica o resultado normalizado da operação no tópico configurado. */
     @Override
     public void publish(C6Operation operation, String operationId, C6Reply reply) {
         try {
@@ -37,8 +39,12 @@ public class C6ResultPublisherAdapter implements C6ResultPublisher {
             event.put("status", reply.status());
             event.put("uncertain", reply.uncertain());
             event.put("mocked", reply.mocked());
-            kafka.send(TOPIC, operationId == null ? operation.name() : operationId, mapper.writeValueAsString(event));
-            LOG.info("C6 result published operation={} status={}", operation.name(), reply.status());
+            kafka.send(
+                    TOPIC,
+                    operationId == null ? operation.name() : operationId,
+                    mapper.writeValueAsString(event));
+            LOG.info(
+                    "C6 result published operation={} status={}", operation.name(), reply.status());
         } catch (Exception exception) {
             LOG.error("C6 result publication failed operation={}", operation.name(), exception);
         }

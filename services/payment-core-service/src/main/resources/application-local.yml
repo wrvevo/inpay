@@ -8,6 +8,18 @@ spring:
 inpay:
   local-password: ${LOCAL_PASSWORD:inpay@123}
   local-merchant: 11111111-1111-1111-1111-111111111111
+  # Endereços internos explícitos: evita ambiguidades do relaxed binding em variáveis de ambiente.
+  bank-gateway:
+    username: ${INPAY_BANK_GATEWAY_USERNAME:developer}
+    password: ${INPAY_BANK_GATEWAY_PASSWORD:${LOCAL_PASSWORD:inpay@123}}
+    urls:
+      c6: ${INPAY_BANK_GATEWAY_URLS_C6:http://127.0.0.1:8111}
+      itau: ${INPAY_BANK_GATEWAY_URLS_ITAU:http://127.0.0.1:8112}
+      santander: ${INPAY_BANK_GATEWAY_URLS_SANTANDER:http://127.0.0.1:8113}
+      bb: ${INPAY_BANK_GATEWAY_URLS_BB:http://127.0.0.1:8114}
+      bradesco: ${INPAY_BANK_GATEWAY_URLS_BRADESCO:http://127.0.0.1:8115}
+      caixa: ${INPAY_BANK_GATEWAY_URLS_CAIXA:http://127.0.0.1:8116}
+      banrisul: ${INPAY_BANK_GATEWAY_URLS_BANRISUL:http://127.0.0.1:8117}
   c6:
     gateway-kafka: ${C6_GATEWAY_KAFKA:true}
 

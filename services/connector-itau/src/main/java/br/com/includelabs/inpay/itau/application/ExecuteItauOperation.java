@@ -1,5 +1,6 @@
 package br.com.includelabs.inpay.itau.application;
 
+import br.com.includelabs.inpay.contracts.MockIntentClient;
 import br.com.includelabs.inpay.itau.domain.ItauOperation;
 import br.com.includelabs.inpay.itau.domain.ItauProduct;
 import br.com.includelabs.inpay.itau.domain.ItauReply;
@@ -12,6 +13,7 @@ import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
+import tools.jackson.databind.ObjectMapper;
 
 /** Caso de uso: mock ou banco e idempotência. Não registra segredo nem payload. */
 public final class ExecuteItauOperation {
@@ -22,12 +24,14 @@ public final class ExecuteItauOperation {
     private final boolean confirmUnverified;
     private final ConcurrentHashMap<String, ItauReply> journal = new ConcurrentHashMap<>();
 
+    /** Inicializa a porta e os controles do caso de uso do Itaú. */
     public ExecuteItauOperation(ItauBankPort bank, boolean liveEnabled, boolean confirmUnverified) {
         this.bank = bank;
         this.liveEnabled = liveEnabled;
         this.confirmUnverified = confirmUnverified;
     }
 
+    /** Lista as operações disponíveis e seus metadados técnicos. */
     public List<Map<String, String>> catalog() {
         LOG.info("Itau catalog requested");
         List<Map<String, String>> rows = new ArrayList<>();
@@ -43,6 +47,7 @@ public final class ExecuteItauOperation {
         return rows;
     }
 
+    /** Valida a operação, seleciona o ambiente e controla a idempotência. */
     public ItauReply execute(
             String operationName,
             String operationId,
@@ -66,7 +71,7 @@ public final class ExecuteItauOperation {
                 mock);
         try {
             if (operation.hasBody() && operation != ItauOperation.AUTH_TOKEN) {
-                ItauReply replay = replay(operation, operationId);
+                ItauReply replay = replay(operation, operationId, mock);
                 if (replay != null) {
                     LOG.info("Itau operation replayed operation={}", operation.name());
                     return replay;
@@ -76,7 +81,7 @@ public final class ExecuteItauOperation {
             if (operation.hasBody()
                     && operation != ItauOperation.AUTH_TOKEN
                     && operationId != null) {
-                journal.put(operation.name() + "|" + operationId, reply);
+                journal.put(operation.name() + "|" + mock + "|" + operationId, reply);
             }
             LOG.info(
                     "Itau operation finished operation={} status={}",
@@ -89,6 +94,7 @@ public final class ExecuteItauOperation {
         }
     }
 
+    /** Executa a chamada real somente quando habilitada e confirmada. */
     private ItauReply live(ItauOperation operation, Map<String, Object> payload) {
         if (!liveEnabled) {
             throw new IllegalStateException("Itau connector is disabled; send X-Mock: true");
@@ -101,7 +107,11 @@ public final class ExecuteItauOperation {
         return bank.send(operation, planned.path(), planned.body(), planned.form());
     }
 
+    /** Executa a simulação sem enviar uma transação financeira ao banco. */
     private ItauReply mock(ItauOperation operation, Map<String, Object> payload) {
+        if (MockIntentClient.configured()) {
+            return wireMock(operation);
+        }
         Map<String, Object> body = new LinkedHashMap<>();
         body.put("mocked", true);
         body.put("bank", "itau");
@@ -122,10 +132,35 @@ public final class ExecuteItauOperation {
         return new ItauReply(operation.name(), 200, false, true, body);
     }
 
-    private ItauReply replay(ItauOperation operation, String operationId) {
+    /** Consulta o WireMock central e valida o contrato sintético retornado. */
+    @SuppressWarnings("unchecked")
+    private ItauReply wireMock(ItauOperation operation) {
+        try {
+            var response = MockIntentClient.execute("itau", operation.name());
+            if (response.status() != 200) {
+                return new ItauReply(
+                        operation.name(), 503, true, true, Map.of("error", "MOCK_UNAVAILABLE"));
+            }
+            Map<String, Object> body = new ObjectMapper().readValue(response.body(), Map.class);
+            if (!Boolean.TRUE.equals(body.get("mocked"))
+                    || !operation.name().equals(body.get("operation"))) {
+                throw new IllegalStateException("Invalid mock contract");
+            }
+            return new ItauReply(operation.name(), 200, false, true, body);
+        } catch (InterruptedException failure) {
+            Thread.currentThread().interrupt();
+        } catch (Exception failure) {
+            LOG.warn("Mock intent failed operation={}", operation.name());
+        }
+        return new ItauReply(
+                operation.name(), 503, true, true, Map.of("error", "MOCK_UNAVAILABLE"));
+    }
+
+    /** Recupera o resultado anterior da mesma operação e ambiente. */
+    private ItauReply replay(ItauOperation operation, String operationId, boolean mock) {
         if (operationId == null || !operationId.matches("[A-Za-z0-9_-]{1,80}")) {
             throw new IllegalArgumentException("operationId is required");
         }
-        return journal.get(operation.name() + "|" + operationId);
+        return journal.get(operation.name() + "|" + mock + "|" + operationId);
     }
 }

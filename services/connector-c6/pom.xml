@@ -11,6 +11,11 @@
     <dependencies>
         <dependency>
             <groupId>br.com.includelabs</groupId>
+            <artifactId>contracts</artifactId>
+            <version>${project.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>br.com.includelabs</groupId>
             <artifactId>bank-connector</artifactId>
             <version>${project.version}</version>
             <exclusions>

@@ -71,9 +71,14 @@ class AccessPolicyTest {
         var cloned = desk.cloneFrom(source.id(), Catalog.STORE_SUL, "PDV");
         assertEquals(source.antifraud(), cloned.antifraud());
         assertEquals("RASCUNHO", cloned.status());
-        var submitted = desk.submit(cloned.id(), "PDV");
-        assertEquals("APROVADA", desk.decide(submitted.id(), "BACKOFFICE", true).status());
-        assertTrue(
+        var submitted = desk.submit(cloned.id(), "PDV", "operator");
+        assertThrows(
+                IllegalArgumentException.class,
+                () -> desk.decide(submitted.id(), "ADMIN", "operator", true));
+        assertThrows(IllegalArgumentException.class, () -> desk.save(submitted));
+        assertEquals(
+                "APROVADA", desk.decide(submitted.id(), "BACKOFFICE", "reviewer", true).status());
+        assertFalse(
                 desk.list().stream()
                         .filter(item -> item.id().equals(submitted.id()))
                         .findFirst()

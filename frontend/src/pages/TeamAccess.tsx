@@ -2,10 +2,12 @@ import { useState } from "react";
 import { Heading, Notice } from "../components/UI";
 import { createUser, setMenus, usersOf, MENUS } from "../access.mjs";
 
-export function TeamAccess({ user, onUser }: { user: any; onUser: (user: any) => void }) {
-  const [rows, setRows] = useState(() => usersOf(user));
+type TeamMember = { id: string; role: string; name: string; email: string; menus: string[]; stores: { id: string }[] };
+
+export function TeamAccess({ user, onUser }: { user: TeamMember; onUser: (user: TeamMember) => void }) {
+  const [rows, setRows] = useState<TeamMember[]>(() => usersOf(user));
   const [error, setError] = useState("");
-  const ceiling = user.role === "ADMIN" ? MENUS : user.menus;
+  const ceiling: string[] = user.role === "ADMIN" ? MENUS : user.menus;
   function refresh(nextActor = user) {
     setRows(usersOf(nextActor));
   }

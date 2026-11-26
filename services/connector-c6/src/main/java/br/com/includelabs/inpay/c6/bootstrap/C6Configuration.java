@@ -12,19 +12,23 @@ import org.springframework.context.annotation.Configuration;
 @Configuration
 @EnableConfigurationProperties(C6Settings.class)
 public class C6Configuration {
+    /** Instancia o adaptador HTTP que implementa a porta bancária. */
     @Bean
     C6BankPort c6BankPort(C6Settings settings) {
         return new C6HttpAdapter(settings);
     }
 
+    /** Define o publicador padrão de resultados do conector. */
     @Bean
     @ConditionalOnMissingBean(C6ResultPublisher.class)
     C6ResultPublisher c6ResultPublisher() {
         return C6ResultPublisher.NONE;
     }
 
+    /** Compõe o caso de uso com as portas e parâmetros configurados. */
     @Bean
-    ExecuteC6Operation executeC6Operation(C6BankPort port, C6ResultPublisher results, C6Settings settings) {
+    ExecuteC6Operation executeC6Operation(
+            C6BankPort port, C6ResultPublisher results, C6Settings settings) {
         return new ExecuteC6Operation(
                 port, results, settings.enabled(), settings.confirmUnverifiedPaths());
     }

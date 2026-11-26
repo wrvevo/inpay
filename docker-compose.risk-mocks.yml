@@ -1,0 +1,80 @@
+services:
+  connector-clearsale:
+    environment:
+      INPAY_INTENT_MOCK_URL: http://bank-mock-server:8099
+    depends_on:
+      bank-mock-server:
+        condition: service_started
+  connector-serasa-experian:
+    environment:
+      INPAY_INTENT_MOCK_URL: http://bank-mock-server:8099
+    depends_on:
+      bank-mock-server:
+        condition: service_started
+  payment-core-service:
+    environment:
+      INPAY_BANK_GATEWAY_URLS_C6: http://connector-c6:8111
+      INPAY_BANK_GATEWAY_URLS_ITAU: http://connector-itau:8112
+      INPAY_BANK_GATEWAY_URLS_SANTANDER: http://connector-santander:8113
+      INPAY_BANK_GATEWAY_URLS_BB: http://connector-bb:8114
+      INPAY_BANK_GATEWAY_URLS_BRADESCO: http://connector-bradesco:8115
+      INPAY_BANK_GATEWAY_URLS_CAIXA: http://connector-caixa:8116
+      INPAY_BANK_GATEWAY_URLS_BANRISUL: http://connector-banrisul:8117
+      INPAY_BANK_GATEWAY_PASSWORD: ${LOCAL_PASSWORD:-inpay@123}
+  connector-cielo:
+    environment:
+      INPAY_INTENT_MOCK_URL: http://bank-mock-server:8099
+    depends_on:
+      bank-mock-server:
+        condition: service_started
+  connector-rede:
+    environment:
+      INPAY_INTENT_MOCK_URL: http://bank-mock-server:8099
+    depends_on:
+      bank-mock-server:
+        condition: service_started
+  connector-getnet:
+    environment:
+      INPAY_INTENT_MOCK_URL: http://bank-mock-server:8099
+    depends_on:
+      bank-mock-server:
+        condition: service_started
+  connector-stone:
+    environment:
+      INPAY_INTENT_MOCK_URL: http://bank-mock-server:8099
+    depends_on:
+      bank-mock-server:
+        condition: service_started
+  connector-bin:
+    environment:
+      INPAY_INTENT_MOCK_URL: http://bank-mock-server:8099
+    depends_on:
+      bank-mock-server:
+        condition: service_started
+  connector-global-payments:
+    environment:
+      INPAY_INTENT_MOCK_URL: http://bank-mock-server:8099
+    depends_on:
+      bank-mock-server:
+        condition: service_started
+  connector-pagbank:
+    environment:
+      INPAY_INTENT_MOCK_URL: http://bank-mock-server:8099
+    depends_on:
+      bank-mock-server:
+        condition: service_started
+  connector-safrapay:
+    environment:
+      INPAY_INTENT_MOCK_URL: http://bank-mock-server:8099
+    depends_on:
+      bank-mock-server:
+        condition: service_started
+  fraud-service:
+    environment:
+      INPAY_CLEARSALE_MOCK_URL: http://connector-clearsale:8128
+      INPAY_SERASA_MOCK_URL: http://connector-serasa-experian:8129
+    depends_on:
+      connector-clearsale:
+        condition: service_started
+      connector-serasa-experian:
+        condition: service_started

@@ -2,8 +2,8 @@ package br.com.includelabs.inpay.c6.domain;
 
 /**
  * Operações do portal C6. As marcadas como documentadas seguem os paths publicados (auth, boleto
- * v1, Pix BACEN v2, bolepix v2, checkout, extrato, webhooks e C6 Pay). Agendamento, saldo isolado
- * e tokenização só saem ao banco quando a confirmação de path está ligada.
+ * v1, Pix BACEN v2, bolepix v2, checkout, extrato, webhooks e C6 Pay). Agendamento, saldo isolado e
+ * tokenização só saem ao banco quando a confirmação de path está ligada.
  */
 public enum C6Operation {
     AUTH_TOKEN(C6Product.AUTHENTICATION, "POST", "/v1/auth", true),
@@ -70,6 +70,7 @@ public enum C6Operation {
     private final String path;
     private final boolean documented;
 
+    /** Define os metadados do contrato de uma operação C6. */
     C6Operation(C6Product product, String method, String path, boolean documented) {
         this.product = product;
         this.method = method;
@@ -77,26 +78,32 @@ public enum C6Operation {
         this.documented = documented;
     }
 
+    /** Retorna o produto bancário associado à operação. */
     public C6Product product() {
         return product;
     }
 
+    /** Retorna o método HTTP definido no contrato. */
     public String method() {
         return method;
     }
 
+    /** Retorna o caminho relativo da operação no provedor. */
     public String path() {
         return path;
     }
 
+    /** Indica se o contrato da operação está documentado. */
     public boolean documented() {
         return documented;
     }
 
+    /** Identifica operações HTTP que aceitam um corpo de requisição. */
     public boolean hasBody() {
         return "POST".equals(method) || "PUT".equals(method) || "PATCH".equals(method);
     }
 
+    /** Resolve a operação pelo nome e rejeita valores desconhecidos. */
     public static C6Operation fromName(String value) {
         if (value == null) {
             throw new IllegalArgumentException("Unknown C6 operation");

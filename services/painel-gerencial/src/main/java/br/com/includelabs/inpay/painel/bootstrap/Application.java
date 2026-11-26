@@ -2,7 +2,9 @@ package br.com.includelabs.inpay.painel.bootstrap;
 
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
+import org.springframework.scheduling.annotation.EnableScheduling;
 
+@EnableScheduling
 @SpringBootApplication(
         scanBasePackages = {
             "br.com.includelabs.inpay.painel",

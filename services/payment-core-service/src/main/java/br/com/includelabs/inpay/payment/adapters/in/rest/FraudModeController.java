@@ -31,6 +31,7 @@ public class FraudModeController {
     private final HttpClient http =
             HttpClient.newBuilder().connectTimeout(Duration.ofSeconds(2)).build();
 
+    /** Inicializa as dependências do controle de modo antifraude. */
     public FraudModeController(
             FraudModeHolder holder,
             @Value("${inpay.fraud.url:http://127.0.0.1:8087}") String fraudUrl,
@@ -40,6 +41,7 @@ public class FraudModeController {
         this.password = password;
     }
 
+    /** Consulta o modo antifraude ativo no Gateway. */
     @GetMapping
     @PreAuthorize("hasAuthority('SCOPE_payments/read')")
     @Operation(
@@ -51,6 +53,7 @@ public class FraudModeController {
         return body(holder.current(), false);
     }
 
+    /** Altera o modo e informa se a sincronização com o serviço de risco ocorreu. */
     @PutMapping
     @PreAuthorize("hasAuthority('SCOPE_payments/create')")
     @Operation(
@@ -61,10 +64,12 @@ public class FraudModeController {
         return body(mode, sync(mode));
     }
 
+    /** Monta o contrato de resposta sem expor credenciais. */
     private Map<String, Object> body(String mode, boolean synced) {
         return Map.of("mode", mode, "providers", FraudMode.all(), "syncedWithFraudService", synced);
     }
 
+    /** Replica o modo selecionado no serviço de risco e sinaliza indisponibilidade. */
     private boolean sync(String mode) {
         if (password.isBlank() || fraudUrl.isBlank()) {
             return false;
@@ -72,8 +77,7 @@ public class FraudModeController {
         try {
             String token =
                     Base64.getEncoder()
-                            .encodeToString(
-                                    ("inpay:" + password).getBytes(StandardCharsets.UTF_8));
+                            .encodeToString(("inpay:" + password).getBytes(StandardCharsets.UTF_8));
             HttpRequest request =
                     HttpRequest.newBuilder(URI.create(fraudUrl + "/internal/v1/fraud-mode"))
                             .timeout(Duration.ofSeconds(2))

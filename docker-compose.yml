@@ -16,6 +16,7 @@ services:
       MARKETPLACE_URL: http://marketplace-service:8112
       BILLING_URL: http://billing-service:8113
       ACCOUNTS_URL: http://accounts-service:8111
+      PAINEL_URL: http://painel-gerencial:8130
     restart: unless-stopped
   postgres:
     image: postgres:17.6
@@ -470,12 +471,24 @@ services:
       SPRING_PROFILES_ACTIVE: local
       LOCAL_PASSWORD: ${LOCAL_PASSWORD:-inpay@123}
       SERVER_PORT: '8130'
+      DB_URL: jdbc:postgresql://postgres:5432/painel_gerencial
+      DB_USER: painel_gerencial
+      DB_PASSWORD: local-only
+      INPAY_ONBOARDING_ENABLED: "true"
+      INPAY_DOCUMENT_KEY: ${INPAY_DOCUMENT_KEY:-}
+      INPAY_DOCUMENT_KEY_ID: ${INPAY_DOCUMENT_KEY_ID:-}
+      INPAY_DOCUMENT_RETENTION_DAYS: ${INPAY_DOCUMENT_RETENTION_DAYS:-0}
+      INPAY_DOCUMENT_SYNTHETIC_FIXTURE: ${INPAY_DOCUMENT_SYNTHETIC_FIXTURE:-false}
+      INPAY_DOCUMENT_SCANNER_HOST: ${INPAY_DOCUMENT_SCANNER_HOST:-}
       OTEL_SERVICE_NAME: painel-gerencial
       OTEL_METRICS_EXPORTER: none
       OTEL_LOGS_EXPORTER: none
       JAVA_TOOL_OPTIONS: -XX:MaxRAMPercentage=60 -XX:InitialRAMPercentage=15
     ports:
     - 127.0.0.1:8130:8130
+    depends_on:
+      postgres:
+        condition: service_healthy
     mem_limit: ${SERVICE_MEMORY_LIMIT:-512m}
     restart: unless-stopped
     image: inpay/painel-gerencial:0.2.0

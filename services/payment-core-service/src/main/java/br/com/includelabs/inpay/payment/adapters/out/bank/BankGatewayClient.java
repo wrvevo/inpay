@@ -18,12 +18,15 @@ import tools.jackson.databind.ObjectMapper;
 @Component
 public class BankGatewayClient {
     static final Duration BUDGET = Duration.ofMillis(100);
+    private static final Duration MOCK_BUDGET = Duration.ofSeconds(5);
     private static final Logger LOG = LogManager.getLogger(BankGatewayClient.class);
 
     private final BankGatewaySettings settings;
     private final HttpClient client;
+    private final HttpClient mockClient;
     private final ObjectMapper mapper = new ObjectMapper();
 
+    /** Configura o transporte e os endereços dos conectores bancários. */
     @Autowired
     public BankGatewayClient(BankGatewaySettings settings) {
         this(
@@ -34,11 +37,18 @@ public class BankGatewayClient {
                         .build());
     }
 
+    /** Configura o transporte e os endereços dos conectores bancários. */
     private BankGatewayClient(BankGatewaySettings settings, HttpClient client) {
         this.settings = settings;
         this.client = client;
+        this.mockClient =
+                HttpClient.newBuilder()
+                        .connectTimeout(MOCK_BUDGET)
+                        .followRedirects(HttpClient.Redirect.NEVER)
+                        .build();
     }
 
+    /** Encaminha a operação ao banco com o orçamento de tempo definido. */
     public Downstream execute(
             String bank,
             String operation,
@@ -46,6 +56,9 @@ public class BankGatewayClient {
             String operationId,
             Map<String, Object> payload) {
         String base = settings.url(bank);
+        boolean simulated = "true".equalsIgnoreCase(mock == null ? "" : mock.trim());
+        Duration budget = simulated ? MOCK_BUDGET : BUDGET;
+        HttpClient transport = simulated ? mockClient : client;
         LOG.info(
                 "Gateway bank dispatch started bank={} operation={} mock={} ",
                 bank,
@@ -56,7 +69,7 @@ public class BankGatewayClient {
             HttpRequest.Builder request =
                     HttpRequest.newBuilder(
                                     URI.create(base + "/internal/v1/bank/operations/" + operation))
-                            .timeout(BUDGET)
+                            .timeout(budget)
                             .header("Accept", "application/json")
                             .header("Content-Type", "application/json")
                             .header("Idempotency-Key", operationId)
@@ -75,9 +88,19 @@ public class BankGatewayClient {
                 request.header("X-Mock", mock.trim());
             }
             request.POST(HttpRequest.BodyPublishers.ofString(body, StandardCharsets.UTF_8));
-            var future = client.sendAsync(request.build(), HttpResponse.BodyHandlers.ofString());
-            HttpResponse<String> response =
-                    future.get(BUDGET.toMillis(), java.util.concurrent.TimeUnit.MILLISECONDS);
+            var future = transport.sendAsync(request.build(), HttpResponse.BodyHandlers.ofString());
+            HttpResponse<String> response;
+            try {
+                response =
+                        future.get(budget.toMillis(), java.util.concurrent.TimeUnit.MILLISECONDS);
+            } catch (InterruptedException exception) {
+                future.cancel(true);
+                Thread.currentThread().interrupt();
+                throw exception;
+            } catch (Exception exception) {
+                future.cancel(true);
+                throw exception;
+            }
             LOG.info(
                     "Gateway bank dispatch finished bank={} operation={} status={}",
                     bank,

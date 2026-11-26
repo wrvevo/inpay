@@ -127,7 +127,7 @@ try {
                         "POST",
                         "",
                         [
-                            "merchantOrder" => $key,
+                            "merchantOrder" => isset($_SESSION["demo_id"]) ? $_SESSION["demo_id"].":".$key : $key,
                             "amount" => $prepared["order"]["amount"],
                             "method" => $journeyMethod,
                             "instrument" => $instrument,
