@@ -4,6 +4,7 @@ import br.com.includelabs.inpay.painel.domain.Directory;
 import br.com.includelabs.inpay.painel.domain.HomologationDesk;
 import java.util.Map;
 import java.util.Set;
+import org.springframework.context.annotation.Profile;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.core.context.SecurityContextHolder;
@@ -15,6 +16,7 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RestController;
 
 @RestController
+@Profile("local")
 public class PainelController {
     private final Directory directory;
     private final HomologationDesk desk;

@@ -11,7 +11,9 @@ import org.springframework.web.bind.annotation.*;
 import org.springframework.web.server.ResponseStatusException;
 import tools.jackson.databind.ObjectMapper;
 
-/** Local-only, explicitly synthetic tests; never touches live credentials or the financial journal. */
+/**
+ * Local-only, explicitly synthetic tests; never touches live credentials or the financial journal.
+ */
 @RestController
 @Profile("local")
 @RequestMapping("/internal/v1/provider-mocks")
