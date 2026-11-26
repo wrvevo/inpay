@@ -1,21 +1,13 @@
 {
-  "folders": {
-    "GATEWAY": {
-      "description": "Bases dos servicos do gateway"
-    },
-    "DEMO": {
-      "description": "Bases usadas pela loja e pelo simulador locais"
-    },
-    "PAINEL_GERENCIAL": {
-      "description": "Base do painel de homologacao"
-    }
-  },
+  "folders": {},
   "connections": {
-    "gateway-postgres": {
+    "postgres-jdbc-inpay-gateway-postgres": {
       "provider": "postgresql",
       "driver": "postgres-jdbc",
       "name": "postgres (admin)",
+      "description": "GATEWAY · postgres",
       "save-password": true,
+      "read-only": false,
       "folder": "GATEWAY",
       "configuration": {
         "host": "127.0.0.1",
@@ -26,15 +18,19 @@
         "type": "dev",
         "closeIdleConnection": true,
         "auth-model": "native",
-        "user": "postgres",
-        "password": "local-admin-only"
+        "auth-properties": {
+          "userName": "postgres",
+          "userPassword": "local-admin-only"
+        }
       }
     },
-    "gateway-merchant_service": {
+    "postgres-jdbc-inpay-gateway-merchant-service": {
       "provider": "postgresql",
       "driver": "postgres-jdbc",
       "name": "merchant_service",
+      "description": "GATEWAY · merchant_service",
       "save-password": true,
+      "read-only": false,
       "folder": "GATEWAY",
       "configuration": {
         "host": "127.0.0.1",
@@ -45,15 +41,19 @@
         "type": "dev",
         "closeIdleConnection": true,
         "auth-model": "native",
-        "user": "merchant_service",
-        "password": "local-only"
+        "auth-properties": {
+          "userName": "merchant_service",
+          "userPassword": "local-only"
+        }
       }
     },
-    "gateway-payment_links_service": {
+    "postgres-jdbc-inpay-gateway-payment-links-service": {
       "provider": "postgresql",
       "driver": "postgres-jdbc",
       "name": "payment_links_service",
+      "description": "GATEWAY · payment_links_service",
       "save-password": true,
+      "read-only": false,
       "folder": "GATEWAY",
       "configuration": {
         "host": "127.0.0.1",
@@ -64,15 +64,19 @@
         "type": "dev",
         "closeIdleConnection": true,
         "auth-model": "native",
-        "user": "payment_links_service",
-        "password": "local-only"
+        "auth-properties": {
+          "userName": "payment_links_service",
+          "userPassword": "local-only"
+        }
       }
     },
-    "gateway-checkout_service": {
+    "postgres-jdbc-inpay-gateway-checkout-service": {
       "provider": "postgresql",
       "driver": "postgres-jdbc",
       "name": "checkout_service",
+      "description": "GATEWAY · checkout_service",
       "save-password": true,
+      "read-only": false,
       "folder": "GATEWAY",
       "configuration": {
         "host": "127.0.0.1",
@@ -83,15 +87,19 @@
         "type": "dev",
         "closeIdleConnection": true,
         "auth-model": "native",
-        "user": "checkout_service",
-        "password": "local-only"
+        "auth-properties": {
+          "userName": "checkout_service",
+          "userPassword": "local-only"
+        }
       }
     },
-    "gateway-payment_core_service": {
+    "postgres-jdbc-inpay-gateway-payment-core-service": {
       "provider": "postgresql",
       "driver": "postgres-jdbc",
       "name": "payment_core_service",
+      "description": "GATEWAY · payment_core_service",
       "save-password": true,
+      "read-only": false,
       "folder": "GATEWAY",
       "configuration": {
         "host": "127.0.0.1",
@@ -102,15 +110,19 @@
         "type": "dev",
         "closeIdleConnection": true,
         "auth-model": "native",
-        "user": "payment_core_service",
-        "password": "local-only"
+        "auth-properties": {
+          "userName": "payment_core_service",
+          "userPassword": "local-only"
+        }
       }
     },
-    "gateway-routing_service": {
+    "postgres-jdbc-inpay-gateway-routing-service": {
       "provider": "postgresql",
       "driver": "postgres-jdbc",
       "name": "routing_service",
+      "description": "GATEWAY · routing_service",
       "save-password": true,
+      "read-only": false,
       "folder": "GATEWAY",
       "configuration": {
         "host": "127.0.0.1",
@@ -121,15 +133,19 @@
         "type": "dev",
         "closeIdleConnection": true,
         "auth-model": "native",
-        "user": "routing_service",
-        "password": "local-only"
+        "auth-properties": {
+          "userName": "routing_service",
+          "userPassword": "local-only"
+        }
       }
     },
-    "gateway-token_service": {
+    "postgres-jdbc-inpay-gateway-token-service": {
       "provider": "postgresql",
       "driver": "postgres-jdbc",
       "name": "token_service",
+      "description": "GATEWAY · token_service",
       "save-password": true,
+      "read-only": false,
       "folder": "GATEWAY",
       "configuration": {
         "host": "127.0.0.1",
@@ -140,15 +156,19 @@
         "type": "dev",
         "closeIdleConnection": true,
         "auth-model": "native",
-        "user": "token_service",
-        "password": "local-only"
+        "auth-properties": {
+          "userName": "token_service",
+          "userPassword": "local-only"
+        }
       }
     },
-    "gateway-fraud_service": {
+    "postgres-jdbc-inpay-gateway-fraud-service": {
       "provider": "postgresql",
       "driver": "postgres-jdbc",
       "name": "fraud_service",
+      "description": "GATEWAY · fraud_service",
       "save-password": true,
+      "read-only": false,
       "folder": "GATEWAY",
       "configuration": {
         "host": "127.0.0.1",
@@ -159,15 +179,19 @@
         "type": "dev",
         "closeIdleConnection": true,
         "auth-model": "native",
-        "user": "fraud_service",
-        "password": "local-only"
+        "auth-properties": {
+          "userName": "fraud_service",
+          "userPassword": "local-only"
+        }
       }
     },
-    "gateway-webhook_ingress_service": {
+    "postgres-jdbc-inpay-gateway-webhook-ingress-service": {
       "provider": "postgresql",
       "driver": "postgres-jdbc",
       "name": "webhook_ingress_service",
+      "description": "GATEWAY · webhook_ingress_service",
       "save-password": true,
+      "read-only": false,
       "folder": "GATEWAY",
       "configuration": {
         "host": "127.0.0.1",
@@ -178,15 +202,19 @@
         "type": "dev",
         "closeIdleConnection": true,
         "auth-model": "native",
-        "user": "webhook_ingress_service",
-        "password": "local-only"
+        "auth-properties": {
+          "userName": "webhook_ingress_service",
+          "userPassword": "local-only"
+        }
       }
     },
-    "gateway-reconciliation_service": {
+    "postgres-jdbc-inpay-gateway-reconciliation-service": {
       "provider": "postgresql",
       "driver": "postgres-jdbc",
       "name": "reconciliation_service",
+      "description": "GATEWAY · reconciliation_service",
       "save-password": true,
+      "read-only": false,
       "folder": "GATEWAY",
       "configuration": {
         "host": "127.0.0.1",
@@ -197,15 +225,19 @@
         "type": "dev",
         "closeIdleConnection": true,
         "auth-model": "native",
-        "user": "reconciliation_service",
-        "password": "local-only"
+        "auth-properties": {
+          "userName": "reconciliation_service",
+          "userPassword": "local-only"
+        }
       }
     },
-    "gateway-notification_service": {
+    "postgres-jdbc-inpay-gateway-notification-service": {
       "provider": "postgresql",
       "driver": "postgres-jdbc",
       "name": "notification_service",
+      "description": "GATEWAY · notification_service",
       "save-password": true,
+      "read-only": false,
       "folder": "GATEWAY",
       "configuration": {
         "host": "127.0.0.1",
@@ -216,15 +248,19 @@
         "type": "dev",
         "closeIdleConnection": true,
         "auth-model": "native",
-        "user": "notification_service",
-        "password": "local-only"
+        "auth-properties": {
+          "userName": "notification_service",
+          "userPassword": "local-only"
+        }
       }
     },
-    "gateway-transaction_query_service": {
+    "postgres-jdbc-inpay-gateway-transaction-query-service": {
       "provider": "postgresql",
       "driver": "postgres-jdbc",
       "name": "transaction_query_service",
+      "description": "GATEWAY · transaction_query_service",
       "save-password": true,
+      "read-only": false,
       "folder": "GATEWAY",
       "configuration": {
         "host": "127.0.0.1",
@@ -235,15 +271,19 @@
         "type": "dev",
         "closeIdleConnection": true,
         "auth-model": "native",
-        "user": "transaction_query_service",
-        "password": "local-only"
+        "auth-properties": {
+          "userName": "transaction_query_service",
+          "userPassword": "local-only"
+        }
       }
     },
-    "gateway-connector_cielo": {
+    "postgres-jdbc-inpay-gateway-connector-cielo": {
       "provider": "postgresql",
       "driver": "postgres-jdbc",
       "name": "connector_cielo",
+      "description": "GATEWAY · connector_cielo",
       "save-password": true,
+      "read-only": false,
       "folder": "GATEWAY",
       "configuration": {
         "host": "127.0.0.1",
@@ -254,15 +294,19 @@
         "type": "dev",
         "closeIdleConnection": true,
         "auth-model": "native",
-        "user": "connector_cielo",
-        "password": "local-only"
+        "auth-properties": {
+          "userName": "connector_cielo",
+          "userPassword": "local-only"
+        }
       }
     },
-    "gateway-connector_rede": {
+    "postgres-jdbc-inpay-gateway-connector-rede": {
       "provider": "postgresql",
       "driver": "postgres-jdbc",
       "name": "connector_rede",
+      "description": "GATEWAY · connector_rede",
       "save-password": true,
+      "read-only": false,
       "folder": "GATEWAY",
       "configuration": {
         "host": "127.0.0.1",
@@ -273,15 +317,19 @@
         "type": "dev",
         "closeIdleConnection": true,
         "auth-model": "native",
-        "user": "connector_rede",
-        "password": "local-only"
+        "auth-properties": {
+          "userName": "connector_rede",
+          "userPassword": "local-only"
+        }
       }
     },
-    "gateway-connector_getnet": {
+    "postgres-jdbc-inpay-gateway-connector-getnet": {
       "provider": "postgresql",
       "driver": "postgres-jdbc",
       "name": "connector_getnet",
+      "description": "GATEWAY · connector_getnet",
       "save-password": true,
+      "read-only": false,
       "folder": "GATEWAY",
       "configuration": {
         "host": "127.0.0.1",
@@ -292,15 +340,19 @@
         "type": "dev",
         "closeIdleConnection": true,
         "auth-model": "native",
-        "user": "connector_getnet",
-        "password": "local-only"
+        "auth-properties": {
+          "userName": "connector_getnet",
+          "userPassword": "local-only"
+        }
       }
     },
-    "gateway-connector_stone": {
+    "postgres-jdbc-inpay-gateway-connector-stone": {
       "provider": "postgresql",
       "driver": "postgres-jdbc",
       "name": "connector_stone",
+      "description": "GATEWAY · connector_stone",
       "save-password": true,
+      "read-only": false,
       "folder": "GATEWAY",
       "configuration": {
         "host": "127.0.0.1",
@@ -311,15 +363,19 @@
         "type": "dev",
         "closeIdleConnection": true,
         "auth-model": "native",
-        "user": "connector_stone",
-        "password": "local-only"
+        "auth-properties": {
+          "userName": "connector_stone",
+          "userPassword": "local-only"
+        }
       }
     },
-    "gateway-connector_bin": {
+    "postgres-jdbc-inpay-gateway-connector-bin": {
       "provider": "postgresql",
       "driver": "postgres-jdbc",
       "name": "connector_bin",
+      "description": "GATEWAY · connector_bin",
       "save-password": true,
+      "read-only": false,
       "folder": "GATEWAY",
       "configuration": {
         "host": "127.0.0.1",
@@ -330,15 +386,19 @@
         "type": "dev",
         "closeIdleConnection": true,
         "auth-model": "native",
-        "user": "connector_bin",
-        "password": "local-only"
+        "auth-properties": {
+          "userName": "connector_bin",
+          "userPassword": "local-only"
+        }
       }
     },
-    "gateway-connector_global_payments": {
+    "postgres-jdbc-inpay-gateway-connector-global-payments": {
       "provider": "postgresql",
       "driver": "postgres-jdbc",
       "name": "connector_global_payments",
+      "description": "GATEWAY · connector_global_payments",
       "save-password": true,
+      "read-only": false,
       "folder": "GATEWAY",
       "configuration": {
         "host": "127.0.0.1",
@@ -349,15 +409,19 @@
         "type": "dev",
         "closeIdleConnection": true,
         "auth-model": "native",
-        "user": "connector_global_payments",
-        "password": "local-only"
+        "auth-properties": {
+          "userName": "connector_global_payments",
+          "userPassword": "local-only"
+        }
       }
     },
-    "gateway-connector_pagbank": {
+    "postgres-jdbc-inpay-gateway-connector-pagbank": {
       "provider": "postgresql",
       "driver": "postgres-jdbc",
       "name": "connector_pagbank",
+      "description": "GATEWAY · connector_pagbank",
       "save-password": true,
+      "read-only": false,
       "folder": "GATEWAY",
       "configuration": {
         "host": "127.0.0.1",
@@ -368,15 +432,19 @@
         "type": "dev",
         "closeIdleConnection": true,
         "auth-model": "native",
-        "user": "connector_pagbank",
-        "password": "local-only"
+        "auth-properties": {
+          "userName": "connector_pagbank",
+          "userPassword": "local-only"
+        }
       }
     },
-    "gateway-connector_safrapay": {
+    "postgres-jdbc-inpay-gateway-connector-safrapay": {
       "provider": "postgresql",
       "driver": "postgres-jdbc",
       "name": "connector_safrapay",
+      "description": "GATEWAY · connector_safrapay",
       "save-password": true,
+      "read-only": false,
       "folder": "GATEWAY",
       "configuration": {
         "host": "127.0.0.1",
@@ -387,15 +455,19 @@
         "type": "dev",
         "closeIdleConnection": true,
         "auth-model": "native",
-        "user": "connector_safrapay",
-        "password": "local-only"
+        "auth-properties": {
+          "userName": "connector_safrapay",
+          "userPassword": "local-only"
+        }
       }
     },
-    "gateway-marketplace_service": {
+    "postgres-jdbc-inpay-gateway-marketplace-service": {
       "provider": "postgresql",
       "driver": "postgres-jdbc",
       "name": "marketplace_service",
+      "description": "GATEWAY · marketplace_service",
       "save-password": true,
+      "read-only": false,
       "folder": "GATEWAY",
       "configuration": {
         "host": "127.0.0.1",
@@ -406,15 +478,19 @@
         "type": "dev",
         "closeIdleConnection": true,
         "auth-model": "native",
-        "user": "marketplace_service",
-        "password": "local-only"
+        "auth-properties": {
+          "userName": "marketplace_service",
+          "userPassword": "local-only"
+        }
       }
     },
-    "gateway-accounts_service": {
+    "postgres-jdbc-inpay-gateway-accounts-service": {
       "provider": "postgresql",
       "driver": "postgres-jdbc",
       "name": "accounts_service",
+      "description": "GATEWAY · accounts_service",
       "save-password": true,
+      "read-only": false,
       "folder": "GATEWAY",
       "configuration": {
         "host": "127.0.0.1",
@@ -425,15 +501,19 @@
         "type": "dev",
         "closeIdleConnection": true,
         "auth-model": "native",
-        "user": "accounts_service",
-        "password": "local-only"
+        "auth-properties": {
+          "userName": "accounts_service",
+          "userPassword": "local-only"
+        }
       }
     },
-    "gateway-commerce_marketplace": {
+    "postgres-jdbc-inpay-gateway-commerce-marketplace": {
       "provider": "postgresql",
       "driver": "postgres-jdbc",
       "name": "commerce_marketplace",
+      "description": "GATEWAY · commerce_marketplace",
       "save-password": true,
+      "read-only": false,
       "folder": "GATEWAY",
       "configuration": {
         "host": "127.0.0.1",
@@ -444,15 +524,19 @@
         "type": "dev",
         "closeIdleConnection": true,
         "auth-model": "native",
-        "user": "commerce_marketplace",
-        "password": "local-only"
+        "auth-properties": {
+          "userName": "commerce_marketplace",
+          "userPassword": "local-only"
+        }
       }
     },
-    "gateway-billing_service": {
+    "postgres-jdbc-inpay-gateway-billing-service": {
       "provider": "postgresql",
       "driver": "postgres-jdbc",
       "name": "billing_service",
+      "description": "GATEWAY · billing_service",
       "save-password": true,
+      "read-only": false,
       "folder": "GATEWAY",
       "configuration": {
         "host": "127.0.0.1",
@@ -463,15 +547,19 @@
         "type": "dev",
         "closeIdleConnection": true,
         "auth-model": "native",
-        "user": "billing_service",
-        "password": "local-only"
+        "auth-properties": {
+          "userName": "billing_service",
+          "userPassword": "local-only"
+        }
       }
     },
-    "demo-payment_core_service": {
+    "postgres-jdbc-inpay-demo-payment-core-service": {
       "provider": "postgresql",
       "driver": "postgres-jdbc",
-      "name": "demo payment_core_service",
+      "name": "payment_core_service",
+      "description": "DEMO · payment_core_service",
       "save-password": true,
+      "read-only": false,
       "folder": "DEMO",
       "configuration": {
         "host": "127.0.0.1",
@@ -482,15 +570,19 @@
         "type": "dev",
         "closeIdleConnection": true,
         "auth-model": "native",
-        "user": "payment_core_service",
-        "password": "local-only"
+        "auth-properties": {
+          "userName": "payment_core_service",
+          "userPassword": "local-only"
+        }
       }
     },
-    "demo-fraud_service": {
+    "postgres-jdbc-inpay-demo-fraud-service": {
       "provider": "postgresql",
       "driver": "postgres-jdbc",
-      "name": "demo fraud_service",
+      "name": "fraud_service",
+      "description": "DEMO · fraud_service",
       "save-password": true,
+      "read-only": false,
       "folder": "DEMO",
       "configuration": {
         "host": "127.0.0.1",
@@ -501,15 +593,19 @@
         "type": "dev",
         "closeIdleConnection": true,
         "auth-model": "native",
-        "user": "fraud_service",
-        "password": "local-only"
+        "auth-properties": {
+          "userName": "fraud_service",
+          "userPassword": "local-only"
+        }
       }
     },
-    "demo-billing_service": {
+    "postgres-jdbc-inpay-demo-billing-service": {
       "provider": "postgresql",
       "driver": "postgres-jdbc",
-      "name": "demo billing_service",
+      "name": "billing_service",
+      "description": "DEMO · billing_service",
       "save-password": true,
+      "read-only": false,
       "folder": "DEMO",
       "configuration": {
         "host": "127.0.0.1",
@@ -520,16 +616,20 @@
         "type": "dev",
         "closeIdleConnection": true,
         "auth-model": "native",
-        "user": "billing_service",
-        "password": "local-only"
+        "auth-properties": {
+          "userName": "billing_service",
+          "userPassword": "local-only"
+        }
       }
     },
-    "painel-gerencial": {
+    "postgres-jdbc-inpay-painel-gerencial-painel-gerencial": {
       "provider": "postgresql",
       "driver": "postgres-jdbc",
       "name": "painel_gerencial",
+      "description": "PAINEL GERENCIAL · painel_gerencial",
       "save-password": true,
-      "folder": "PAINEL_GERENCIAL",
+      "read-only": false,
+      "folder": "PAINEL GERENCIAL",
       "configuration": {
         "host": "127.0.0.1",
         "port": "5432",
@@ -539,9 +639,27 @@
         "type": "dev",
         "closeIdleConnection": true,
         "auth-model": "native",
-        "user": "painel_gerencial",
-        "password": "local-only"
+        "auth-properties": {
+          "userName": "painel_gerencial",
+          "userPassword": "local-only"
+        }
       }
+    }
+  },
+  "connection-types": {
+    "dev": {
+      "name": "Development",
+      "color": "255,255,255",
+      "description": "Regular development database",
+      "auto-commit": true,
+      "confirm-execute": false,
+      "confirm-data-change": false,
+      "smart-commit": false,
+      "smart-commit-recover": true,
+      "auto-close-transactions": true,
+      "close-transactions-period": 1800,
+      "auto-close-connections": true,
+      "close-connections-period": 14400
     }
   }
 }
