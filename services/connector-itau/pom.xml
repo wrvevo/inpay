@@ -10,6 +10,11 @@
     <artifactId>connector-itau</artifactId>
     <dependencies>
         <dependency>
+            <groupId>br.com.includelabs.inpay</groupId>
+            <artifactId>contracts</artifactId>
+            <version>${project.version}</version>
+        </dependency>
+        <dependency>
             <groupId>br.com.includelabs</groupId>
             <artifactId>bank-connector</artifactId>
             <version>${project.version}</version>
