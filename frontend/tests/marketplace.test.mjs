@@ -42,7 +42,7 @@ test("local customer bridge never uses admin identity or overrides supplied JWT"
     );
     assert.equal(
       Buffer.from(calls[1].slice(6), "base64").toString(),
-      "developer:test-only",
+      "inpay:test-only",
     );
     assert.equal(calls[2], "Bearer supplied");
   } finally {
