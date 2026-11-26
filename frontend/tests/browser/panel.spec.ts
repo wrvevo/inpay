@@ -171,8 +171,10 @@ test("all pages render and mobile navigation has no horizontal overflow", async 
   await page.goto("/");
   await expect(page.getByRole("button", { name: "Abrir menu" })).toBeVisible();
   await page.getByRole("button", { name: "Abrir menu" }).click();
+  await page.getByLabel("Aplicação InPay").selectOption("accounts");
+  await page.getByRole("button", { name: "Abrir menu" }).click();
   await page
-    .getByRole("button", { name: "Meios de pagamento", exact: true })
+    .getByRole("button", { name: "Meios e adquirentes (templates)", exact: true })
     .click();
   await expect(
     page.getByRole("heading", { name: "Meios de pagamento", exact: true }),
@@ -200,4 +202,16 @@ test("risk simulation and split retain the expected decision and cents", async (
   await page.getByLabel("Valor da venda (R$)").fill("10,01");
   await expect(page.locator("dd").first()).toHaveText("R$ 1,00");
   await expect(page.locator("dd").last()).toHaveText("R$ 9,01");
+});
+
+
+test("product navigation isolates menus and deep links select their owner", async ({ page }) => {
+  await expect(page.getByLabel("Aplicação InPay")).toHaveValue("gateway");
+  await expect(page.getByRole("button", { name: "Vendedores e repasses" })).toHaveCount(0);
+  await page.getByLabel("Aplicação InPay").selectOption("marketplace");
+  await expect(page.getByRole("button", { name: "Vendedores e repasses" })).toBeVisible();
+  await expect(page.getByRole("button", { name: "Transações", exact: true })).toHaveCount(0);
+  await page.goto("/#methods");
+  await expect(page.getByLabel("Aplicação InPay")).toHaveValue("accounts");
+  await expect(page.getByRole("heading", { name: "Meios de pagamento", exact: true })).toBeVisible();
 });
