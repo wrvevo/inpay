@@ -5,6 +5,7 @@ import br.com.includelabs.inpay.c6.domain.C6Product;
 import br.com.includelabs.inpay.c6.domain.C6Reply;
 import br.com.includelabs.inpay.c6.domain.C6RequestPlan;
 import br.com.includelabs.inpay.c6.domain.port.C6BankPort;
+import br.com.includelabs.inpay.contracts.MockIntentClient;
 import java.util.ArrayList;
 import java.util.LinkedHashMap;
 import java.util.List;
@@ -12,6 +13,7 @@ import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
+import tools.jackson.databind.ObjectMapper;
 
 /** Caso de uso: mock ou banco, idempotência e publicação do resultado. */
 public final class ExecuteC6Operation {
@@ -63,7 +65,7 @@ public final class ExecuteC6Operation {
         LOG.info("C6 operation started operation={} product={} mock={}", operation.name(), operation.product(), mock);
         try {
             if (operation.hasBody() && operation != C6Operation.AUTH_TOKEN) {
-                C6Reply replay = replay(operation, operationId, payload);
+                C6Reply replay = replay(operation, operationId, mock, payload);
                 if (replay != null) {
                     LOG.info("C6 operation replayed operation={}", operation.name());
                     return replay;
@@ -71,7 +73,7 @@ public final class ExecuteC6Operation {
             }
             C6Reply reply = mock ? mock(operation, payload) : live(operation, payload);
             if (operation.hasBody() && operation != C6Operation.AUTH_TOKEN && operationId != null) {
-                journal.put(operation.name() + "|" + operationId, reply);
+                journal.put(operation.name() + "|" + mock + "|" + operationId, reply);
             }
             results.publish(operation, operationId, reply);
             LOG.info(
@@ -98,6 +100,9 @@ public final class ExecuteC6Operation {
     }
 
     private C6Reply mock(C6Operation operation, Map<String, Object> payload) {
+        if (MockIntentClient.configured()) {
+            return wireMock(operation);
+        }
         Map<String, Object> body = new LinkedHashMap<>();
         body.put("mocked", true);
         body.put("bank", "c6");
@@ -121,10 +126,33 @@ public final class ExecuteC6Operation {
         return new C6Reply(operation.name(), 200, false, true, body);
     }
 
-    private C6Reply replay(C6Operation operation, String operationId, Map<String, Object> payload) {
+    @SuppressWarnings("unchecked")
+    private C6Reply wireMock(C6Operation operation) {
+        try {
+            var response = MockIntentClient.execute("c6", operation.name());
+            if (response.status() != 200) {
+                return new C6Reply(
+                        operation.name(), 503, true, true, Map.of("error", "MOCK_UNAVAILABLE"));
+            }
+            Map<String, Object> body = new ObjectMapper().readValue(response.body(), Map.class);
+            if (!Boolean.TRUE.equals(body.get("mocked"))
+                    || !operation.name().equals(body.get("operation"))) {
+                throw new IllegalStateException("Invalid mock contract");
+            }
+            return new C6Reply(operation.name(), 200, false, true, body);
+        } catch (InterruptedException failure) {
+            Thread.currentThread().interrupt();
+        } catch (Exception failure) {
+            LOG.warn("Mock intent failed operation={}", operation.name());
+        }
+        return new C6Reply(
+                operation.name(), 503, true, true, Map.of("error", "MOCK_UNAVAILABLE"));
+    }
+
+    private C6Reply replay(C6Operation operation, String operationId, boolean mock, Map<String, Object> payload) {
         if (operationId == null || !operationId.matches("[A-Za-z0-9_-]{1,80}")) {
             throw new IllegalArgumentException("operationId is required");
         }
-        return journal.get(operation.name() + "|" + operationId);
+        return journal.get(operation.name() + "|" + mock + "|" + operationId);
     }
 }
