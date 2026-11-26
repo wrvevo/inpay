@@ -2,6 +2,7 @@ package br.com.includelabs.inpay.serasa.adapters.in.rest;
 
 import br.com.includelabs.inpay.contracts.AntifraudStubs;
 import br.com.includelabs.inpay.contracts.FraudMode;
+import br.com.includelabs.inpay.contracts.MockIntentClient;
 import br.com.includelabs.inpay.serasa.bootstrap.SerasaSettings;
 import java.util.Map;
 import org.springframework.http.HttpStatus;
@@ -12,6 +13,7 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestHeader;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.server.ResponseStatusException;
+import tools.jackson.databind.ObjectMapper;
 
 /** Conector Serasa Experian. A consulta real permanece desligada; X-Mock devolve o stub. */
 @RestController
@@ -39,7 +41,10 @@ public class SerasaController {
     public Map<String, Object> assess(
             @RequestHeader(value = "X-Mock", required = false) String mock,
             @RequestBody(required = false) Map<String, Object> body) {
-        boolean simulated = mock == null || mock.equalsIgnoreCase("true");
+        if (mock != null && !mock.equalsIgnoreCase("true") && !mock.equalsIgnoreCase("false")) {
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "X-Mock must be true or false");
+        }
+        boolean simulated = "true".equalsIgnoreCase(mock);
         if (!simulated && !settings.enabled()) {
             throw new ResponseStatusException(
                     HttpStatus.SERVICE_UNAVAILABLE, "serasa experian disabled");
@@ -50,6 +55,9 @@ public class SerasaController {
         }
         AntifraudStubs.Verdict verdict =
                 AntifraudStubs.evaluate(FraudMode.SERASA_EXPERIAN, probe(body));
+        if (MockIntentClient.configured()) {
+            return wireMock("ASSESSMENT_" + verdict.decision());
+        }
         return Map.of(
                 "provider",
                 "serasa-experian",
@@ -63,6 +71,27 @@ public class SerasaController {
                 verdict.reasons(),
                 "mock",
                 true);
+    }
+
+    @SuppressWarnings("unchecked")
+    private Map<String, Object> wireMock(String intent) {
+        try {
+            var reply = MockIntentClient.execute("serasa-experian", intent);
+            if (reply.status() != 200) {
+                throw new IllegalStateException("Mock unavailable");
+            }
+            Map<String, Object> body = new ObjectMapper().readValue(reply.body(), Map.class);
+            if (!Boolean.TRUE.equals(body.get("mock"))
+                    || !"serasa-experian".equals(body.get("provider"))) {
+                throw new IllegalStateException("Invalid mock response");
+            }
+            return body;
+        } catch (InterruptedException failure) {
+            Thread.currentThread().interrupt();
+        } catch (Exception failure) {
+            // Never fall back to a live provider or approve on a mock failure.
+        }
+        throw new ResponseStatusException(HttpStatus.SERVICE_UNAVAILABLE, "Mock unavailable");
     }
 
     private static AntifraudStubs.Probe probe(Map<String, Object> body) {
