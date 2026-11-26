@@ -100,14 +100,14 @@ public class PainelController {
     @PostMapping("/homologation/v1/cases/{id}/submit")
     @PreAuthorize("hasAnyAuthority('SCOPE_homologation/write','SCOPE_homologation/admin')")
     public HomologationDesk.Case submit(@PathVariable String id) {
-        return desk.submit(id, role());
+        return desk.submit(id, role(), actor());
     }
 
     @PostMapping("/homologation/v1/cases/{id}/decide")
     @PreAuthorize("hasAnyAuthority('SCOPE_homologation/approve','SCOPE_homologation/admin')")
     public HomologationDesk.Case decide(
             @PathVariable String id, @RequestBody Map<String, Boolean> body) {
-        return desk.decide(id, role(), Boolean.TRUE.equals(body.get("approve")));
+        return desk.decide(id, role(), actor(), Boolean.TRUE.equals(body.get("approve")));
     }
 
     @PostMapping("/homologation/v1/cases/{id}/clone")

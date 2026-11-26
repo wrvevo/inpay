@@ -25,15 +25,16 @@ public final class HomologationDesk {
             boolean accountsPrepared) {}
 
     private final Map<String, Case> cases = new LinkedHashMap<>();
+    private final Map<String, String> submittedBy = new LinkedHashMap<>();
 
     public HomologationDesk() {
-        save(
+        store(
                 draft(
                         Catalog.STORE_CENTRO,
                         "InPay Comércio de Laboratório Ltda",
                         "Loja Centro",
-                        "EM_HOMOLOGACAO"));
-        save(
+                        "RASCUNHO"));
+        store(
                 draft(
                         Catalog.STORE_SUL,
                         "InPay Comércio de Laboratório Ltda",
@@ -41,11 +42,25 @@ public final class HomologationDesk {
                         "RASCUNHO"));
     }
 
-    public List<Case> list() {
+    public synchronized List<Case> list() {
         return List.copyOf(cases.values());
     }
 
-    public Case save(Case item) {
+    public synchronized Case save(Case item) {
+        Case existing = cases.get(item.id());
+        if (existing != null && !editable(existing)) {
+            throw new IllegalArgumentException("Case is locked for review");
+        }
+        if (!"RASCUNHO".equals(item.status()) || item.accountsPrepared()) {
+            throw new IllegalArgumentException("Draft cannot set approval or Accounts provisioning");
+        }
+        if (existing != null && !existing.storeId().equals(item.storeId())) {
+            throw new IllegalArgumentException("Store cannot change");
+        }
+        return store(item);
+    }
+
+    private Case store(Case item) {
         String id =
                 item.id() == null || item.id().isBlank() ? UUID.randomUUID().toString() : item.id();
         if (!Set.of("RASCUNHO", "EM_HOMOLOGACAO", "APROVADA", "RECUSADA").contains(item.status())) {
@@ -71,26 +86,43 @@ public final class HomologationDesk {
         return stored;
     }
 
-    public Case submit(String id, String role) {
+    public synchronized Case submit(String id, String role, String actor) {
         if (!Set.of("PDV", "ADMIN").contains(role)) {
             throw new IllegalArgumentException("Role cannot submit");
         }
         Case current = required(id);
-        return save(copy(current, "EM_HOMOLOGACAO", false));
+        if (!editable(current)
+                || actor == null
+                || actor.isBlank()
+                || current.legalName() == null
+                || current.legalName().isBlank()
+                || current.address() == null
+                || current.address().isBlank()
+                || current.payments().isEmpty()) {
+            throw new IllegalArgumentException("Case is incomplete or locked");
+        }
+        submittedBy.put(id, actor);
+        return store(copy(current, "EM_HOMOLOGACAO", false));
     }
 
-    public Case decide(String id, String role, boolean approve) {
+    public synchronized Case decide(String id, String role, String actor, boolean approve) {
         if (!Set.of("BACKOFFICE", "ADMIN").contains(role)) {
             throw new IllegalArgumentException("Role cannot approve");
         }
         Case current = required(id);
-        if (!current.status().equals("EM_HOMOLOGACAO")) {
+        if (!current.status().equals("EM_HOMOLOGACAO")
+                || !submittedBy.containsKey(id)
+                || actor == null
+                || actor.isBlank()
+                || actor.equals(submittedBy.get(id))) {
             throw new IllegalArgumentException("Case is not waiting");
         }
-        return save(copy(current, approve ? "APROVADA" : "RECUSADA", approve));
+        submittedBy.remove(id);
+        // Approval of the laboratory record never confirms Accounts or production activation.
+        return store(copy(current, approve ? "APROVADA" : "RECUSADA", false));
     }
 
-    public Case cloneFrom(String sourceId, String targetStoreId, String role) {
+    public synchronized Case cloneFrom(String sourceId, String targetStoreId, String role) {
         if (!Set.of("PDV", "ADMIN").contains(role)) {
             throw new IllegalArgumentException("Role cannot clone");
         }
@@ -103,7 +135,10 @@ public final class HomologationDesk {
         if (!source.cnpj().equals(target.cnpj()) || source.storeId().equals(target.storeId())) {
             throw new IllegalArgumentException("Clone requires another store of the same CNPJ");
         }
-        return save(
+        if (!editable(target)) {
+            throw new IllegalArgumentException("Target store is locked");
+        }
+        return store(
                 new Case(
                         target.id(),
                         target.storeId(),
@@ -119,6 +154,10 @@ public final class HomologationDesk {
                         source.splitEnabled(),
                         "RASCUNHO",
                         false));
+    }
+
+    private static boolean editable(Case item) {
+        return Set.of("RASCUNHO", "RECUSADA").contains(item.status());
     }
 
     private Case required(String id) {
