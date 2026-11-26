@@ -177,7 +177,9 @@ class BankConnectorTest {
                         1,
                         Duration.ofSeconds(30));
         BankConnector connector =
-                new BankConnector(settings, new BankTransport(settings, new SimpleMeterRegistry()));
+                new BankConnector(
+                        settings,
+                        new BankTransport(settings, new SimpleMeterRegistry(), Duration.ofMillis(100)));
         long started = System.nanoTime();
         BankResult timedOut = connector.execute("BALANCE_GET", null, "true", Map.of());
         BankResult opened = connector.execute("BALANCE_GET", null, "true", Map.of());
