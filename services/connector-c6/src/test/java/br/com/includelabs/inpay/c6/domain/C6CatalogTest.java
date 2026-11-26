@@ -12,13 +12,25 @@ import org.junit.jupiter.api.Test;
 class C6CatalogTest {
     @Test
     void everyPortalProductCanBeMocked() {
-        ExecuteC6Operation useCase = new ExecuteC6Operation(null, C6ResultPublisher.NONE, false, false);
+        ExecuteC6Operation useCase =
+                new ExecuteC6Operation(null, C6ResultPublisher.NONE, false, false);
         EnumSet<C6Product> products = EnumSet.noneOf(C6Product.class);
         Map<String, Object> ids =
-                Map.of("id", "abc123", "txid", "abc123", "e2eid", "abc123", "chave", "chave", "data", "2026-11-23");
+                Map.of(
+                        "id",
+                        "abc123",
+                        "txid",
+                        "abc123",
+                        "e2eid",
+                        "abc123",
+                        "chave",
+                        "chave",
+                        "data",
+                        "2026-11-23");
         for (C6Operation operation : C6Operation.values()) {
             products.add(operation.product());
-            C6Reply reply = useCase.execute(operation.name(), "op-" + operation.name(), "true", ids);
+            C6Reply reply =
+                    useCase.execute(operation.name(), "op-" + operation.name(), "true", ids);
             assertEquals(200, reply.status(), operation.name());
             assertTrue(reply.mocked());
         }

@@ -26,7 +26,10 @@ public final class ExecuteC6Operation {
     private final ConcurrentHashMap<String, C6Reply> journal = new ConcurrentHashMap<>();
 
     public ExecuteC6Operation(
-            C6BankPort bank, C6ResultPublisher results, boolean liveEnabled, boolean confirmUnverified) {
+            C6BankPort bank,
+            C6ResultPublisher results,
+            boolean liveEnabled,
+            boolean confirmUnverified) {
         this.bank = bank;
         this.results = results;
         this.liveEnabled = liveEnabled;
@@ -53,16 +56,27 @@ public final class ExecuteC6Operation {
         return rows;
     }
 
-    public C6Reply execute(String operationName, String operationId, String mockHeader, Map<String, Object> payload) {
+    public C6Reply execute(
+            String operationName,
+            String operationId,
+            String mockHeader,
+            Map<String, Object> payload) {
         C6Operation operation = C6Operation.fromName(operationName);
-        boolean mock = mockHeader == null || mockHeader.isBlank() ? false : Boolean.parseBoolean(mockHeader.trim());
+        boolean mock =
+                mockHeader == null || mockHeader.isBlank()
+                        ? false
+                        : Boolean.parseBoolean(mockHeader.trim());
         if (mockHeader != null
                 && !mockHeader.isBlank()
                 && !"true".equalsIgnoreCase(mockHeader.trim())
                 && !"false".equalsIgnoreCase(mockHeader.trim())) {
             throw new IllegalArgumentException("X-Mock must be true or false");
         }
-        LOG.info("C6 operation started operation={} product={} mock={}", operation.name(), operation.product(), mock);
+        LOG.info(
+                "C6 operation started operation={} product={} mock={}",
+                operation.name(),
+                operation.product(),
+                mock);
         try {
             if (operation.hasBody() && operation != C6Operation.AUTH_TOKEN) {
                 C6Reply replay = replay(operation, operationId, mock, payload);
@@ -93,7 +107,8 @@ public final class ExecuteC6Operation {
             throw new IllegalStateException("C6 connector is disabled; send X-Mock: true");
         }
         if (!operation.documented() && !confirmUnverified) {
-            throw new IllegalArgumentException("Operation waits for the contracted C6 OpenAPI path");
+            throw new IllegalArgumentException(
+                    "Operation waits for the contracted C6 OpenAPI path");
         }
         C6RequestPlan.Planned planned = C6RequestPlan.plan(operation, payload);
         return bank.send(operation, planned.path(), planned.body(), planned.form());
@@ -109,10 +124,12 @@ public final class ExecuteC6Operation {
         body.put("product", operation.product().name());
         body.put("operation", operation.name());
         body.put("status", operation.product() == C6Product.PIX ? "ATIVA" : "CREATED");
-        if (operation.product() == C6Product.PIX || operation.product() == C6Product.PIX_AUTOMATIC) {
+        if (operation.product() == C6Product.PIX
+                || operation.product() == C6Product.PIX_AUTOMATIC) {
             body.put("pixCopiaECola", "000201mocked-c6");
         }
-        if (operation.product() == C6Product.BANK_SLIP || operation.product() == C6Product.BOLEPIX) {
+        if (operation.product() == C6Product.BANK_SLIP
+                || operation.product() == C6Product.BOLEPIX) {
             body.put("id", "c6-slip-mock");
             body.put("digitable_line", "00000.00000 00000.000000 00000.000000 0 00000000000000");
         }
@@ -145,11 +162,11 @@ public final class ExecuteC6Operation {
         } catch (Exception failure) {
             LOG.warn("Mock intent failed operation={}", operation.name());
         }
-        return new C6Reply(
-                operation.name(), 503, true, true, Map.of("error", "MOCK_UNAVAILABLE"));
+        return new C6Reply(operation.name(), 503, true, true, Map.of("error", "MOCK_UNAVAILABLE"));
     }
 
-    private C6Reply replay(C6Operation operation, String operationId, boolean mock, Map<String, Object> payload) {
+    private C6Reply replay(
+            C6Operation operation, String operationId, boolean mock, Map<String, Object> payload) {
         if (operationId == null || !operationId.matches("[A-Za-z0-9_-]{1,80}")) {
             throw new IllegalArgumentException("operationId is required");
         }

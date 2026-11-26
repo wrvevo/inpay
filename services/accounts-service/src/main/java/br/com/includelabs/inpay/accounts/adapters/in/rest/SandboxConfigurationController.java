@@ -35,9 +35,22 @@ public class SandboxConfigurationController {
         if (request.storeId() == null) throw new IllegalArgumentException("Store required");
         SandboxBindings.validate(request.bindings());
         return store.create(
-                tenants.resolve(tenant), KIND, key, request,
-                id -> Map.of("id", id, "storeId", request.storeId(), "bindings", request.bindings(),
-                        "status", "SANDBOX_CONFIGURED", "productionEnabled", false));
+                tenants.resolve(tenant),
+                KIND,
+                key,
+                request,
+                id ->
+                        Map.of(
+                                "id",
+                                id,
+                                "storeId",
+                                request.storeId(),
+                                "bindings",
+                                request.bindings(),
+                                "status",
+                                "SANDBOX_CONFIGURED",
+                                "productionEnabled",
+                                false));
     }
 
     @GetMapping("/{id}")

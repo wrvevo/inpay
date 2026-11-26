@@ -24,7 +24,8 @@ public class C6Configuration {
     }
 
     @Bean
-    ExecuteC6Operation executeC6Operation(C6BankPort port, C6ResultPublisher results, C6Settings settings) {
+    ExecuteC6Operation executeC6Operation(
+            C6BankPort port, C6ResultPublisher results, C6Settings settings) {
         return new ExecuteC6Operation(
                 port, results, settings.enabled(), settings.confirmUnverifiedPaths());
     }

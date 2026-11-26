@@ -52,7 +52,8 @@ public final class HomologationDesk {
             throw new IllegalArgumentException("Case is locked for review");
         }
         if (!"RASCUNHO".equals(item.status()) || item.accountsPrepared()) {
-            throw new IllegalArgumentException("Draft cannot set approval or Accounts provisioning");
+            throw new IllegalArgumentException(
+                    "Draft cannot set approval or Accounts provisioning");
         }
         if (existing != null && !existing.storeId().equals(item.storeId())) {
             throw new IllegalArgumentException("Store cannot change");

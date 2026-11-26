@@ -21,6 +21,10 @@ cleanup() {
   trap - EXIT
   "${C[@]}" ps -a > test-results/compose-ps.txt || true
   "${C[@]}" logs --no-color --tail=150 > test-results/compose.log || true
+  if [ "$code" -ne 0 ]; then
+    cat test-results/compose-ps.txt
+    tail -n 150 test-results/compose.log
+  fi
   "${C[@]}" down -v --remove-orphans || true
   exit "$code"
 }

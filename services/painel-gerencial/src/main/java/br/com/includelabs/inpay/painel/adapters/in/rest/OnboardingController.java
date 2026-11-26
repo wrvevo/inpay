@@ -40,7 +40,9 @@ public class OnboardingController {
     }
 
     public record Upload(String kind, String data) {}
+
     public record Decision(boolean approve) {}
+
     public record Bindings(Map<String, String> bindings) {}
 
     @GetMapping("/cases")
@@ -82,7 +84,8 @@ public class OnboardingController {
             throws IOException {
         String actor = actor();
         byte[] body = request.getInputStream().readNBytes(3 * 1024 * 1024 + 1);
-        if (body.length > 3 * 1024 * 1024) throw new IllegalArgumentException("Document request too large");
+        if (body.length > 3 * 1024 * 1024)
+            throw new IllegalArgumentException("Document request too large");
         Upload upload = json.readValue(body, Upload.class);
         return service.upload(tenant(), id, actor, upload.kind(), upload.data());
     }
@@ -148,7 +151,8 @@ public class OnboardingController {
     @PreAuthorize("hasAuthority('SCOPE_homologation/admin')")
     public Map<String, Object> demo(@PathVariable UUID demoId) {
         if (!environment.matchesProfiles("local")
-                || !"inpay".equals(SecurityContextHolder.getContext().getAuthentication().getName())) {
+                || !"inpay"
+                        .equals(SecurityContextHolder.getContext().getAuthentication().getName())) {
             throw new AccessDeniedException("Local demo service only");
         }
         return service.demo(tenant(), demoId);
@@ -161,9 +165,12 @@ public class OnboardingController {
     private String actor() {
         var auth = SecurityContextHolder.getContext().getAuthentication();
         if (environment.matchesProfiles("local")
-                && auth.getAuthorities().stream().noneMatch(a ->
-                        a.getAuthority().equals("ROLE_PDV") || a.getAuthority().equals("ROLE_BACKOFFICE")
-                                || a.getAuthority().equals("ROLE_ADMIN"))) {
+                && auth.getAuthorities().stream()
+                        .noneMatch(
+                                a ->
+                                        a.getAuthority().equals("ROLE_PDV")
+                                                || a.getAuthority().equals("ROLE_BACKOFFICE")
+                                                || a.getAuthority().equals("ROLE_ADMIN"))) {
             throw new AccessDeniedException("Named onboarding operator required");
         }
         if (auth.getName().isBlank() || auth.getName().length() > 256) {

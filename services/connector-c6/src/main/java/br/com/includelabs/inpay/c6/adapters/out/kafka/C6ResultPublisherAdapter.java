@@ -37,8 +37,12 @@ public class C6ResultPublisherAdapter implements C6ResultPublisher {
             event.put("status", reply.status());
             event.put("uncertain", reply.uncertain());
             event.put("mocked", reply.mocked());
-            kafka.send(TOPIC, operationId == null ? operation.name() : operationId, mapper.writeValueAsString(event));
-            LOG.info("C6 result published operation={} status={}", operation.name(), reply.status());
+            kafka.send(
+                    TOPIC,
+                    operationId == null ? operation.name() : operationId,
+                    mapper.writeValueAsString(event));
+            LOG.info(
+                    "C6 result published operation={} status={}", operation.name(), reply.status());
         } catch (Exception exception) {
             LOG.error("C6 result publication failed operation={}", operation.name(), exception);
         }

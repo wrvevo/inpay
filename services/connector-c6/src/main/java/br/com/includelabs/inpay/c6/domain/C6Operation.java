@@ -2,8 +2,8 @@ package br.com.includelabs.inpay.c6.domain;
 
 /**
  * Operações do portal C6. As marcadas como documentadas seguem os paths publicados (auth, boleto
- * v1, Pix BACEN v2, bolepix v2, checkout, extrato, webhooks e C6 Pay). Agendamento, saldo isolado
- * e tokenização só saem ao banco quando a confirmação de path está ligada.
+ * v1, Pix BACEN v2, bolepix v2, checkout, extrato, webhooks e C6 Pay). Agendamento, saldo isolado e
+ * tokenização só saem ao banco quando a confirmação de path está ligada.
  */
 public enum C6Operation {
     AUTH_TOKEN(C6Product.AUTHENTICATION, "POST", "/v1/auth", true),

@@ -46,10 +46,23 @@ public class OnboardingService {
     public OnboardingCase create(UUID tenant, String actor, Draft draft) {
         String cnpj = draft.cnpj() == null ? "" : draft.cnpj().replaceAll("[^0-9]", "");
         if (cnpj.length() != 14) throw new IllegalArgumentException("CNPJ required");
-        var item = new OnboardingCase(
-                UUID.randomUUID(), UUID.randomUUID(), cnpj, text(draft.legalName(), 200),
-                text(draft.storeName(), 120), text(draft.address(), 500), Map.of(), "DRAFT",
-                "", "", Map.of(), "", null, Map.of(), 1);
+        var item =
+                new OnboardingCase(
+                        UUID.randomUUID(),
+                        UUID.randomUUID(),
+                        cnpj,
+                        text(draft.legalName(), 200),
+                        text(draft.storeName(), 120),
+                        text(draft.address(), 500),
+                        Map.of(),
+                        "DRAFT",
+                        "",
+                        "",
+                        Map.of(),
+                        "",
+                        null,
+                        Map.of(),
+                        1);
         repo.insert(tenant, item);
         repo.audit(tenant, item.id(), actor, "CASE_CREATED");
         return item;
@@ -67,17 +80,27 @@ public class OnboardingService {
     public OnboardingDocument upload(
             UUID tenant, UUID id, String actor, String kind, String encoded) {
         locked(tenant, id, "DRAFT");
-        if (!REQUIRED_DOCUMENTS.contains(kind) || encoded == null
+        if (!REQUIRED_DOCUMENTS.contains(kind)
+                || encoded == null
                 || encoded.length() > 3 * 1024 * 1024) {
             throw new IllegalArgumentException("Invalid document");
         }
         byte[] bytes = Base64.getDecoder().decode(encoded);
         try {
             var secured = protection.protect(tenant, id, kind, bytes);
-            var doc = repo.insertDocument(
-                    tenant, id, kind, secured.mime(), secured.sha256(), secured.keyId(),
-                    secured.nonce(), secured.ciphertext(), actor, secured.scanSource(),
-                    secured.expiresAt());
+            var doc =
+                    repo.insertDocument(
+                            tenant,
+                            id,
+                            kind,
+                            secured.mime(),
+                            secured.sha256(),
+                            secured.keyId(),
+                            secured.nonce(),
+                            secured.ciphertext(),
+                            actor,
+                            secured.scanSource(),
+                            secured.expiresAt());
             repo.audit(tenant, id, actor, "DOCUMENT_IMPORTED_" + kind);
             return doc;
         } finally {
@@ -93,12 +116,22 @@ public class OnboardingService {
     public Map<String, String> download(UUID tenant, UUID id, UUID docId, String actor) {
         repo.get(tenant, id, false);
         var blob = repo.document(tenant, id, docId);
-        byte[] content = protection.decrypt(
-                tenant, id, blob.info().kind(), blob.info().sha256(), blob.keyId(),
-                blob.nonce(), blob.ciphertext());
+        byte[] content =
+                protection.decrypt(
+                        tenant,
+                        id,
+                        blob.info().kind(),
+                        blob.info().sha256(),
+                        blob.keyId(),
+                        blob.nonce(),
+                        blob.ciphertext());
         try {
             repo.audit(tenant, id, actor, "DOCUMENT_ACCESSED");
-            return Map.of("mime", blob.info().mime(), "data", Base64.getEncoder().encodeToString(content));
+            return Map.of(
+                    "mime",
+                    blob.info().mime(),
+                    "data",
+                    Base64.getEncoder().encodeToString(content));
         } finally {
             java.util.Arrays.fill(content, (byte) 0);
         }
@@ -110,18 +143,21 @@ public class OnboardingService {
         SandboxBindings.validate(item.bindings());
         requireDocuments(tenant, id, false);
         return update(
-                tenant, item.transition("DOCUMENT_REVIEW", actor, "", Map.of(), "", null, Map.of()),
-                actor, "DOCUMENT_REVIEW_SUBMITTED");
+                tenant,
+                item.transition("DOCUMENT_REVIEW", actor, "", Map.of(), "", null, Map.of()),
+                actor,
+                "DOCUMENT_REVIEW_SUBMITTED");
     }
 
     @Transactional
-    public void review(
-            UUID tenant, UUID id, UUID docId, String actor, boolean approve) {
+    public void review(UUID tenant, UUID id, UUID docId, String actor, boolean approve) {
         var item = locked(tenant, id, "DOCUMENT_REVIEW");
         differentActor(item, actor);
-        var doc = repo.currentDocuments(tenant, id).stream()
-                .filter(row -> row.id().equals(docId)).findFirst()
-                .orElseThrow(() -> new IllegalArgumentException("Document is not current"));
+        var doc =
+                repo.currentDocuments(tenant, id).stream()
+                        .filter(row -> row.id().equals(docId))
+                        .findFirst()
+                        .orElseThrow(() -> new IllegalArgumentException("Document is not current"));
         if (actor.equals(doc.uploadedBy()) || !doc.expiresAt().isAfter(Instant.now())) {
             throw new IllegalArgumentException("Reviewer must be independent");
         }
@@ -135,9 +171,12 @@ public class OnboardingService {
         differentActor(item, actor);
         requireDocuments(tenant, id, true);
         var evidence = clients.partners(tenant, id);
-        return update(tenant, item.transition(
-                item.state(), item.submittedBy(), actor, evidence, "", null, Map.of()),
-                actor, "PARTNER_MOCK_REVIEWS_RECORDED");
+        return update(
+                tenant,
+                item.transition(
+                        item.state(), item.submittedBy(), actor, evidence, "", null, Map.of()),
+                actor,
+                "PARTNER_MOCK_REVIEWS_RECORDED");
     }
 
     @Transactional
@@ -147,13 +186,22 @@ public class OnboardingService {
         if (approve) {
             requireDocuments(tenant, id, true);
             if (!item.partners().keySet().equals(Set.of("clearsale", "serasa-experian"))
-                    || item.partners().values().stream().anyMatch(v -> !v.equals("MOCK_CUSTOMER_REVIEW"))) {
+                    || item.partners().values().stream()
+                            .anyMatch(v -> !v.equals("MOCK_CUSTOMER_REVIEW"))) {
                 throw new IllegalStateException("Partner evidence required");
             }
         }
-        return update(tenant, item.transition(
-                approve ? "CADASTRAL_SANDBOX_APPROVED" : "DRAFT", approve ? item.submittedBy() : "", actor,
-                approve ? item.partners() : Map.of(), "", null, Map.of()), actor,
+        return update(
+                tenant,
+                item.transition(
+                        approve ? "CADASTRAL_SANDBOX_APPROVED" : "DRAFT",
+                        approve ? item.submittedBy() : "",
+                        actor,
+                        approve ? item.partners() : Map.of(),
+                        "",
+                        null,
+                        Map.of()),
+                actor,
                 approve ? "SANDBOX_CADASTRAL_APPROVED" : "RETURNED_TO_DRAFT");
     }
 
@@ -162,9 +210,18 @@ public class OnboardingService {
         var item = locked(tenant, id, "CADASTRAL_SANDBOX_APPROVED");
         requireDocuments(tenant, id, true);
         String receipt = clients.provision(tenant, item);
-        return update(tenant, item.transition(
-                "SANDBOX_READY", item.submittedBy(), item.reviewedBy(), item.partners(),
-                receipt, UUID.randomUUID(), Map.of()), actor, "ACCOUNTS_SANDBOX_PROVISIONED");
+        return update(
+                tenant,
+                item.transition(
+                        "SANDBOX_READY",
+                        item.submittedBy(),
+                        item.reviewedBy(),
+                        item.partners(),
+                        receipt,
+                        UUID.randomUUID(),
+                        Map.of()),
+                actor,
+                "ACCOUNTS_SANDBOX_PROVISIONED");
     }
 
     @Transactional
@@ -173,9 +230,18 @@ public class OnboardingService {
         requireDocuments(tenant, id, true);
         var tests = clients.tests(tenant, item);
         if (tests.isEmpty()) throw new IllegalStateException("Missing integration evidence");
-        return update(tenant, item.transition(
-                "TECHNICAL_REVIEW", actor, item.reviewedBy(), item.partners(),
-                item.accountsReceipt(), item.demoId(), tests), actor, "MOCK_TEST_EVIDENCE_RECORDED");
+        return update(
+                tenant,
+                item.transition(
+                        "TECHNICAL_REVIEW",
+                        actor,
+                        item.reviewedBy(),
+                        item.partners(),
+                        item.accountsReceipt(),
+                        item.demoId(),
+                        tests),
+                actor,
+                "MOCK_TEST_EVIDENCE_RECORDED");
     }
 
     @Transactional
@@ -186,19 +252,38 @@ public class OnboardingService {
         if (item.tests().isEmpty() || item.accountsReceipt().isBlank() || item.demoId() == null) {
             throw new IllegalStateException("Integration evidence required");
         }
-        return update(tenant, item.transition(
-                "SANDBOX_APPROVED", item.submittedBy(), actor, item.partners(),
-                item.accountsReceipt(), item.demoId(), item.tests()), actor, "SANDBOX_TECHNICAL_APPROVED");
+        return update(
+                tenant,
+                item.transition(
+                        "SANDBOX_APPROVED",
+                        item.submittedBy(),
+                        actor,
+                        item.partners(),
+                        item.accountsReceipt(),
+                        item.demoId(),
+                        item.tests()),
+                actor,
+                "SANDBOX_TECHNICAL_APPROVED");
     }
 
     public Map<String, Object> demo(UUID tenant, UUID demoId) {
         var item = repo.getByDemo(tenant, demoId);
-        if (!Set.of("SANDBOX_READY", "TECHNICAL_REVIEW", "SANDBOX_APPROVED").contains(item.state())) {
+        if (!Set.of("SANDBOX_READY", "TECHNICAL_REVIEW", "SANDBOX_APPROVED")
+                .contains(item.state())) {
             throw new IllegalArgumentException("Demo unavailable");
         }
         requireDocuments(tenant, item.id(), true);
-        return Map.of("demoId", demoId, "storeId", item.storeId(), "bindings", item.bindings(),
-                "mode", "SYNTHETIC", "productionEnabled", false);
+        return Map.of(
+                "demoId",
+                demoId,
+                "storeId",
+                item.storeId(),
+                "bindings",
+                item.bindings(),
+                "mode",
+                "SYNTHETIC",
+                "productionEnabled",
+                false);
     }
 
     public List<Map<String, Object>> audit(UUID tenant, UUID id) {
@@ -212,7 +297,8 @@ public class OnboardingService {
 
     private OnboardingCase locked(UUID tenant, UUID id, String state) {
         var item = repo.get(tenant, id, true);
-        if (!state.equals(item.state())) throw new IllegalStateException("Case state does not permit action");
+        if (!state.equals(item.state()))
+            throw new IllegalStateException("Case state does not permit action");
         return item;
     }
 
@@ -225,15 +311,21 @@ public class OnboardingService {
     private void requireDocuments(UUID tenant, UUID id, boolean approved) {
         var docs = repo.currentDocuments(tenant, id);
         for (String kind : REQUIRED_DOCUMENTS) {
-            boolean valid = docs.stream().anyMatch(doc -> kind.equals(doc.kind())
-                    && doc.expiresAt().isAfter(Instant.now())
-                    && (!approved || "APPROVED".equals(doc.decision())));
+            boolean valid =
+                    docs.stream()
+                            .anyMatch(
+                                    doc ->
+                                            kind.equals(doc.kind())
+                                                    && doc.expiresAt().isAfter(Instant.now())
+                                                    && (!approved
+                                                            || "APPROVED".equals(doc.decision())));
             if (!valid) throw new IllegalStateException("Document checklist incomplete");
         }
     }
 
     private static void differentActor(OnboardingCase item, String actor) {
-        if (actor.equals(item.submittedBy())) throw new IllegalArgumentException("Independent reviewer required");
+        if (actor.equals(item.submittedBy()))
+            throw new IllegalArgumentException("Independent reviewer required");
     }
 
     private static String text(String input, int maximum) {

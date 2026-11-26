@@ -21,7 +21,10 @@ public record C6Settings(
         @DefaultValue("0.2.0") String partnerVersion) {
 
     public boolean credentialsPresent() {
-        return !clientId.isBlank() && !clientSecret.isBlank() && !certificate.isBlank() && !privateKey.isBlank();
+        return !clientId.isBlank()
+                && !clientSecret.isBlank()
+                && !certificate.isBlank()
+                && !privateKey.isBlank();
     }
 
     @Override

@@ -36,13 +36,39 @@ public record OnboardingCase(
             UUID demo,
             Map<String, String> evidence) {
         return new OnboardingCase(
-                id, storeId, cnpj, legalName, storeName, address, bindings, next, submitter,
-                reviewer, partnerEvidence, receipt, demo, evidence, version + 1);
+                id,
+                storeId,
+                cnpj,
+                legalName,
+                storeName,
+                address,
+                bindings,
+                next,
+                submitter,
+                reviewer,
+                partnerEvidence,
+                receipt,
+                demo,
+                evidence,
+                version + 1);
     }
 
     public OnboardingCase configure(Map<String, String> next) {
         return new OnboardingCase(
-                id, storeId, cnpj, legalName, storeName, address, next, state, submittedBy,
-                reviewedBy, partners, accountsReceipt, demoId, tests, version + 1);
+                id,
+                storeId,
+                cnpj,
+                legalName,
+                storeName,
+                address,
+                next,
+                state,
+                submittedBy,
+                reviewedBy,
+                partners,
+                accountsReceipt,
+                demoId,
+                tests,
+                version + 1);
     }
 }

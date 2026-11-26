@@ -45,7 +45,8 @@ public class SerasaController {
             @RequestHeader(value = "X-Mock", required = false) String mock,
             @RequestBody(required = false) Map<String, Object> body) {
         if (mock != null && !mock.equalsIgnoreCase("true") && !mock.equalsIgnoreCase("false")) {
-            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "X-Mock must be true or false");
+            throw new ResponseStatusException(
+                    HttpStatus.BAD_REQUEST, "X-Mock must be true or false");
         }
         boolean simulated = "true".equalsIgnoreCase(mock);
         if (!simulated && !settings.enabled()) {
@@ -85,7 +86,8 @@ public class SerasaController {
         if (!"true".equalsIgnoreCase(mock) || !MockIntentClient.configured()) {
             throw new ResponseStatusException(HttpStatus.SERVICE_UNAVAILABLE, "Mock unavailable");
         }
-        if (!Set.of("CUSTOMER_REVIEW", "DOCUMENT_PENDING", "PROVIDER_UNAVAILABLE").contains(intent)) {
+        if (!Set.of("CUSTOMER_REVIEW", "DOCUMENT_PENDING", "PROVIDER_UNAVAILABLE")
+                .contains(intent)) {
             throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Unknown review intent");
         }
         try {

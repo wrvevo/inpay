@@ -20,8 +20,8 @@ import org.springframework.core.env.Environment;
 import org.springframework.stereotype.Component;
 
 /**
- * Encrypts file contents before storage. An actual scanner is mandatory outside the synthetic
- * local fixture. Keys and retention policy are deployment configuration, never browser data.
+ * Encrypts file contents before storage. An actual scanner is mandatory outside the synthetic local
+ * fixture. Keys and retention policy are deployment configuration, never browser data.
  */
 @Component
 public class DocumentProtection {
@@ -55,8 +55,13 @@ public class DocumentProtection {
     }
 
     public record Protected(
-            String mime, String sha256, String keyId, byte[] nonce, byte[] ciphertext,
-            String scanSource, Instant expiresAt) {}
+            String mime,
+            String sha256,
+            String keyId,
+            byte[] nonce,
+            byte[] ciphertext,
+            String scanSource,
+            Instant expiresAt) {}
 
     public Protected protect(UUID tenant, UUID id, String kind, byte[] data) {
         if (data.length == 0 || data.length > MAX_BYTES) {
@@ -68,12 +73,18 @@ public class DocumentProtection {
             throw new IllegalStateException("Document retention or key policy unavailable");
         }
         try {
-            String hash = HexFormat.of().formatHex(MessageDigest.getInstance("SHA-256").digest(data));
+            String hash =
+                    HexFormat.of().formatHex(MessageDigest.getInstance("SHA-256").digest(data));
             byte[] nonce = new byte[12];
             random.nextBytes(nonce);
             byte[] encrypted = crypt(Cipher.ENCRYPT_MODE, tenant, id, kind, hash, nonce, data);
             return new Protected(
-                    mime, hash, keyId, nonce, encrypted, source,
+                    mime,
+                    hash,
+                    keyId,
+                    nonce,
+                    encrypted,
+                    source,
                     Instant.now().plus(retentionDays, ChronoUnit.DAYS));
         } catch (Exception failure) {
             throw new IllegalStateException("Document encryption unavailable");
@@ -81,8 +92,13 @@ public class DocumentProtection {
     }
 
     public byte[] decrypt(
-            UUID tenant, UUID id, String kind, String hash, String storedKeyId,
-            byte[] nonce, byte[] ciphertext) {
+            UUID tenant,
+            UUID id,
+            String kind,
+            String hash,
+            String storedKeyId,
+            byte[] nonce,
+            byte[] ciphertext) {
         if (!keyId.equals(storedKeyId)) throw new IllegalStateException("Document key unavailable");
         try {
             return crypt(Cipher.DECRYPT_MODE, tenant, id, kind, hash, nonce, ciphertext);
@@ -99,8 +115,9 @@ public class DocumentProtection {
             if (material.length != 32) throw new IllegalStateException("AES-256 key required");
             Cipher cipher = Cipher.getInstance("AES/GCM/NoPadding");
             cipher.init(mode, new SecretKeySpec(material, "AES"), new GCMParameterSpec(128, nonce));
-            cipher.updateAAD((tenant + "|" + id + "|" + kind + "|" + hash + "|" + keyId)
-                    .getBytes(StandardCharsets.UTF_8));
+            cipher.updateAAD(
+                    (tenant + "|" + id + "|" + kind + "|" + hash + "|" + keyId)
+                            .getBytes(StandardCharsets.UTF_8));
             return cipher.doFinal(bytes);
         } finally {
             Arrays.fill(material, (byte) 0);

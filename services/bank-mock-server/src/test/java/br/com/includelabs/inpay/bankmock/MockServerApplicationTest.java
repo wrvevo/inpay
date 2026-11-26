@@ -37,9 +37,12 @@ class MockServerApplicationTest {
                     "POST",
                     503,
                     "PROVIDER_UNAVAILABLE");
-            assertResponse(client, server, "/intents/santander/PAYMENT_CREATE", "POST", 200, "mocked");
-            assertResponse(client, server, "/intents/rede/AUTHORIZE", "POST", 200, "MOCK_AUTHORIZE");
-            assertResponse(client, server, "/intents/cielo/ZERO_AUTH", "POST", 200, "MOCK_ZERO_AUTH");
+            assertResponse(
+                    client, server, "/intents/santander/PAYMENT_CREATE", "POST", 200, "mocked");
+            assertResponse(
+                    client, server, "/intents/rede/AUTHORIZE", "POST", 200, "MOCK_AUTHORIZE");
+            assertResponse(
+                    client, server, "/intents/cielo/ZERO_AUTH", "POST", 200, "MOCK_ZERO_AUTH");
             assertResponse(client, server, "/intents/itau/UNDECLARED", "POST", 404, "");
         } finally {
             server.stop();

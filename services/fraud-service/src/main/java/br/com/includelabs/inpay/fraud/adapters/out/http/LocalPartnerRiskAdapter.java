@@ -38,7 +38,8 @@ public class LocalPartnerRiskAdapter implements ExternalRiskPort {
         auth =
                 "Basic "
                         + Base64.getEncoder()
-                                .encodeToString(("inpay:" + password).getBytes(StandardCharsets.UTF_8));
+                                .encodeToString(
+                                        ("inpay:" + password).getBytes(StandardCharsets.UTF_8));
         urls = Map.of(FraudMode.CLEARSALE, clearSale, FraudMode.SERASA_EXPERIAN, serasa);
     }
 
@@ -50,7 +51,11 @@ public class LocalPartnerRiskAdapter implements ExternalRiskPort {
             if (!"http".equals(endpoint.getScheme())
                     || endpoint.getUserInfo() != null
                     || endpoint.getHost() == null
-                    || !List.of("connector-clearsale", "connector-serasa-experian", "127.0.0.1", "localhost")
+                    || !List.of(
+                                    "connector-clearsale",
+                                    "connector-serasa-experian",
+                                    "127.0.0.1",
+                                    "localhost")
                             .contains(endpoint.getHost())) {
                 throw new IllegalStateException("Partner mock endpoint unavailable");
             }
@@ -60,7 +65,9 @@ public class LocalPartnerRiskAdapter implements ExternalRiskPort {
                             .header("Authorization", auth)
                             .header("Content-Type", "application/json")
                             .header("X-Mock", "true")
-                            .POST(HttpRequest.BodyPublishers.ofString(json.writeValueAsString(probe)))
+                            .POST(
+                                    HttpRequest.BodyPublishers.ofString(
+                                            json.writeValueAsString(probe)))
                             .build();
             var response = http.send(request, HttpResponse.BodyHandlers.ofString());
             var body = json.readTree(response.body());

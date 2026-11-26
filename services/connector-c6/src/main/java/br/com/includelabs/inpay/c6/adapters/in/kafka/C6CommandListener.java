@@ -29,7 +29,8 @@ public class C6CommandListener {
             Map<?, ?> command = mapper.readValue(payload, Map.class);
             String operation = String.valueOf(command.get("operation"));
             String operationId = String.valueOf(command.get("operationId"));
-            String mock = command.get("mock") == null ? "false" : String.valueOf(command.get("mock"));
+            String mock =
+                    command.get("mock") == null ? "false" : String.valueOf(command.get("mock"));
             Object body = command.get("payload");
             Map<String, Object> fields = body instanceof Map<?, ?> map ? cast(map) : Map.of();
             LOG.info("C6 Kafka command received operation={}", operation);
