@@ -1,0 +1,13 @@
+services:
+  connector-clearsale:
+    environment:
+      INPAY_INTENT_MOCK_URL: http://bank-mock-server:8099
+    depends_on:
+      bank-mock-server:
+        condition: service_started
+  connector-serasa-experian:
+    environment:
+      INPAY_INTENT_MOCK_URL: http://bank-mock-server:8099
+    depends_on:
+      bank-mock-server:
+        condition: service_started
