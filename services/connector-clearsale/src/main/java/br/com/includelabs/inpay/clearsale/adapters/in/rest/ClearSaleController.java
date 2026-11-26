@@ -5,9 +5,12 @@ import br.com.includelabs.inpay.contracts.AntifraudStubs;
 import br.com.includelabs.inpay.contracts.FraudMode;
 import br.com.includelabs.inpay.contracts.MockIntentClient;
 import java.util.Map;
+import java.util.Set;
 import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestHeader;
@@ -63,6 +66,37 @@ public class ClearSaleController {
                 verdict.reasons(),
                 "mock",
                 true);
+    }
+
+    @PostMapping("/internal/v1/customer-reviews/{intent}")
+    @PreAuthorize("hasAuthority('SCOPE_connectors-clearsale/execute')")
+    @SuppressWarnings("unchecked")
+    public ResponseEntity<Map<String, Object>> customerReview(
+            @PathVariable String intent,
+            @RequestHeader(value = "X-Mock", required = false) String mock) {
+        if (!"true".equalsIgnoreCase(mock) || !MockIntentClient.configured()) {
+            throw new ResponseStatusException(HttpStatus.SERVICE_UNAVAILABLE, "Mock unavailable");
+        }
+        if (!Set.of("CUSTOMER_REVIEW", "DOCUMENT_PENDING", "PROVIDER_UNAVAILABLE").contains(intent)) {
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Unknown review intent");
+        }
+        try {
+            var response = MockIntentClient.execute("clearsale", intent);
+            Map<String, Object> body = new ObjectMapper().readValue(response.body(), Map.class);
+            if (!Boolean.TRUE.equals(body.get("mock"))
+                    || !Boolean.FALSE.equals(body.get("productionApproved"))
+                    || !intent.equals(body.get("stage"))
+                    || !"clearsale".equals(body.get("provider"))
+                    || !Set.of(200, 422, 503).contains(response.status())) {
+                throw new IllegalStateException("Invalid partner response");
+            }
+            return ResponseEntity.status(response.status()).body(body);
+        } catch (InterruptedException failure) {
+            Thread.currentThread().interrupt();
+        } catch (Exception failure) {
+            // A synthetic review cannot authorize a real account.
+        }
+        throw new ResponseStatusException(HttpStatus.SERVICE_UNAVAILABLE, "Mock unavailable");
     }
 
     @SuppressWarnings("unchecked")
