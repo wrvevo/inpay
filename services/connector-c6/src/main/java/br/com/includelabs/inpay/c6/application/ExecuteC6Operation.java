@@ -25,6 +25,7 @@ public final class ExecuteC6Operation {
     private final boolean confirmUnverified;
     private final ConcurrentHashMap<String, C6Reply> journal = new ConcurrentHashMap<>();
 
+    /** Inicializa as portas e controles do caso de uso do C6. */
     public ExecuteC6Operation(
             C6BankPort bank,
             C6ResultPublisher results,
@@ -36,6 +37,7 @@ public final class ExecuteC6Operation {
         this.confirmUnverified = confirmUnverified;
     }
 
+    /** Lista as operações disponíveis e seus metadados técnicos. */
     public List<Map<String, String>> catalog() {
         LOG.info("C6 catalog requested");
         List<Map<String, String>> rows = new ArrayList<>();
@@ -56,6 +58,7 @@ public final class ExecuteC6Operation {
         return rows;
     }
 
+    /** Valida a operação, seleciona o ambiente e controla a idempotência. */
     public C6Reply execute(
             String operationName,
             String operationId,
@@ -102,6 +105,7 @@ public final class ExecuteC6Operation {
         }
     }
 
+    /** Executa a chamada real somente quando habilitada e confirmada. */
     private C6Reply live(C6Operation operation, Map<String, Object> payload) {
         if (!liveEnabled) {
             throw new IllegalStateException("C6 connector is disabled; send X-Mock: true");
@@ -114,6 +118,7 @@ public final class ExecuteC6Operation {
         return bank.send(operation, planned.path(), planned.body(), planned.form());
     }
 
+    /** Executa a simulação sem enviar uma transação financeira ao banco. */
     private C6Reply mock(C6Operation operation, Map<String, Object> payload) {
         if (MockIntentClient.configured()) {
             return wireMock(operation);
@@ -143,6 +148,7 @@ public final class ExecuteC6Operation {
         return new C6Reply(operation.name(), 200, false, true, body);
     }
 
+    /** Consulta o WireMock central e valida o contrato sintético retornado. */
     @SuppressWarnings("unchecked")
     private C6Reply wireMock(C6Operation operation) {
         try {
@@ -165,6 +171,7 @@ public final class ExecuteC6Operation {
         return new C6Reply(operation.name(), 503, true, true, Map.of("error", "MOCK_UNAVAILABLE"));
     }
 
+    /** Recupera o resultado anterior da mesma operação e ambiente. */
     private C6Reply replay(
             C6Operation operation, String operationId, boolean mock, Map<String, Object> payload) {
         if (operationId == null || !operationId.matches("[A-Za-z0-9_-]{1,80}")) {

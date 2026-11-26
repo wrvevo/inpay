@@ -19,10 +19,12 @@ public class C6CommandListener {
     private final ExecuteC6Operation useCase;
     private final ObjectMapper mapper = new ObjectMapper();
 
+    /** Recebe a dependência que executa as operações bancárias. */
     public C6CommandListener(ExecuteC6Operation useCase) {
         this.useCase = useCase;
     }
 
+    /** Recebe o comando Kafka e encaminha a operação ao caso de uso. */
     @KafkaListener(topics = TOPIC, groupId = "connector-c6")
     public void onCommand(String payload) {
         try {
@@ -40,6 +42,7 @@ public class C6CommandListener {
         }
     }
 
+    /** Normaliza o mapa recebido no comando para o contrato do conector. */
     @SuppressWarnings("unchecked")
     private static Map<String, Object> cast(Map<?, ?> map) {
         return (Map<String, Object>) map;

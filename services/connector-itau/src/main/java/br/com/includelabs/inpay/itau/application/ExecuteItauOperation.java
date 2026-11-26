@@ -24,12 +24,14 @@ public final class ExecuteItauOperation {
     private final boolean confirmUnverified;
     private final ConcurrentHashMap<String, ItauReply> journal = new ConcurrentHashMap<>();
 
+    /** Inicializa a porta e os controles do caso de uso do Itaú. */
     public ExecuteItauOperation(ItauBankPort bank, boolean liveEnabled, boolean confirmUnverified) {
         this.bank = bank;
         this.liveEnabled = liveEnabled;
         this.confirmUnverified = confirmUnverified;
     }
 
+    /** Lista as operações disponíveis e seus metadados técnicos. */
     public List<Map<String, String>> catalog() {
         LOG.info("Itau catalog requested");
         List<Map<String, String>> rows = new ArrayList<>();
@@ -45,6 +47,7 @@ public final class ExecuteItauOperation {
         return rows;
     }
 
+    /** Valida a operação, seleciona o ambiente e controla a idempotência. */
     public ItauReply execute(
             String operationName,
             String operationId,
@@ -91,6 +94,7 @@ public final class ExecuteItauOperation {
         }
     }
 
+    /** Executa a chamada real somente quando habilitada e confirmada. */
     private ItauReply live(ItauOperation operation, Map<String, Object> payload) {
         if (!liveEnabled) {
             throw new IllegalStateException("Itau connector is disabled; send X-Mock: true");
@@ -103,6 +107,7 @@ public final class ExecuteItauOperation {
         return bank.send(operation, planned.path(), planned.body(), planned.form());
     }
 
+    /** Executa a simulação sem enviar uma transação financeira ao banco. */
     private ItauReply mock(ItauOperation operation, Map<String, Object> payload) {
         if (MockIntentClient.configured()) {
             return wireMock(operation);
@@ -127,6 +132,7 @@ public final class ExecuteItauOperation {
         return new ItauReply(operation.name(), 200, false, true, body);
     }
 
+    /** Consulta o WireMock central e valida o contrato sintético retornado. */
     @SuppressWarnings("unchecked")
     private ItauReply wireMock(ItauOperation operation) {
         try {
@@ -150,6 +156,7 @@ public final class ExecuteItauOperation {
                 operation.name(), 503, true, true, Map.of("error", "MOCK_UNAVAILABLE"));
     }
 
+    /** Recupera o resultado anterior da mesma operação e ambiente. */
     private ItauReply replay(ItauOperation operation, String operationId, boolean mock) {
         if (operationId == null || !operationId.matches("[A-Za-z0-9_-]{1,80}")) {
             throw new IllegalArgumentException("operationId is required");

@@ -23,10 +23,12 @@ import tools.jackson.databind.ObjectMapper;
 public class SerasaController {
     private final SerasaSettings settings;
 
+    /** Inicializa as configurações do conector Serasa Experian. */
     public SerasaController(SerasaSettings settings) {
         this.settings = settings;
     }
 
+    /** Expõe os metadados do módulo de integração. */
     @GetMapping("/internal/v1/module")
     @PreAuthorize("hasAuthority('SCOPE_connectors-serasa-experian/read')")
     public Map<String, String> module() {
@@ -39,6 +41,7 @@ public class SerasaController {
                 "serasa-experian");
     }
 
+    /** Avalia os sinais de risco no ambiente configurado. */
     @PostMapping("/internal/v1/assessments")
     @PreAuthorize("hasAuthority('SCOPE_connectors-serasa-experian/execute')")
     public Map<String, Object> assess(
@@ -77,6 +80,7 @@ public class SerasaController {
                 true);
     }
 
+    /** Consulta uma intenção de revisão cadastral exclusivamente sintética. */
     @PostMapping("/internal/v1/customer-reviews/{intent}")
     @PreAuthorize("hasAuthority('SCOPE_connectors-serasa-experian/execute')")
     @SuppressWarnings("unchecked")
@@ -109,6 +113,7 @@ public class SerasaController {
         throw new ResponseStatusException(HttpStatus.SERVICE_UNAVAILABLE, "Mock unavailable");
     }
 
+    /** Encaminha a intenção ao WireMock e valida a resposta. */
     @SuppressWarnings("unchecked")
     private Map<String, Object> wireMock(String intent) {
         try {
@@ -130,6 +135,7 @@ public class SerasaController {
         throw new ResponseStatusException(HttpStatus.SERVICE_UNAVAILABLE, "Mock unavailable");
     }
 
+    /** Converte os sinais de entrada no contrato comum de avaliação. */
     private static AntifraudStubs.Probe probe(Map<String, Object> body) {
         return new AntifraudStubs.Probe(
                 flag(body, "knownCompromised"),
@@ -140,11 +146,13 @@ public class SerasaController {
                 flag(body, "addressMismatch"));
     }
 
+    /** Extrai um sinal booleano da requisição. */
     private static boolean flag(Map<String, Object> body, String key) {
         Object value = body == null ? null : body.get(key);
         return Boolean.TRUE.equals(value) || "true".equalsIgnoreCase(String.valueOf(value));
     }
 
+    /** Extrai um sinal numérico da requisição. */
     private static int number(Map<String, Object> body, String key) {
         Object value = body == null ? null : body.get(key);
         if (value instanceof Number number) {

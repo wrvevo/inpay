@@ -22,11 +22,13 @@ public class ProviderMockController {
     private final TenantContext tenants;
     private final ObjectMapper mapper = new ObjectMapper();
 
+    /** Inicializa as configurações do provedor e o contexto do lojista. */
     public ProviderMockController(ProviderSettings settings, TenantContext tenants) {
         this.settings = settings;
         this.tenants = tenants;
     }
 
+    /** Executa uma operação sintética sem acessar credenciais reais. */
     @PostMapping("/{operation}")
     @SuppressWarnings("unchecked")
     public Map<String, Object> execute(

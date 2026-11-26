@@ -19,6 +19,7 @@ public class SandboxConfigurationController {
     private final ResourceRepository store;
     private final TenantContext tenants;
 
+    /** Inicializa as portas de persistência e resolução do lojista. */
     public SandboxConfigurationController(ResourceRepository store, TenantContext tenants) {
         this.store = store;
         this.tenants = tenants;
@@ -26,6 +27,7 @@ public class SandboxConfigurationController {
 
     public record Configuration(UUID storeId, Map<String, String> bindings) {}
 
+    /** Persiste a configuração de sandbox de forma idempotente. */
     @PostMapping
     @PreAuthorize("hasAuthority('SCOPE_accounts/write')")
     public JsonNode provision(
@@ -53,6 +55,7 @@ public class SandboxConfigurationController {
                                 false));
     }
 
+    /** Consulta a configuração no contexto do lojista autenticado. */
     @GetMapping("/{id}")
     @PreAuthorize("hasAuthority('SCOPE_accounts/read')")
     public JsonNode get(

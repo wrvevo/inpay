@@ -70,6 +70,7 @@ public enum C6Operation {
     private final String path;
     private final boolean documented;
 
+    /** Define os metadados do contrato de uma operação C6. */
     C6Operation(C6Product product, String method, String path, boolean documented) {
         this.product = product;
         this.method = method;
@@ -77,26 +78,32 @@ public enum C6Operation {
         this.documented = documented;
     }
 
+    /** Retorna o produto bancário associado à operação. */
     public C6Product product() {
         return product;
     }
 
+    /** Retorna o método HTTP definido no contrato. */
     public String method() {
         return method;
     }
 
+    /** Retorna o caminho relativo da operação no provedor. */
     public String path() {
         return path;
     }
 
+    /** Indica se o contrato da operação está documentado. */
     public boolean documented() {
         return documented;
     }
 
+    /** Identifica operações HTTP que aceitam um corpo de requisição. */
     public boolean hasBody() {
         return "POST".equals(method) || "PUT".equals(method) || "PATCH".equals(method);
     }
 
+    /** Resolve a operação pelo nome e rejeita valores desconhecidos. */
     public static C6Operation fromName(String value) {
         if (value == null) {
             throw new IllegalArgumentException("Unknown C6 operation");

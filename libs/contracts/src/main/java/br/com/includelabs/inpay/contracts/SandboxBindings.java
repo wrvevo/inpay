@@ -18,8 +18,10 @@ public final class SandboxBindings {
     public static final Set<String> BANKS =
             Set.of("c6", "itau", "santander", "bb", "bradesco", "caixa", "banrisul");
 
+    /** Impede a instanciação do catálogo estático. */
     private SandboxBindings() {}
 
+    /** Valida os meios e provedores permitidos no ambiente de sandbox. */
     public static void validate(Map<String, String> bindings) {
         if (bindings == null || bindings.isEmpty() || bindings.size() > 5) {
             throw new IllegalArgumentException("Payment bindings required");
@@ -38,6 +40,7 @@ public final class SandboxBindings {
                 });
     }
 
+    /** Traduz o meio de pagamento para a operação específica do banco. */
     public static String bankOperation(String method, String provider) {
         return switch (method) {
             case "pix" -> "PIX_COB_POST";

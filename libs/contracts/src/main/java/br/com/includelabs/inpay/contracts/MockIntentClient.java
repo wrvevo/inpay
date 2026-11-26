@@ -17,14 +17,17 @@ public final class MockIntentClient {
                     .followRedirects(HttpClient.Redirect.NEVER)
                     .build();
 
+    /** Impede a instanciação do cliente utilitário. */
     private MockIntentClient() {}
 
     public record Reply(int status, String body) {}
 
+    /** Verifica se o endereço do servidor de mocks foi configurado. */
     public static boolean configured() {
         return !System.getenv().getOrDefault("INPAY_INTENT_MOCK_URL", "").isBlank();
     }
 
+    /** Envia uma intenção sintética, sem credenciais ou dados do cliente. */
     public static Reply execute(String provider, String intent)
             throws IOException, InterruptedException {
         URI base = URI.create(System.getenv().getOrDefault("INPAY_INTENT_MOCK_URL", ""));

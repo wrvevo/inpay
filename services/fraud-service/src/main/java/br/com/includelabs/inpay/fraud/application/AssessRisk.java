@@ -19,6 +19,7 @@ public final class AssessRisk {
     private final FraudModeSource modes;
     private final ExternalRiskPort external;
 
+    /** Inicializa as portas de avaliação de risco e persistência. */
     public AssessRisk(
             InPayRiskEngine engine,
             AssessmentStore assessmentStore,
@@ -34,6 +35,7 @@ public final class AssessRisk {
 
     public record Result(UUID assessmentId, RiskPolicy.Assessment assessment) {}
 
+    /** Seleciona o motor de risco e persiste a avaliação obtida. */
     public Result execute(
             UUID merchantId,
             UUID paymentId,
@@ -49,6 +51,7 @@ public final class AssessRisk {
         return new Result(assessmentStore.save(merchantId, paymentId, assessment), assessment);
     }
 
+    /** Registra o resultado observado para aprendizado do motor nativo. */
     public void learn(UUID merchantId, String deviceKey, boolean confirmedFraud) {
         if (deviceKey == null || !deviceKey.matches("[A-Za-z0-9_\\-]{1,128}")) {
             throw new IllegalArgumentException("Invalid device key");
@@ -56,6 +59,7 @@ public final class AssessRisk {
         learningStore.record(merchantId, deviceKey, confirmedFraud);
     }
 
+    /** Avalia os sinais internos com o histórico de aprendizado. */
     private RiskPolicy.Assessment nativeAssessment(
             UUID merchantId,
             RiskPolicy.Signals signals,
@@ -70,6 +74,7 @@ public final class AssessRisk {
                 signals, behavior, device, identity, counts.confirmed(), counts.legitimate());
     }
 
+    /** Encaminha os sinais derivados para o parceiro selecionado. */
     private RiskPolicy.Assessment externalAssessment(
             String mode,
             RiskPolicy.Signals signals,

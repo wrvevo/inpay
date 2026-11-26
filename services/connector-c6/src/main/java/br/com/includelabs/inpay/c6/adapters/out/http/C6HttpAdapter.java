@@ -40,12 +40,14 @@ public final class C6HttpAdapter implements C6BankPort {
     private volatile Instant tokenUntil = Instant.EPOCH;
     private int failures;
 
+    /** Inicializa o cliente HTTP conforme as configurações do C6. */
     public C6HttpAdapter(C6Settings settings) {
         this.settings = settings;
         this.client =
                 HttpClient.newBuilder().connectTimeout(BUDGET).sslContext(ssl(settings)).build();
     }
 
+    /** Executa a operação bancária com autenticação e controle de resposta. */
     @Override
     public C6Reply send(
             C6Operation operation, String path, Map<String, Object> body, boolean form) {
@@ -112,6 +114,7 @@ public final class C6HttpAdapter implements C6BankPort {
         }
     }
 
+    /** Obtém o token de acesso exigido pela integração do C6. */
     private String accessToken() throws Exception {
         if (tokenUntil.isAfter(Instant.now().plusSeconds(5)) && !token.isBlank()) {
             return token;
@@ -132,6 +135,7 @@ public final class C6HttpAdapter implements C6BankPort {
         return token;
     }
 
+    /** Decodifica o corpo da resposta sem registrar dados sensíveis. */
     @SuppressWarnings("unchecked")
     private Map<String, Object> decode(byte[] bytes) {
         if (bytes == null || bytes.length == 0) {
@@ -149,6 +153,7 @@ public final class C6HttpAdapter implements C6BankPort {
         }
     }
 
+    /** Configura o contexto TLS a partir dos certificados informados. */
     private static SSLContext ssl(C6Settings settings) {
         try {
             if (settings.certificate().isBlank() || settings.privateKey().isBlank()) {
@@ -175,6 +180,7 @@ public final class C6HttpAdapter implements C6BankPort {
         }
     }
 
+    /** Converte a chave PEM no formato aceito pelo cliente TLS. */
     private static PrivateKey privateKey(String pem) throws Exception {
         String base64 =
                 pem.replace("-----BEGIN PRIVATE KEY-----", "")

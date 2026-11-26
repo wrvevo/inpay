@@ -21,11 +21,13 @@ public class PainelController {
     private final Directory directory;
     private final HomologationDesk desk;
 
+    /** Inicializa o diretório e a homologação legada de laboratório. */
     public PainelController(Directory directory, HomologationDesk desk) {
         this.directory = directory;
         this.desk = desk;
     }
 
+    /** Autentica um operador no ambiente local. */
     @PostMapping("/auth/login")
     public ResponseEntity<?> login(@RequestBody Map<String, String> body) {
         try {
@@ -36,6 +38,7 @@ public class PainelController {
         }
     }
 
+    /** Gera um token de recuperação exclusivo do laboratório. */
     @PostMapping("/auth/recover")
     public Map<String, String> recover(@RequestBody Map<String, String> body) {
         return Map.of(
@@ -45,24 +48,28 @@ public class PainelController {
                 "Laboratório local: o token aparece aqui porque não há envio de e-mail.");
     }
 
+    /** Redefine a senha com o token de recuperação local. */
     @PostMapping("/auth/reset")
     public Map<String, String> reset(@RequestBody Map<String, String> body) {
         directory.reset(body.get("token"), body.get("password"));
         return Map.of("status", "UPDATED");
     }
 
+    /** Atualiza o perfil do operador autenticado. */
     @PutMapping("/auth/profile")
     @PreAuthorize("isAuthenticated()")
     public Directory.SessionView profile(@RequestBody Map<String, String> body) {
         return directory.update(actor(), body.get("name"), body.get("email"), body.get("document"));
     }
 
+    /** Lista os usuários visíveis ao operador. */
     @GetMapping("/panel/v1/users")
     @PreAuthorize("hasAuthority('SCOPE_painel/read')")
     public Map<String, Object> users() {
         return Map.of("data", directory.visible(actor()));
     }
 
+    /** Cria um usuário conforme as permissões do solicitante. */
     @PostMapping("/panel/v1/users")
     @PreAuthorize(
             "hasAnyAuthority('SCOPE_painel/manage','SCOPE_painel/admin','SCOPE_homologation/admin')")
@@ -79,6 +86,7 @@ public class PainelController {
                         : java.util.List.of());
     }
 
+    /** Atualiza as permissões de menu do usuário. */
     @PutMapping("/panel/v1/users/{id}/menus")
     @PreAuthorize("hasAnyAuthority('SCOPE_painel/manage','SCOPE_painel/admin')")
     public Directory.SessionView menus(
@@ -86,6 +94,7 @@ public class PainelController {
         return directory.menus(actor(), id, strings(body.get("menus")));
     }
 
+    /** Lista os processos da homologação legada em memória. */
     @GetMapping("/homologation/v1/cases")
     @PreAuthorize(
             "hasAnyAuthority('SCOPE_homologation/write','SCOPE_homologation/approve','SCOPE_homologation/admin')")
@@ -93,18 +102,21 @@ public class PainelController {
         return Map.of("data", desk.list());
     }
 
+    /** Salva o processo de homologação de laboratório. */
     @PostMapping("/homologation/v1/cases")
     @PreAuthorize("hasAnyAuthority('SCOPE_homologation/write','SCOPE_homologation/admin')")
     public HomologationDesk.Case save(@RequestBody HomologationDesk.Case body) {
         return desk.save(body);
     }
 
+    /** Encaminha o processo para revisão do operador autorizado. */
     @PostMapping("/homologation/v1/cases/{id}/submit")
     @PreAuthorize("hasAnyAuthority('SCOPE_homologation/write','SCOPE_homologation/admin')")
     public HomologationDesk.Case submit(@PathVariable String id) {
         return desk.submit(id, role(), actor());
     }
 
+    /** Registra a decisão de laboratório do revisor. */
     @PostMapping("/homologation/v1/cases/{id}/decide")
     @PreAuthorize("hasAnyAuthority('SCOPE_homologation/approve','SCOPE_homologation/admin')")
     public HomologationDesk.Case decide(
@@ -112,6 +124,7 @@ public class PainelController {
         return desk.decide(id, role(), actor(), Boolean.TRUE.equals(body.get("approve")));
     }
 
+    /** Cria outro processo com base em um cadastro existente. */
     @PostMapping("/homologation/v1/cases/{id}/clone")
     @PreAuthorize("hasAnyAuthority('SCOPE_homologation/write','SCOPE_homologation/admin')")
     public HomologationDesk.Case cloneCase(
@@ -119,10 +132,12 @@ public class PainelController {
         return desk.cloneFrom(id, body.get("targetStoreId"), role());
     }
 
+    /** Recupera a identidade do operador autenticado. */
     private static String actor() {
         return SecurityContextHolder.getContext().getAuthentication().getName();
     }
 
+    /** Obtém o perfil associado à autenticação. */
     private static String role() {
         return SecurityContextHolder.getContext().getAuthentication().getAuthorities().stream()
                 .map(item -> item.getAuthority())
@@ -132,11 +147,13 @@ public class PainelController {
                 .orElse("");
     }
 
+    /** Extrai o valor textual de um campo da requisição. */
     private static String text(Map<String, Object> body, String key) {
         Object value = body.get(key);
         return value == null ? "" : String.valueOf(value);
     }
 
+    /** Converte uma coleção da requisição em conjunto de textos. */
     private static Set<String> strings(Object value) {
         if (!(value instanceof java.util.List<?> list)) {
             return Set.of();

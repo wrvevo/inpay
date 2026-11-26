@@ -24,6 +24,7 @@ public final class ExecuteSantanderOperation {
     private final boolean confirmUnverified;
     private final ConcurrentHashMap<String, SantanderReply> journal = new ConcurrentHashMap<>();
 
+    /** Inicializa a porta e os controles do caso de uso do Santander. */
     public ExecuteSantanderOperation(
             SantanderBankPort bank, boolean liveEnabled, boolean confirmUnverified) {
         this.bank = bank;
@@ -31,6 +32,7 @@ public final class ExecuteSantanderOperation {
         this.confirmUnverified = confirmUnverified;
     }
 
+    /** Lista as operações disponíveis e seus metadados técnicos. */
     public List<Map<String, String>> catalog() {
         LOG.info("Santander catalog requested");
         List<Map<String, String>> rows = new ArrayList<>();
@@ -46,6 +48,7 @@ public final class ExecuteSantanderOperation {
         return rows;
     }
 
+    /** Valida a operação, seleciona o ambiente e controla a idempotência. */
     public SantanderReply execute(
             String operationName,
             String operationId,
@@ -92,6 +95,7 @@ public final class ExecuteSantanderOperation {
         }
     }
 
+    /** Executa a chamada real somente quando habilitada e confirmada. */
     private SantanderReply live(SantanderOperation operation, Map<String, Object> payload) {
         if (!liveEnabled) {
             throw new IllegalStateException("Santander connector is disabled; send X-Mock: true");
@@ -104,6 +108,7 @@ public final class ExecuteSantanderOperation {
         return bank.send(operation, planned.path(), planned.body(), planned.form());
     }
 
+    /** Executa a simulação sem enviar uma transação financeira ao banco. */
     private SantanderReply mock(SantanderOperation operation, Map<String, Object> payload) {
         if (MockIntentClient.configured()) {
             return wireMock(operation);
@@ -126,6 +131,7 @@ public final class ExecuteSantanderOperation {
         return new SantanderReply(operation.name(), 200, false, true, body);
     }
 
+    /** Consulta o WireMock central e valida o contrato sintético retornado. */
     @SuppressWarnings("unchecked")
     private SantanderReply wireMock(SantanderOperation operation) {
         try {
@@ -149,6 +155,7 @@ public final class ExecuteSantanderOperation {
                 operation.name(), 503, true, true, Map.of("error", "MOCK_UNAVAILABLE"));
     }
 
+    /** Recupera o resultado anterior da mesma operação e ambiente. */
     private SantanderReply replay(SantanderOperation operation, String operationId, boolean mock) {
         if (operationId == null || !operationId.matches("[A-Za-z0-9_-]{1,80}")) {
             throw new IllegalArgumentException("operationId is required");

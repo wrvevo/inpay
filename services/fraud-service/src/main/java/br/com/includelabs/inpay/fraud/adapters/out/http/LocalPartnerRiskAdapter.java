@@ -31,6 +31,7 @@ public class LocalPartnerRiskAdapter implements ExternalRiskPort {
     private final String auth;
     private final Map<String, String> urls;
 
+    /** Configura autenticação e endereços dos conectores locais. */
     public LocalPartnerRiskAdapter(
             @Value("${inpay.local-password}") String password,
             @Value("${INPAY_CLEARSALE_MOCK_URL:}") String clearSale,
@@ -43,6 +44,7 @@ public class LocalPartnerRiskAdapter implements ExternalRiskPort {
         urls = Map.of(FraudMode.CLEARSALE, clearSale, FraudMode.SERASA_EXPERIAN, serasa);
     }
 
+    /** Consulta o parceiro e exige evidência de uma resposta simulada válida. */
     @Override
     public RiskPolicy.Assessment evaluate(String mode, AntifraudStubs.Probe probe) {
         try {
@@ -95,6 +97,7 @@ public class LocalPartnerRiskAdapter implements ExternalRiskPort {
         return unavailable(mode);
     }
 
+    /** Retorna revisão manual quando o parceiro está indisponível. */
     public static RiskPolicy.Assessment unavailable(String mode) {
         return new RiskPolicy.Assessment(
                 100,

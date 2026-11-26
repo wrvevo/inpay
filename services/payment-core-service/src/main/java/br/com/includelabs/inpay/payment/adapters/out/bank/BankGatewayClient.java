@@ -25,6 +25,7 @@ public class BankGatewayClient {
     private final HttpClient client;
     private final ObjectMapper mapper = new ObjectMapper();
 
+    /** Configura o transporte e os endereços dos conectores bancários. */
     @Autowired
     public BankGatewayClient(BankGatewaySettings settings) {
         this(
@@ -35,11 +36,13 @@ public class BankGatewayClient {
                         .build());
     }
 
+    /** Configura o transporte e os endereços dos conectores bancários. */
     private BankGatewayClient(BankGatewaySettings settings, HttpClient client) {
         this.settings = settings;
         this.client = client;
     }
 
+    /** Encaminha a operação ao banco com o orçamento de tempo definido. */
     public Downstream execute(
             String bank,
             String operation,

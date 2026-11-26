@@ -37,6 +37,7 @@ public class DocumentProtection {
     private final boolean local;
     private final boolean fixtureEnabled;
 
+    /** Configura a proteção dos documentos e a retenção autorizada. */
     public DocumentProtection(
             Environment environment,
             @Value("${INPAY_DOCUMENT_KEY:}") String key,
@@ -63,6 +64,7 @@ public class DocumentProtection {
             String scanSource,
             Instant expiresAt) {}
 
+    /** Valida, verifica e criptografa o documento antes da gravação. */
     public Protected protect(UUID tenant, UUID id, String kind, byte[] data) {
         if (data.length == 0 || data.length > MAX_BYTES) {
             throw new IllegalArgumentException("Document size invalid");
@@ -91,6 +93,7 @@ public class DocumentProtection {
         }
     }
 
+    /** Decifra o documento e verifica a integridade autenticada. */
     public byte[] decrypt(
             UUID tenant,
             UUID id,
@@ -107,6 +110,7 @@ public class DocumentProtection {
         }
     }
 
+    /** Aplica AES-GCM com o contexto do tenant e do documento. */
     private byte[] crypt(
             int mode, UUID tenant, UUID id, String kind, String hash, byte[] nonce, byte[] bytes)
             throws Exception {
@@ -124,6 +128,7 @@ public class DocumentProtection {
         }
     }
 
+    /** Exige a verificação de malware ou a fixture sintética autorizada. */
     private String scan(byte[] bytes) {
         if (local && fixtureEnabled && Arrays.equals(bytes, FIXTURE)) return "SYNTHETIC_FIXTURE";
         if (scanner.isBlank()) throw new IllegalStateException("Malware scanner unavailable");
@@ -154,6 +159,7 @@ public class DocumentProtection {
         }
     }
 
+    /** Identifica o formato a partir da assinatura dos bytes. */
     private static String mime(byte[] bytes) {
         if (starts(bytes, "%PDF-".getBytes(StandardCharsets.US_ASCII))) return "application/pdf";
         if (starts(bytes, new byte[] {(byte) 0xff, (byte) 0xd8, (byte) 0xff})) return "image/jpeg";
@@ -162,6 +168,7 @@ public class DocumentProtection {
         throw new IllegalArgumentException("Unsupported document type");
     }
 
+    /** Compara o prefixo binário para reconhecer o formato do arquivo. */
     private static boolean starts(byte[] bytes, byte[] prefix) {
         return bytes.length >= prefix.length
                 && Arrays.equals(Arrays.copyOf(bytes, prefix.length), prefix);

@@ -25,6 +25,7 @@ public class OnboardingService {
     private final DocumentProtection protection;
     private final SandboxClients clients;
 
+    /** Inicializa a orquestração das etapas e seus adaptadores. */
     public OnboardingService(
             OnboardingRepository repo, DocumentProtection protection, SandboxClients clients) {
         this.repo = repo;
@@ -34,14 +35,17 @@ public class OnboardingService {
 
     public record Draft(String cnpj, String legalName, String storeName, String address) {}
 
+    /** Lista os processos persistidos do tenant. */
     public List<OnboardingCase> list(UUID tenant) {
         return repo.list(tenant);
     }
 
+    /** Recupera um processo pertencente ao tenant. */
     public OnboardingCase get(UUID tenant, UUID id) {
         return repo.get(tenant, id, false);
     }
 
+    /** Cria o rascunho e registra o primeiro evento de auditoria. */
     @Transactional
     public OnboardingCase create(UUID tenant, String actor, Draft draft) {
         String cnpj = draft.cnpj() == null ? "" : draft.cnpj().replaceAll("[^0-9]", "");
@@ -68,6 +72,7 @@ public class OnboardingService {
         return item;
     }
 
+    /** Valida e salva os vínculos de pagamento enquanto em rascunho. */
     @Transactional
     public OnboardingCase configure(
             UUID tenant, UUID id, String actor, Map<String, String> bindings) {
@@ -76,6 +81,7 @@ public class OnboardingService {
         return update(tenant, item.configure(bindings), actor, "BINDINGS_CONFIGURED");
     }
 
+    /** Protege e armazena uma nova versão do documento. */
     @Transactional
     public OnboardingDocument upload(
             UUID tenant, UUID id, String actor, String kind, String encoded) {
@@ -108,10 +114,12 @@ public class OnboardingService {
         }
     }
 
+    /** Consulta os metadados das versões documentais vigentes. */
     public List<OnboardingDocument> documents(UUID tenant, UUID id) {
         return repo.currentDocuments(tenant, id);
     }
 
+    /** Decifra o conteúdo autorizado e audita o acesso. */
     @Transactional
     public Map<String, String> download(UUID tenant, UUID id, UUID docId, String actor) {
         repo.get(tenant, id, false);
@@ -137,6 +145,7 @@ public class OnboardingService {
         }
     }
 
+    /** Exige a configuração e os documentos antes de iniciar a revisão. */
     @Transactional
     public OnboardingCase submit(UUID tenant, UUID id, String actor) {
         var item = locked(tenant, id, "DRAFT");
@@ -149,6 +158,7 @@ public class OnboardingService {
                 "DOCUMENT_REVIEW_SUBMITTED");
     }
 
+    /** Verifica a independência do revisor e registra a decisão. */
     @Transactional
     public void review(UUID tenant, UUID id, UUID docId, String actor, boolean approve) {
         var item = locked(tenant, id, "DOCUMENT_REVIEW");
@@ -165,6 +175,7 @@ public class OnboardingService {
         repo.audit(tenant, id, actor, approve ? "DOCUMENT_APPROVED" : "DOCUMENT_REJECTED");
     }
 
+    /** Consulta os parceiros após a aprovação dos documentos. */
     @Transactional
     public OnboardingCase partners(UUID tenant, UUID id, String actor) {
         var item = locked(tenant, id, "DOCUMENT_REVIEW");
@@ -179,6 +190,7 @@ public class OnboardingService {
                 "PARTNER_MOCK_REVIEWS_RECORDED");
     }
 
+    /** Aprova o cadastro de sandbox ou retorna o processo ao rascunho. */
     @Transactional
     public OnboardingCase decide(UUID tenant, UUID id, String actor, boolean approve) {
         var item = locked(tenant, id, "DOCUMENT_REVIEW");
@@ -205,6 +217,7 @@ public class OnboardingService {
                 approve ? "SANDBOX_CADASTRAL_APPROVED" : "RETURNED_TO_DRAFT");
     }
 
+    /** Confirma o Accounts antes de liberar a demonstração. */
     @Transactional
     public OnboardingCase provision(UUID tenant, UUID id, String actor) {
         var item = locked(tenant, id, "CADASTRAL_SANDBOX_APPROVED");
@@ -224,6 +237,7 @@ public class OnboardingService {
                 "ACCOUNTS_SANDBOX_PROVISIONED");
     }
 
+    /** Executa os mocks dos conectores e persiste as evidências. */
     @Transactional
     public OnboardingCase test(UUID tenant, UUID id, String actor) {
         var item = locked(tenant, id, "SANDBOX_READY");
@@ -244,6 +258,7 @@ public class OnboardingService {
                 "MOCK_TEST_EVIDENCE_RECORDED");
     }
 
+    /** Aprova o sandbox após revisão técnica independente. */
     @Transactional
     public OnboardingCase technical(UUID tenant, UUID id, String actor) {
         var item = locked(tenant, id, "TECHNICAL_REVIEW");
@@ -266,6 +281,7 @@ public class OnboardingService {
                 "SANDBOX_TECHNICAL_APPROVED");
     }
 
+    /** Consulta a configuração sintética de uma demonstração liberada. */
     public Map<String, Object> demo(UUID tenant, UUID demoId) {
         var item = repo.getByDemo(tenant, demoId);
         if (!Set.of("SANDBOX_READY", "TECHNICAL_REVIEW", "SANDBOX_APPROVED")
@@ -286,15 +302,18 @@ public class OnboardingService {
                 false);
     }
 
+    /** Lista o histórico de auditoria do processo. */
     public List<Map<String, Object>> audit(UUID tenant, UUID id) {
         return repo.audit(tenant, id);
     }
 
+    /** Remove o conteúdo dos documentos com retenção vencida. */
     @Scheduled(fixedDelayString = "${INPAY_DOCUMENT_PURGE_INTERVAL_MS:3600000}")
     public void purgeExpired() {
         repo.purgeExpired();
     }
 
+    /** Bloqueia o processo e exige o estado esperado para a transição. */
     private OnboardingCase locked(UUID tenant, UUID id, String state) {
         var item = repo.get(tenant, id, true);
         if (!state.equals(item.state()))
@@ -302,12 +321,14 @@ public class OnboardingService {
         return item;
     }
 
+    /** Persiste a transição e registra a auditoria na mesma transação. */
     private OnboardingCase update(UUID tenant, OnboardingCase item, String actor, String event) {
         repo.update(tenant, item);
         repo.audit(tenant, item.id(), actor, event);
         return item;
     }
 
+    /** Valida a presença, vigência e aprovação dos documentos exigidos. */
     private void requireDocuments(UUID tenant, UUID id, boolean approved) {
         var docs = repo.currentDocuments(tenant, id);
         for (String kind : REQUIRED_DOCUMENTS) {
@@ -323,11 +344,13 @@ public class OnboardingService {
         }
     }
 
+    /** Impede a aprovação pelo mesmo operador que submeteu o processo. */
     private static void differentActor(OnboardingCase item, String actor) {
         if (actor.equals(item.submittedBy()))
             throw new IllegalArgumentException("Independent reviewer required");
     }
 
+    /** Normaliza e valida campos de texto obrigatórios. */
     private static String text(String input, int maximum) {
         if (input == null || input.isBlank() || input.length() > maximum) {
             throw new IllegalArgumentException("Invalid case field");

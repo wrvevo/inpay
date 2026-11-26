@@ -22,10 +22,12 @@ public class C6ResultPublisherAdapter implements C6ResultPublisher {
     private final KafkaTemplate<String, String> kafka;
     private final ObjectMapper mapper = new ObjectMapper();
 
+    /** Inicializa o produtor Kafka responsável pelos resultados. */
     public C6ResultPublisherAdapter(KafkaTemplate<String, String> kafka) {
         this.kafka = kafka;
     }
 
+    /** Publica o resultado normalizado da operação no tópico configurado. */
     @Override
     public void publish(C6Operation operation, String operationId, C6Reply reply) {
         try {

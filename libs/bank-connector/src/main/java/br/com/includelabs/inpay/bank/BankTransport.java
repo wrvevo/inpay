@@ -29,14 +29,17 @@ public final class BankTransport {
     private final ObjectMapper mapper;
     private final MeterRegistry meters;
 
+    /** Configura o transporte HTTP e a instrumentação do conector. */
     public BankTransport(BankSettings settings) {
         this(settings, null);
     }
 
+    /** Configura o transporte HTTP e a instrumentação do conector. */
     public BankTransport(BankSettings settings, MeterRegistry meters) {
         this(settings, meters, MOCK_BUDGET);
     }
 
+    /** Configura o transporte HTTP e a instrumentação do conector. */
     BankTransport(BankSettings settings, MeterRegistry meters, Duration mockBudget) {
         this.mockBudget = mockBudget;
         this.mockCircuit = new BankCircuit(settings.failureThreshold(), settings.openDuration());
@@ -50,6 +53,7 @@ public final class BankTransport {
         this.meters = meters;
     }
 
+    /** Encaminha a requisição ao ambiente configurado com limites de tempo. */
     public BankResult send(
             BankId bank, BankOperation operation, boolean mocked, URI uri, String body) {
         long started = System.nanoTime();
@@ -140,6 +144,7 @@ public final class BankTransport {
         }
     }
 
+    /** Registra a conclusão e retorna o resultado normalizado. */
     private BankResult finish(
             BankId bank,
             BankOperation operation,
@@ -169,6 +174,7 @@ public final class BankTransport {
         return result;
     }
 
+    /** Decodifica o corpo da resposta em uma estrutura de dados. */
     @SuppressWarnings("unchecked")
     private Map<String, Object> decode(byte[] bytes) {
         if (bytes == null || bytes.length == 0 || bytes.length > 1_048_576) {

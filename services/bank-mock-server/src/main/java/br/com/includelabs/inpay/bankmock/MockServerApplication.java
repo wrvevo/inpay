@@ -15,10 +15,12 @@ import org.springframework.core.io.support.PathMatchingResourcePatternResolver;
 
 @SpringBootApplication
 public class MockServerApplication {
+    /** Inicializa a aplicação responsável pelos contratos simulados. */
     public static void main(String[] args) {
         SpringApplication.run(MockServerApplication.class, args);
     }
 
+    /** Configura e inicia o WireMock com os mapeamentos bancários. */
     @Bean(destroyMethod = "stop")
     WireMockServer bankWireMock(@Value("${inpay.mock.port:8099}") int port) throws Exception {
         WireMockServer server = new WireMockServer(WireMockConfiguration.options().port(port));

@@ -31,6 +31,7 @@ public class FraudModeController {
     private final HttpClient http =
             HttpClient.newBuilder().connectTimeout(Duration.ofSeconds(2)).build();
 
+    /** Inicializa as dependências do controle de modo antifraude. */
     public FraudModeController(
             FraudModeHolder holder,
             @Value("${inpay.fraud.url:http://127.0.0.1:8087}") String fraudUrl,

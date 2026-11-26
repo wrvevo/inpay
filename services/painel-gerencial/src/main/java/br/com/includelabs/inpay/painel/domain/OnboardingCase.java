@@ -21,12 +21,14 @@ public record OnboardingCase(
         Map<String, String> tests,
         long version) {
 
+    /** Copia as coleções para preservar a imutabilidade do processo. */
     public OnboardingCase {
         bindings = Map.copyOf(bindings);
         partners = Map.copyOf(partners);
         tests = Map.copyOf(tests);
     }
 
+    /** Cria a próxima versão do processo com o novo estado e evidências. */
     public OnboardingCase transition(
             String next,
             String submitter,
@@ -53,6 +55,7 @@ public record OnboardingCase(
                 version + 1);
     }
 
+    /** Cria uma nova versão com os vínculos de pagamento atualizados. */
     public OnboardingCase configure(Map<String, String> next) {
         return new OnboardingCase(
                 id,

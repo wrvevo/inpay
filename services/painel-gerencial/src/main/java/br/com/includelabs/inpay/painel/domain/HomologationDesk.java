@@ -27,6 +27,7 @@ public final class HomologationDesk {
     private final Map<String, Case> cases = new LinkedHashMap<>();
     private final Map<String, String> submittedBy = new LinkedHashMap<>();
 
+    /** Inicializa os registros demonstrativos da homologação legada. */
     public HomologationDesk() {
         store(
                 draft(
@@ -42,10 +43,12 @@ public final class HomologationDesk {
                         "RASCUNHO"));
     }
 
+    /** Lista os processos de laboratório armazenados em memória. */
     public synchronized List<Case> list() {
         return List.copyOf(cases.values());
     }
 
+    /** Valida e atualiza o processo em edição. */
     public synchronized Case save(Case item) {
         Case existing = cases.get(item.id());
         if (existing != null && !editable(existing)) {
@@ -61,6 +64,7 @@ public final class HomologationDesk {
         return store(item);
     }
 
+    /** Armazena o processo demonstrativo no diretório local. */
     private Case store(Case item) {
         String id =
                 item.id() == null || item.id().isBlank() ? UUID.randomUUID().toString() : item.id();
@@ -87,6 +91,7 @@ public final class HomologationDesk {
         return stored;
     }
 
+    /** Submete a jornada para revisão com validação do operador. */
     public synchronized Case submit(String id, String role, String actor) {
         if (!Set.of("PDV", "ADMIN").contains(role)) {
             throw new IllegalArgumentException("Role cannot submit");
@@ -106,6 +111,7 @@ public final class HomologationDesk {
         return store(copy(current, "EM_HOMOLOGACAO", false));
     }
 
+    /** Registra a aprovação ou recusa da jornada demonstrativa. */
     public synchronized Case decide(String id, String role, String actor, boolean approve) {
         if (!Set.of("BACKOFFICE", "ADMIN").contains(role)) {
             throw new IllegalArgumentException("Role cannot approve");
@@ -123,6 +129,7 @@ public final class HomologationDesk {
         return store(copy(current, approve ? "APROVADA" : "RECUSADA", false));
     }
 
+    /** Cria outra loja de laboratório a partir de um cadastro existente. */
     public synchronized Case cloneFrom(String sourceId, String targetStoreId, String role) {
         if (!Set.of("PDV", "ADMIN").contains(role)) {
             throw new IllegalArgumentException("Role cannot clone");
@@ -157,10 +164,12 @@ public final class HomologationDesk {
                         false));
     }
 
+    /** Verifica se o processo ainda permite alterações. */
     private static boolean editable(Case item) {
         return Set.of("RASCUNHO", "RECUSADA").contains(item.status());
     }
 
+    /** Localiza o processo ou rejeita um identificador inexistente. */
     private Case required(String id) {
         Case found = cases.get(id);
         if (found == null) {
@@ -169,6 +178,7 @@ public final class HomologationDesk {
         return found;
     }
 
+    /** Cria um rascunho de homologação com valores iniciais. */
     private static Case draft(String storeId, String legalName, String storeName, String status) {
         return new Case(
                 storeId,
@@ -187,6 +197,7 @@ public final class HomologationDesk {
                 false);
     }
 
+    /** Copia o processo com o novo estado e a situação da demo. */
     private static Case copy(Case current, String status, boolean prepared) {
         return new Case(
                 current.id(),
@@ -205,6 +216,7 @@ public final class HomologationDesk {
                 prepared);
     }
 
+    /** Remove caracteres não numéricos do documento. */
     private static String digits(String value) {
         String digits = value == null ? "" : value.replaceAll("\\D", "");
         if (digits.length() != 14) {

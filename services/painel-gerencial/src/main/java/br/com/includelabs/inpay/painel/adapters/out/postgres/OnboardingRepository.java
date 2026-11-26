@@ -21,10 +21,12 @@ public class OnboardingRepository {
     private final JdbcTemplate jdbc;
     private final JsonMapper json = JsonMapper.builder().build();
 
+    /** Inicializa o adaptador de persistência PostgreSQL. */
     public OnboardingRepository(JdbcTemplate jdbc) {
         this.jdbc = jdbc;
     }
 
+    /** Lista os processos do tenant em ordem de criação. */
     public List<OnboardingCase> list(UUID tenant) {
         return jdbc.query(
                 "SELECT payload::text FROM onboarding_case WHERE tenant=? ORDER BY created_at DESC LIMIT 100",
@@ -32,6 +34,7 @@ public class OnboardingRepository {
                 tenant);
     }
 
+    /** Consulta o processo e aplica bloqueio de linha quando solicitado. */
     public OnboardingCase get(UUID tenant, UUID id, boolean lock) {
         var rows =
                 jdbc.query(
@@ -44,6 +47,7 @@ public class OnboardingRepository {
         return rows.getFirst();
     }
 
+    /** Localiza o processo associado à demonstração do tenant. */
     public OnboardingCase getByDemo(UUID tenant, UUID demoId) {
         var rows =
                 jdbc.query(
@@ -55,6 +59,7 @@ public class OnboardingRepository {
         return rows.getFirst();
     }
 
+    /** Persiste um novo processo de homologação. */
     public void insert(UUID tenant, OnboardingCase item) {
         jdbc.update(
                 "INSERT INTO onboarding_case(tenant,id,payload) VALUES(?,?,?::jsonb)",
@@ -63,6 +68,7 @@ public class OnboardingRepository {
                 json.writeValueAsString(item));
     }
 
+    /** Atualiza o processo e exige que o registro exista no tenant. */
     public void update(UUID tenant, OnboardingCase item) {
         int count =
                 jdbc.update(
@@ -73,6 +79,7 @@ public class OnboardingRepository {
         if (count != 1) throw new ApiErrors.NoSuchResource();
     }
 
+    /** Registra ou consulta eventos de auditoria do processo. */
     public void audit(UUID tenant, UUID id, String actor, String event) {
         jdbc.update(
                 "INSERT INTO onboarding_audit(tenant,case_id,actor,event) VALUES(?,?,?,?)",
@@ -82,6 +89,7 @@ public class OnboardingRepository {
                 event);
     }
 
+    /** Registra ou consulta eventos de auditoria do processo. */
     public List<Map<String, Object>> audit(UUID tenant, UUID id) {
         get(tenant, id, false);
         return jdbc.queryForList(
@@ -92,6 +100,7 @@ public class OnboardingRepository {
 
     public record Blob(OnboardingDocument info, String keyId, byte[] nonce, byte[] ciphertext) {}
 
+    /** Persiste a versão criptografada e os metadados do documento. */
     public OnboardingDocument insertDocument(
             UUID tenant,
             UUID id,
@@ -131,6 +140,7 @@ public class OnboardingRepository {
                 docId, kind, version, mime, sha256, source, actor, "PENDING", expiresAt);
     }
 
+    /** Seleciona a última versão de cada tipo de documento. */
     public List<OnboardingDocument> currentDocuments(UUID tenant, UUID id) {
         get(tenant, id, false);
         return jdbc.query(
@@ -140,6 +150,7 @@ public class OnboardingRepository {
                 id);
     }
 
+    /** Recupera o conteúdo criptografado ainda válido no tenant. */
     public Blob document(UUID tenant, UUID id, UUID docId) {
         var rows =
                 jdbc.query(
@@ -157,6 +168,7 @@ public class OnboardingRepository {
         return rows.getFirst();
     }
 
+    /** Persiste a decisão de revisão do documento vigente. */
     public void review(UUID tenant, UUID id, UUID docId, String actor, String decision) {
         int count =
                 jdbc.update(
@@ -169,11 +181,13 @@ public class OnboardingRepository {
         if (count != 1) throw new ApiErrors.NoSuchResource();
     }
 
+    /** Remove o conteúdo criptografado dos documentos expirados. */
     public int purgeExpired() {
         return jdbc.update(
                 "UPDATE onboarding_document SET ciphertext=NULL,nonce=NULL,decision='EXPIRED' WHERE expires_at<=now() AND ciphertext IS NOT NULL");
     }
 
+    /** Converte os dados da consulta em metadados do documento. */
     private static OnboardingDocument metadata(ResultSet rs) throws SQLException {
         return new OnboardingDocument(
                 rs.getObject("id", UUID.class),

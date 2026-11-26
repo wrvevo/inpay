@@ -48,6 +48,7 @@ public class SandboxClients {
                     "safrapay",
                     8108);
 
+    /** Configura o cliente HTTP exclusivo para integrações locais. */
     public SandboxClients(
             Environment environment, @Value("${inpay.local-password:}") String password) {
         this.local = environment.matchesProfiles("local");
@@ -58,6 +59,7 @@ public class SandboxClients {
                                         ("inpay:" + password).getBytes(StandardCharsets.UTF_8));
     }
 
+    /** Consulta ClearSale e Serasa e valida os resultados simulados. */
     public Map<String, String> partners(UUID tenant, UUID caseId) {
         Map<String, String> evidence = new LinkedHashMap<>();
         for (String provider : new String[] {"clearsale", "serasa-experian"}) {
@@ -84,6 +86,7 @@ public class SandboxClients {
         return evidence;
     }
 
+    /** Confirma a configuração persistida no Accounts. */
     public String provision(UUID tenant, OnboardingCase item) {
         JsonNode reply =
                 post(
@@ -103,6 +106,7 @@ public class SandboxClients {
         return reply.path("id").asText();
     }
 
+    /** Executa operações sintéticas dos provedores vinculados à loja. */
     public Map<String, String> tests(UUID tenant, OnboardingCase item) {
         Map<String, String> results = new LinkedHashMap<>();
         item.bindings()
@@ -157,6 +161,7 @@ public class SandboxClients {
         return results;
     }
 
+    /** Envia a requisição local e rejeita falhas sem acionar produção. */
     private JsonNode post(String url, UUID tenant, String key, Object body, boolean mock) {
         if (!local)
             throw new UnsupportedOperationException("External partner contract not configured");
