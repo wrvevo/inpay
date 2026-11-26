@@ -11,3 +11,13 @@ services:
     depends_on:
       bank-mock-server:
         condition: service_started
+  payment-core-service:
+    environment:
+      INPAY_BANK_GATEWAY_URLS_C6: http://connector-c6:8111
+      INPAY_BANK_GATEWAY_URLS_ITAU: http://connector-itau:8112
+      INPAY_BANK_GATEWAY_URLS_SANTANDER: http://connector-santander:8113
+      INPAY_BANK_GATEWAY_URLS_BB: http://connector-bb:8114
+      INPAY_BANK_GATEWAY_URLS_BRADESCO: http://connector-bradesco:8115
+      INPAY_BANK_GATEWAY_URLS_CAIXA: http://connector-caixa:8116
+      INPAY_BANK_GATEWAY_URLS_BANRISUL: http://connector-banrisul:8117
+      INPAY_BANK_GATEWAY_PASSWORD: ${LOCAL_PASSWORD:-inpay@123}
