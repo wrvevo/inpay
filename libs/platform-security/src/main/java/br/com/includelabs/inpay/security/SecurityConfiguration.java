@@ -3,6 +3,7 @@ package br.com.includelabs.inpay.security;
 import java.util.*;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.*;
+import org.springframework.core.annotation.Order;
 import org.springframework.security.config.Customizer;
 import org.springframework.security.config.annotation.method.configuration.EnableMethodSecurity;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
@@ -13,6 +14,7 @@ import org.springframework.security.oauth2.jose.jws.SignatureAlgorithm;
 import org.springframework.security.oauth2.jwt.*;
 import org.springframework.security.provisioning.InMemoryUserDetailsManager;
 import org.springframework.security.web.SecurityFilterChain;
+import org.springframework.security.web.authentication.www.BasicAuthenticationFilter;
 
 /**
  * Componente de infraestrutura do InPay responsável por SecurityConfiguration. Não deve ser
@@ -32,11 +34,15 @@ public class SecurityConfiguration {
     @Bean
     @Profile("local")
     UserDetailsService localUsers(@Value("${inpay.local-password}") String password) {
-        return new InMemoryUserDetailsManager(
-                User.withUsername("developer")
-                        .password("{noop}" + password)
-                        .authorities(SCOPES)
-                        .build());
+        var manager = new InMemoryUserDetailsManager();
+        for (String username : new String[] {"inpay", "developer"}) {
+            manager.createUser(
+                    User.withUsername(username)
+                            .password("{noop}" + password)
+                            .authorities(SCOPES)
+                            .build());
+        }
+        return manager;
     }
 
     private static final String[] SCOPES =
@@ -100,7 +106,17 @@ public class SecurityConfiguration {
                 "SCOPE_connectors-caixa/execute",
                 "SCOPE_connectors-caixa/read",
                 "SCOPE_connectors-banrisul/execute",
-                "SCOPE_connectors-banrisul/read"
+                "SCOPE_connectors-banrisul/read",
+                "SCOPE_connectors-clearsale/execute",
+                "SCOPE_connectors-clearsale/read",
+                "SCOPE_connectors-serasa-experian/execute",
+                "SCOPE_connectors-serasa-experian/read",
+                "SCOPE_painel/read",
+                "SCOPE_painel/manage",
+                "SCOPE_painel/admin",
+                "SCOPE_homologation/write",
+                "SCOPE_homologation/approve",
+                "SCOPE_homologation/admin"
             };
 
     /**
@@ -112,8 +128,14 @@ public class SecurityConfiguration {
      */
     @Bean
     @Profile("local")
-    SecurityFilterChain local(HttpSecurity http) throws Exception {
-        return base(http, true).httpBasic(Customizer.withDefaults()).build();
+    @Order(100)
+    SecurityFilterChain local(HttpSecurity http, @Value("${inpay.local-password:}") String password)
+            throws Exception {
+        var chain = base(http, true).httpBasic(Customizer.withDefaults());
+        if (!password.isBlank()) {
+            chain.addFilterBefore(new LocalBearerFilter(password), BasicAuthenticationFilter.class);
+        }
+        return chain.build();
     }
 
     /**
@@ -126,6 +148,7 @@ public class SecurityConfiguration {
      */
     @Bean
     @Profile("!local")
+    @Order(100)
     SecurityFilterChain aws(HttpSecurity http) throws Exception {
         return base(http, false)
                 .oauth2ResourceServer(o -> o.jwt(Customizer.withDefaults()))

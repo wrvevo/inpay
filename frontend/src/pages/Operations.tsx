@@ -138,23 +138,52 @@ export function Fraud({ session }: { session: Session }) {
     setResult(null);
     try {
       const f = new FormData(event.currentTarget);
+      const mode = String(f.get("mode") || "INPAY_RISK");
+      const typing = Number(f.get("typing") || 0);
+      const pointer = Number(f.get("pointer") || 0);
+      const dwell = Number(f.get("dwell") || 0);
       const body = {
         paymentId: String(f.get("id")),
         amount: toCents(String(f.get("amount"))),
         attemptsLastHour: Number(f.get("attempts")),
         declinesLastHour: Number(f.get("declines")),
         knownCompromised: f.get("compromised") === "on",
+        behavior:
+          typing > 0 || pointer > 0 || dwell > 0
+            ? {
+                typingIntervalMs: typing,
+                mouseEntropy: pointer,
+                navigationSeconds: dwell,
+                unusualJourney: false,
+              }
+            : undefined,
       };
-      setResult(
-        session.mode === "demo"
-          ? assessDemo(
-              body.amount,
-              body.attemptsLastHour,
-              body.declinesLastHour,
-              body.knownCompromised,
-            )
-          : await api(session, "fraud", body),
-      );
+      if (session.mode !== "demo") {
+        await api(session, "fraud/mode", { mode });
+      }
+      const demo =
+        mode === "INPAY_RISK"
+          ? {
+              ...assessDemo(
+                body.amount,
+                body.attemptsLastHour,
+                body.declinesLastHour,
+                body.knownCompromised,
+              ),
+              provider: "INPAY_RISK",
+              tokens: 90 + (body.behavior ? 180 : 0),
+              policyVersion: "inpay-risk-v1",
+            }
+          : {
+              provider: mode,
+              score: body.knownCompromised ? 90 : 15,
+              decision: body.knownCompromised ? "REJECT" : "ACCEPT",
+              policyVersion:
+                mode === "CLEARSALE" ? "clearsale-mock-v1" : "serasa-experian-mock-v1",
+              reasons: ["MOCK_STUB"],
+              tokens: 0,
+            };
+      setResult(session.mode === "demo" ? demo : await api(session, "fraud", body));
     } catch (e) {
       setError((e as Error).message);
     } finally {
@@ -171,7 +200,7 @@ export function Fraud({ session }: { session: Session }) {
         <Metric
           label="Motor nativo"
           value="InPay Risk"
-          note="Política demo-rules-v1"
+          note="Score explicável e tokens de IA"
         />
         <Metric label="Aprovação" value="0–39" note="Score: ACCEPT" />
         <Metric label="Revisão" value="40–69" note="Score: REVIEW" />
@@ -184,8 +213,21 @@ export function Fraud({ session }: { session: Session }) {
               ? "Simular avaliação"
               : "Avaliar e persistir sinais"}
           </h2>
-          <p>Não altera o estado financeiro do pagamento.</p>
+          <p>
+            O gateway escolhe o modo nativo. InPay Risk analisa comportamento,
+            dispositivo, cadastro e chargebacks e mede o custo em tokens. ClearSale
+            e Serasa Experian respondem pelo stub enquanto a chamada real está
+            desligada.
+          </p>
           <form className="form" onSubmit={evaluate}>
+            <label>
+              Modo nativo
+              <select name="mode" defaultValue="INPAY_RISK">
+                <option value="INPAY_RISK">InPay Risk</option>
+                <option value="CLEARSALE">ClearSale</option>
+                <option value="SERASA_EXPERIAN">Serasa Experian</option>
+              </select>
+            </label>
             <label>
               UUID do pagamento
               <input
@@ -232,6 +274,20 @@ export function Fraud({ session }: { session: Session }) {
               <input name="compromised" type="checkbox" />
               Comprometimento conhecido
             </label>
+            <div className="form-grid">
+              <label>
+                Intervalo de digitação (ms)
+                <input name="typing" type="number" min="0" max="60000" defaultValue="0" />
+              </label>
+              <label>
+                Movimento do ponteiro (0–100)
+                <input name="pointer" type="number" min="0" max="100" defaultValue="0" />
+              </label>
+            </div>
+            <label>
+              Permanência no checkout (s)
+              <input name="dwell" type="number" min="0" max="86400" defaultValue="0" />
+            </label>
             {error && (
               <p role="alert" className="error">
                 {error}
@@ -259,9 +315,12 @@ export function Fraud({ session }: { session: Session }) {
             </li>
           </ul>
           <Notice>
-            A política atual é demonstrativa e exige calibração. A coleta
-            automática de sinais e a revisão manual ainda não foram
-            implementadas.
+            InPay Risk soma sinais explicáveis e reserva tokens para o custo do
+            modelo: 90 na síntese do score e 180 quando há comportamento. A
+            franquia e o excedente estão nos planos. Chargeback confirmado sobe o
+            score do dispositivo; contestação legítima reduz falso positivo.
+            ClearSale e Serasa Experian, quando selecionados, não gastam token de
+            IA.
           </Notice>
           {result !== null && (
             <pre aria-live="polite">{JSON.stringify(result, null, 2)}</pre>

@@ -26,7 +26,10 @@ public class ItauOperationsController {
         return Map.of("bank", "itau", "data", useCase.catalog());
     }
 
-    @PostMapping({"/internal/v1/itau/operations/{operation}", "/internal/v1/bank/operations/{operation}"})
+    @PostMapping({
+        "/internal/v1/itau/operations/{operation}",
+        "/internal/v1/bank/operations/{operation}"
+    })
     @PreAuthorize("hasAuthority('SCOPE_connectors-itau/execute')")
     public ItauReply execute(
             @PathVariable String operation,

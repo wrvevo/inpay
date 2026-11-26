@@ -16,6 +16,7 @@ public record BankResult(
     }
 
     public static BankResult unavailable(String bank, String operation, boolean mocked) {
-        return new BankResult(bank, operation, 503, true, mocked, Map.of("error", "PROVIDER_UNAVAILABLE"));
+        return new BankResult(
+                bank, operation, 503, true, mocked, Map.of("error", "PROVIDER_UNAVAILABLE"));
     }
 }

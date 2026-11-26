@@ -24,7 +24,7 @@ public record BankGatewaySettings(Map<String, String> urls, String username, Str
             username = "developer";
         }
         if (password == null || password.isBlank()) {
-            password = "local-only-change-me";
+            password = "inpay@123";
         }
     }
 

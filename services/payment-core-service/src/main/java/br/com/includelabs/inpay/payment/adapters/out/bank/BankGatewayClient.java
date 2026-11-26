@@ -28,7 +28,10 @@ public class BankGatewayClient {
     public BankGatewayClient(BankGatewaySettings settings) {
         this(
                 settings,
-                HttpClient.newBuilder().connectTimeout(BUDGET).followRedirects(HttpClient.Redirect.NEVER).build());
+                HttpClient.newBuilder()
+                        .connectTimeout(BUDGET)
+                        .followRedirects(HttpClient.Redirect.NEVER)
+                        .build());
     }
 
     private BankGatewayClient(BankGatewaySettings settings, HttpClient client) {
@@ -36,7 +39,12 @@ public class BankGatewayClient {
         this.client = client;
     }
 
-    public Downstream execute(String bank, String operation, String mock, String operationId, Map<String, Object> payload) {
+    public Downstream execute(
+            String bank,
+            String operation,
+            String mock,
+            String operationId,
+            Map<String, Object> payload) {
         String base = settings.url(bank);
         LOG.info(
                 "Gateway bank dispatch started bank={} operation={} mock={} ",
@@ -46,7 +54,8 @@ public class BankGatewayClient {
         try {
             String body = mapper.writeValueAsString(payload == null ? Map.of() : payload);
             HttpRequest.Builder request =
-                    HttpRequest.newBuilder(URI.create(base + "/internal/v1/bank/operations/" + operation))
+                    HttpRequest.newBuilder(
+                                    URI.create(base + "/internal/v1/bank/operations/" + operation))
                             .timeout(BUDGET)
                             .header("Accept", "application/json")
                             .header("Content-Type", "application/json")
@@ -56,8 +65,12 @@ public class BankGatewayClient {
                                     "Basic "
                                             + Base64.getEncoder()
                                                     .encodeToString(
-                                                            (settings.username() + ":" + settings.password())
-                                                                    .getBytes(StandardCharsets.UTF_8)));
+                                                            (settings.username()
+                                                                            + ":"
+                                                                            + settings.password())
+                                                                    .getBytes(
+                                                                            StandardCharsets
+                                                                                    .UTF_8)));
             if (mock != null && !mock.isBlank()) {
                 request.header("X-Mock", mock.trim());
             }
@@ -72,7 +85,11 @@ public class BankGatewayClient {
                     response.statusCode());
             return new Downstream(response.statusCode(), response.body());
         } catch (Exception exception) {
-            LOG.error("Gateway bank dispatch failed bank={} operation={}", bank, operation, exception);
+            LOG.error(
+                    "Gateway bank dispatch failed bank={} operation={}",
+                    bank,
+                    operation,
+                    exception);
             return new Downstream(503, "{\"error\":\"PROVIDER_UNAVAILABLE\"}");
         }
     }

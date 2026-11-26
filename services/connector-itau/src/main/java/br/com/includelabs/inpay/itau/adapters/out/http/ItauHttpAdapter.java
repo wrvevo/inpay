@@ -43,27 +43,34 @@ public final class ItauHttpAdapter implements ItauBankPort {
 
     public ItauHttpAdapter(ItauSettings settings) {
         this.settings = settings;
-        this.client = HttpClient.newBuilder().connectTimeout(BUDGET).sslContext(ssl(settings)).build();
+        this.client =
+                HttpClient.newBuilder().connectTimeout(BUDGET).sslContext(ssl(settings)).build();
     }
 
     @Override
-    public ItauReply send(ItauOperation operation, String path, Map<String, Object> body, boolean form) {
+    public ItauReply send(
+            ItauOperation operation, String path, Map<String, Object> body, boolean form) {
         if (failures >= 5) {
             LOG.warn("Itau circuit open operation={}", operation.name());
-            return new ItauReply(operation.name(), 503, true, false, Map.of("error", "CIRCUIT_OPEN"));
+            return new ItauReply(
+                    operation.name(), 503, true, false, Map.of("error", "CIRCUIT_OPEN"));
         }
         try {
             String url = settings.baseUrl(operation.product()).replaceAll("/+$", "") + path;
             String access = operation == ItauOperation.AUTH_TOKEN ? "" : accessToken();
             String payload =
-                    form ? String.valueOf(body.getOrDefault("form", "")) : mapper.writeValueAsString(body);
+                    form
+                            ? String.valueOf(body.getOrDefault("form", ""))
+                            : mapper.writeValueAsString(body);
             HttpRequest.Builder request =
                     HttpRequest.newBuilder(URI.create(url))
                             .timeout(BUDGET)
                             .header("Accept", "application/json")
                             .header(
                                     "Content-Type",
-                                    form ? "application/x-www-form-urlencoded" : "application/json");
+                                    form
+                                            ? "application/x-www-form-urlencoded"
+                                            : "application/json");
             if (!access.isBlank()) {
                 request.header("Authorization", "Bearer " + access);
             }
@@ -75,21 +82,35 @@ public final class ItauHttpAdapter implements ItauBankPort {
             } else {
                 request.method(operation.method(), HttpRequest.BodyPublishers.ofString(payload));
             }
-            LOG.info("Itau external call started operation={} host={}", operation.name(), URI.create(url).getHost());
-            HttpResponse<byte[]> response = client.send(request.build(), HttpResponse.BodyHandlers.ofByteArray());
+            LOG.info(
+                    "Itau external call started operation={} host={}",
+                    operation.name(),
+                    URI.create(url).getHost());
+            HttpResponse<byte[]> response =
+                    client.send(request.build(), HttpResponse.BodyHandlers.ofByteArray());
             boolean failure = response.statusCode() >= 500 || response.statusCode() == 429;
             failures = failure ? failures + 1 : 0;
-            LOG.info("Itau external call finished operation={} status={}", operation.name(), response.statusCode());
-            return new ItauReply(operation.name(), response.statusCode(), failure, false, decode(response.body()));
+            LOG.info(
+                    "Itau external call finished operation={} status={}",
+                    operation.name(),
+                    response.statusCode());
+            return new ItauReply(
+                    operation.name(),
+                    response.statusCode(),
+                    failure,
+                    false,
+                    decode(response.body()));
         } catch (InterruptedException exception) {
             Thread.currentThread().interrupt();
             failures++;
             LOG.error("Itau external call interrupted operation={}", operation.name(), exception);
-            return new ItauReply(operation.name(), 503, true, false, Map.of("error", "INTERRUPTED"));
+            return new ItauReply(
+                    operation.name(), 503, true, false, Map.of("error", "INTERRUPTED"));
         } catch (Exception exception) {
             failures++;
             LOG.error("Itau external call failed operation={}", operation.name(), exception);
-            return new ItauReply(operation.name(), 503, true, false, Map.of("error", "PROVIDER_UNAVAILABLE"));
+            return new ItauReply(
+                    operation.name(), 503, true, false, Map.of("error", "PROVIDER_UNAVAILABLE"));
         }
     }
 
@@ -137,12 +158,14 @@ public final class ItauHttpAdapter implements ItauBankPort {
             Certificate certificate =
                     CertificateFactory.getInstance("X.509")
                             .generateCertificate(
-                                    new ByteArrayInputStream(Files.readAllBytes(Path.of(settings.certificate()))));
+                                    new ByteArrayInputStream(
+                                            Files.readAllBytes(Path.of(settings.certificate()))));
             PrivateKey key = privateKey(Files.readString(Path.of(settings.privateKey())));
             KeyStore store = KeyStore.getInstance("PKCS12");
             store.load(null, null);
             store.setKeyEntry("itau", key, new char[0], new Certificate[] {certificate});
-            KeyManagerFactory keys = KeyManagerFactory.getInstance(KeyManagerFactory.getDefaultAlgorithm());
+            KeyManagerFactory keys =
+                    KeyManagerFactory.getInstance(KeyManagerFactory.getDefaultAlgorithm());
             keys.init(store, new char[0]);
             SSLContext context = SSLContext.getInstance("TLS");
             context.init(keys.getKeyManagers(), null, null);

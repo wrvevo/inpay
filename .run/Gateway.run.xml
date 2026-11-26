@@ -1,6 +1,6 @@
 <component name="ProjectRunConfigurationManager">
   <configuration default="false" name="Gateway" type="ShConfigurationType">
-    <option name="SCRIPT_TEXT" value="$env:LOCAL_PASSWORD='local-only-change-me'; $env:GRAFANA_PASSWORD='local-only-change-me'; $env:SERVICE_MEMORY_LIMIT='512m'; docker compose -f docker-compose.yml up --build -d" />
+    <option name="SCRIPT_TEXT" value="$env:LOCAL_PASSWORD='inpay@123'; $env:GRAFANA_PASSWORD='inpay@123'; $env:SERVICE_MEMORY_LIMIT='512m'; docker compose -f docker-compose.yml up --build -d" />
     <option name="INDEPENDENT_SCRIPT_PATH" value="true" />
     <option name="SCRIPT_PATH" value="" />
     <option name="SCRIPT_OPTIONS" value="" />

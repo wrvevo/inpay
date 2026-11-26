@@ -11,14 +11,21 @@ public final class BankRequestLog implements HandlerInterceptor {
     private static final Logger LOG = LogManager.getLogger(BankRequestLog.class);
 
     @Override
-    public boolean preHandle(HttpServletRequest request, HttpServletResponse response, Object handler) {
-        LOG.info("HTTP bank request started method={} path={}", request.getMethod(), request.getRequestURI());
+    public boolean preHandle(
+            HttpServletRequest request, HttpServletResponse response, Object handler) {
+        LOG.info(
+                "HTTP bank request started method={} path={}",
+                request.getMethod(),
+                request.getRequestURI());
         return true;
     }
 
     @Override
     public void afterCompletion(
-            HttpServletRequest request, HttpServletResponse response, Object handler, Exception exception) {
+            HttpServletRequest request,
+            HttpServletResponse response,
+            Object handler,
+            Exception exception) {
         if (exception == null) {
             LOG.info(
                     "HTTP bank request completed method={} path={} status={}",

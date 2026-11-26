@@ -38,6 +38,10 @@ import {
   Split,
 } from "./pages/Operations";
 import { Developers, Settings } from "./pages/Settings";
+import { Login } from "./pages/Login";
+import { RiskDesk, ProviderSetup } from "./pages/GatewayAdmin";
+import { TeamAccess } from "./pages/TeamAccess";
+import { HomologationApp, Profile } from "./pages/Homologation";
 import { Modal } from "./components/UI";
 import type { Session } from "./api";
 const navigation = [
@@ -80,32 +84,74 @@ const navigation = [
     items: [
       ["finance", "Financeiro", Wallet],
       ["fraud", "Antifraude", ShieldCheck],
+      ["risk", "Gestão InRisk", ShieldCheck],
+      ["clearsale", "ClearSale", ShieldCheck],
+      ["serasa", "Serasa Experian", ShieldCheck],
       ["disputes", "Contestações", Activity],
       ["methods", "Meios de pagamento", CreditCard],
       ["routing", "Roteamento", GitBranch],
       ["developers", "Desenvolvedores", Code2],
       ["team", "Equipe e permissões", Users],
+      ["profile", "Meus dados", Users],
       ["settings", "Configurações", SettingsIcon],
     ],
   },
 ];
 const validPages = navigation.flatMap((g) => g.items.map((i) => String(i[0])));
+const MENU_OF: Record<string, string> = {
+  overview: "overview",
+  transactions: "transactions",
+  fraud: "fraud",
+  risk: "risk",
+  clearsale: "clearsale",
+  serasa: "serasa",
+  methods: "methods",
+  billing: "billing",
+  accounts: "accounts",
+  team: "team",
+  settings: "settings",
+  profile: "settings",
+};
 function currentPage() {
   const page = location.hash.slice(1);
   return validPages.includes(page) ? page : "overview";
 }
 
+function readUser() {
+  try {
+    return JSON.parse(sessionStorage.getItem("inpay-user") || "null");
+  } catch {
+    return null;
+  }
+}
 /** The mode/tenant key destroys page state on context changes to prevent data mixing. */
 export default function App() {
   const [page, setPage] = useState(currentPage);
   const [menu, setMenu] = useState(false);
   const [help, setHelp] = useState(false);
   const [search, setSearch] = useState("");
+  const [user, setUser] = useState<any>(readUser);
   const [session, setSession] = useState<Session>({
     mode: "demo",
     token: "",
-    tenant: "11111111-1111-1111-1111-111111111111",
+    tenant: readUser()?.stores?.[0]?.id || "11111111-1111-1111-1111-111111111111",
   });
+  function enter(next: any, redirect = true) {
+    sessionStorage.setItem("inpay-user", JSON.stringify(next));
+    setUser(next);
+    setSession((current) => ({
+      ...current,
+      tenant: next.stores?.[0]?.id || current.tenant,
+    }));
+    if (redirect) {
+      location.hash = next.realm === "HOMOLOGATION" ? "homologation" : "overview";
+      setPage("overview");
+    }
+  }
+  function logout() {
+    sessionStorage.removeItem("inpay-user");
+    setUser(null);
+  }
   useEffect(() => {
     const listener = () => {
       setPage(currentPage());
@@ -121,7 +167,7 @@ export default function App() {
     setMenu(false);
     window.scrollTo(0, 0);
   }
-  const visibleNavigation =
+  const visibleNavigation = (
     page === "my-credit"
       ? [
           {
@@ -132,7 +178,17 @@ export default function App() {
             ],
           },
         ]
-      : navigation;
+      : navigation
+  )
+    .map((group) => ({
+      ...group,
+      items: group.items.filter(([id]) => {
+        if (!user || user.role === "ADMIN") return true;
+        const key = MENU_OF[String(id)];
+        return key ? user.menus.includes(key) : false;
+      }),
+    }))
+    .filter((group) => group.items.length);
   const activeName = navigation
     .flatMap((g) => g.items)
     .find((i) => i[0] === page)?.[1];
@@ -152,6 +208,11 @@ export default function App() {
   else if (page === "links") content = <Links session={session} />;
   else if (page === "methods") content = <Methods />;
   else if (page === "fraud") content = <Fraud session={session} />;
+  else if (page === "risk") content = <RiskDesk />;
+  else if (page === "clearsale") content = <ProviderSetup provider="clearsale" />;
+  else if (page === "serasa") content = <ProviderSetup provider="serasa" />;
+  else if (page === "team") content = <TeamAccess user={user} onUser={(next) => enter(next, false)} />;
+  else if (page === "profile") content = <Profile user={user} onUser={(next) => enter(next, false)} />;
   else if (page === "routing") content = <Routing />;
   else if (page === "split") content = <Split />;
   else if (page === "journey") content = <Journey />;
@@ -168,11 +229,14 @@ export default function App() {
             | "recipients"
             | "subscriptions"
             | "disputes"
-            | "team"
         }
         session={session}
       />
     );
+  if (!user) return <Login onLogin={enter} />;
+  if (user.realm === "HOMOLOGATION") {
+    return <HomologationApp user={user} onLogout={logout} />;
+  }
   return (
     <>
       <a className="skip-link" href="#main-content">
@@ -235,20 +299,15 @@ export default function App() {
               </button>
             </div>
           </div>
-          <button className="profile" onClick={() => navigate("settings")}>
+          <button className="profile" onClick={() => navigate("profile")}>
             <span>IL</span>
             <div>
-              <strong>
-                {session.mode === "demo"
-                  ? page === "my-credit"
-                    ? "Cliente demo"
-                    : "Administrador demo"
-                  : "Sessão técnica"}
-              </strong>
-              <small>Include Labs · InPay</small>
+              <strong>{user?.name || "Conta"}</strong>
+              <small>{user?.role} · {user?.stores?.find((item: { id: string }) => item.id === session.tenant)?.name || "Loja"}</small>
             </div>
             <PanelLeftClose size={16} />
           </button>
+          <button onClick={logout}>Sair</button>
         </div>
       </aside>
       <div className="shell">
@@ -264,6 +323,21 @@ export default function App() {
             <span>Painel gerencial</span>
             <span>/</span>
             <strong>{String(activeName)}</strong>
+            {user?.stores?.length > 1 && (
+              <select
+                aria-label="Loja"
+                value={session.tenant}
+                onChange={(event) =>
+                  setSession((current) => ({ ...current, tenant: event.target.value }))
+                }
+              >
+                {user.stores.map((item: { id: string; name: string }) => (
+                  <option value={item.id} key={item.id}>
+                    {item.name}
+                  </option>
+                ))}
+              </select>
+            )}
           </div>
           <div className="topbar-actions">
             <div className="global-search">

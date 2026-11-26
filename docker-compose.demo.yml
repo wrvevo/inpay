@@ -4,14 +4,14 @@ services:
     environment:
       INPAY_JOURNEY_MODE: local-simulator
       INPAY_JOURNEY_CONNECTOR_URL: http://connector-simulator:8120
-      INPAY_JOURNEY_AUTHORIZATION: ${DEMO_CONNECTOR_AUTHORIZATION:?Defina Basic base64(developer:LOCAL_PASSWORD)}
+      INPAY_JOURNEY_AUTHORIZATION: ${DEMO_CONNECTOR_AUTHORIZATION:?Defina Basic base64(inpay:LOCAL_PASSWORD)}
     depends_on:
       connector-simulator:
         condition: service_started
   connector-simulator:
     build: ./examples/connector-simulator
     environment:
-      LOCAL_PASSWORD: ${LOCAL_PASSWORD:-local-only-change-me}
+      LOCAL_PASSWORD: ${LOCAL_PASSWORD:-inpay@123}
     ports:
       - 127.0.0.1:8120:8120
     read_only: true
@@ -23,15 +23,18 @@ services:
       STORE_MODE: local-simulator
       STORE_ADMIN_PASSWORD: ${STORE_ADMIN_PASSWORD:?Defina a senha administrativa local}
       INPAY_URL: http://payment-core-service:8084
-      INPAY_AUTHORIZATION: ${DEMO_CONNECTOR_AUTHORIZATION:?Defina Basic base64(developer:LOCAL_PASSWORD)}
+      INPAY_AUTHORIZATION: ${DEMO_CONNECTOR_AUTHORIZATION:?Defina Basic base64(inpay:LOCAL_PASSWORD)}
       INPAY_TENANT: 11111111-1111-1111-1111-111111111111
       INPAY_SWAGGER_URL: http://localhost:8084/swagger-ui/index.html
+      INPAY_FRAUD_URL: http://fraud-service:8087
     ports:
       - 127.0.0.1:8099:8099
     volumes:
       - game-store-data:/app/data
     depends_on:
       payment-core-service:
+        condition: service_healthy
+      fraud-service:
         condition: service_healthy
 volumes:
   game-store-data: {}

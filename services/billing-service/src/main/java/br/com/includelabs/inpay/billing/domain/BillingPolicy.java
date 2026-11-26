@@ -28,6 +28,27 @@ public final class BillingPolicy {
             String status) {}
 
     /**
+     * InPay Risk cobra o excedente de tokens. ClearSale e Serasa Experian são preço por análise,
+     * fora do medidor de IA. Valores de proposta, não fatura de provedor de modelo.
+     */
+    public record RiskOffer(
+            String planId,
+            long includedTokens,
+            int modelCentsPerThousand,
+            int chargeCentsPerThousand,
+            int clearsaleCents,
+            int serasaCents) {}
+
+    public record RiskQuote(
+            String planId,
+            String mode,
+            int tokens,
+            long includedTokens,
+            int billableTokens,
+            long modelCostCents,
+            long merchantChargeCents) {}
+
+    /**
      * Proposta comercial versionada: não confundir taxa de software com MDR/custo de adquirente.
      */
     public static List<Plan> plans() {
@@ -42,6 +63,66 @@ public final class BillingPolicy {
                 .filter(p -> p.id().equals(id))
                 .findFirst()
                 .orElseThrow(() -> new IllegalArgumentException("Unknown plan"));
+    }
+
+    public static List<RiskOffer> riskOffers() {
+        return List.of(
+                new RiskOffer("START-2026-11", 50_000, 3, 9, 35, 49),
+                new RiskOffer("GROW-2026-11", 1_000_000, 3, 5, 28, 39),
+                new RiskOffer("SCALE-2026-11", 5_000_000, 3, 4, 22, 32));
+    }
+
+    /**
+     * periodTokens é o consumo do ciclo. A cobrança do lojista incide só no excedente da franquia
+     * do InPay Risk. O custo de modelo é informado sobre todos os tokens consumidos.
+     */
+    public static RiskQuote priceFraud(
+            String planId, String mode, int periodTokens, int assessments) {
+        if (periodTokens < 0 || assessments < 0) {
+            throw new IllegalArgumentException("Invalid fraud usage");
+        }
+        RiskOffer offer =
+                riskOffers().stream()
+                        .filter(item -> item.planId().equals(planId))
+                        .findFirst()
+                        .orElseThrow(() -> new IllegalArgumentException("Unknown plan"));
+        String canonical = br.com.includelabs.inpay.contracts.FraudMode.canonical(mode);
+        if (canonical.equals(br.com.includelabs.inpay.contracts.FraudMode.CLEARSALE)) {
+            return new RiskQuote(
+                    planId,
+                    canonical,
+                    0,
+                    0,
+                    0,
+                    0,
+                    Math.multiplyExact(assessments, offer.clearsaleCents()));
+        }
+        if (canonical.equals(br.com.includelabs.inpay.contracts.FraudMode.SERASA_EXPERIAN)) {
+            return new RiskQuote(
+                    planId,
+                    canonical,
+                    0,
+                    0,
+                    0,
+                    0,
+                    Math.multiplyExact(assessments, offer.serasaCents()));
+        }
+        int billable = (int) Math.max(0, periodTokens - offer.includedTokens());
+        return new RiskQuote(
+                planId,
+                canonical,
+                periodTokens,
+                offer.includedTokens(),
+                billable,
+                tokensToCents(periodTokens, offer.modelCentsPerThousand()),
+                tokensToCents(billable, offer.chargeCentsPerThousand()));
+    }
+
+    private static long tokensToCents(int tokens, int centsPerThousand) {
+        return BigDecimal.valueOf(tokens)
+                .multiply(BigDecimal.valueOf(centsPerThousand))
+                .divide(BigDecimal.valueOf(1000), 0, RoundingMode.HALF_UP)
+                .longValueExact();
     }
 
     /** Limita parâmetros técnicos e impede desconto superior ao principal. */

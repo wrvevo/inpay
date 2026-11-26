@@ -91,7 +91,8 @@ class BillingIntegrationTest {
                         UUID.randomUUID(),
                         "Teste financeiro",
                         "START-2026-11",
-                        "contract-ref");
+                        "contract-ref",
+                        null);
         UUID merchant = (UUID) operations.register("operator", merchantBody).get("id");
         var terms =
                 new br.com.includelabs.inpay.billing.domain.BillingPolicy.Conditions(
@@ -181,7 +182,8 @@ class BillingIntegrationTest {
                                                 UUID.randomUUID(),
                                                 "Cycles",
                                                 "GROW-2026-11",
-                                                "contract"))
+                                                "contract",
+                                                "CLEARSALE"))
                                 .get("id");
         ops.approve(
                 "reviewer",

@@ -1,5 +1,15 @@
 import { test, expect } from "@playwright/test";
 
+test.beforeEach(async ({ page }) => {
+  await page.goto("/");
+  await page.getByLabel("E-mail ou documento").fill("admin@inpay.local");
+  await page.getByLabel("Senha").fill("inpay@123");
+  await page.getByRole("button", { name: "Entrar" }).click();
+  await expect(
+    page.getByRole("heading", { name: "Sua operação, em perspectiva." }),
+  ).toBeVisible();
+});
+
 test("dashboard, filters, details and downloads", async ({ page }) => {
   const errors: string[] = [];
   page.on("pageerror", (error) => errors.push(error.message));

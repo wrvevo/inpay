@@ -1,8 +1,11 @@
 package br.com.includelabs.inpay.fraud.bootstrap;
 
 import br.com.includelabs.inpay.fraud.application.AssessRisk;
+import br.com.includelabs.inpay.fraud.domain.InPayRiskEngine;
 import br.com.includelabs.inpay.fraud.domain.RiskPolicy;
 import br.com.includelabs.inpay.fraud.domain.port.AssessmentStore;
+import br.com.includelabs.inpay.fraud.domain.port.FraudModeSource;
+import br.com.includelabs.inpay.fraud.domain.port.LearningStore;
 import org.springframework.context.annotation.*;
 
 /**
@@ -19,7 +22,7 @@ public class UseCases {
      *     sucesso
      */
     @Bean
-    AssessRisk assessRisk(AssessmentStore store) {
-        return new AssessRisk(new RiskPolicy(), store);
+    AssessRisk assessRisk(AssessmentStore store, LearningStore learning, FraudModeSource modes) {
+        return new AssessRisk(new InPayRiskEngine(new RiskPolicy()), store, learning, modes);
     }
 }

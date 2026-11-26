@@ -19,7 +19,7 @@ Requisitos: Docker Engine e Compose v2. Na raiz do repositório, em Bash:
 ```bash
 export LOCAL_PASSWORD='escolha-uma-senha-local'
 export STORE_ADMIN_PASSWORD='escolha-outra-senha-local'
-export DEMO_CONNECTOR_AUTHORIZATION="$(python3 -c 'import os,base64; print("Basic "+base64.b64encode(("developer:"+os.environ["LOCAL_PASSWORD"]).encode()).decode())')"
+export DEMO_CONNECTOR_AUTHORIZATION="$(python3 -c 'import os,base64; print("Basic "+base64.b64encode(("inpay:"+os.environ["LOCAL_PASSWORD"]).encode()).decode())')"
 docker compose -f docker-compose.yml -f docker-compose.demo.yml up --build -d
 ```
 

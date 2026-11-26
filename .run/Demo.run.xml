@@ -1,6 +1,6 @@
 <component name="ProjectRunConfigurationManager">
   <configuration default="false" name="Demo" type="ShConfigurationType">
-    <option name="SCRIPT_TEXT" value="$env:LOCAL_PASSWORD='local-only-change-me'; $env:GRAFANA_PASSWORD='local-only-change-me'; $env:SERVICE_MEMORY_LIMIT='512m'; $env:STORE_ADMIN_PASSWORD='local-only-change-me'; $env:DEMO_CONNECTOR_AUTHORIZATION='Basic ZGV2ZWxvcGVyOmxvY2FsLW9ubHktY2hhbmdlLW1l'; docker compose -f docker-compose.yml -f docker-compose.demo.yml up --build -d" />
+    <option name="SCRIPT_TEXT" value="$env:LOCAL_PASSWORD='inpay@123'; $env:GRAFANA_PASSWORD='inpay@123'; $env:SERVICE_MEMORY_LIMIT='512m'; $env:STORE_ADMIN_PASSWORD='inpay@123'; $env:DEMO_CONNECTOR_AUTHORIZATION='Basic aW5wYXk6aW5wYXlAMTIz'; docker compose -f docker-compose.yml -f docker-compose.demo.yml up --build -d" />
     <option name="INDEPENDENT_SCRIPT_PATH" value="true" />
     <option name="SCRIPT_PATH" value="" />
     <option name="SCRIPT_OPTIONS" value="" />

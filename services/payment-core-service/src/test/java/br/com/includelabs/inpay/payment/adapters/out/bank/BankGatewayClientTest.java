@@ -37,7 +37,9 @@ class BankGatewayClientTest {
     void mockHeaderIsForwardedAndLiveTimeoutStaysInsideTheBudget() {
         BankGatewaySettings settings =
                 new BankGatewaySettings(
-                        Map.of("c6", "http://127.0.0.1:" + server.port()), "developer", "test-only");
+                        Map.of("c6", "http://127.0.0.1:" + server.port()),
+                        "developer",
+                        "test-only");
         BankGatewayClient client = new BankGatewayClient(settings);
         BankGatewayClient.Downstream mocked = new BankGatewayClient.Downstream(503, "");
         for (int attempt = 0; attempt < 20; attempt++) {

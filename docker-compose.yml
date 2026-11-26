@@ -7,7 +7,7 @@ services:
     - 127.0.0.1:3080:8080
     environment:
       PANEL_AUTH_MODE: local
-      LOCAL_PASSWORD: ${LOCAL_PASSWORD:-local-only-change-me}
+      LOCAL_PASSWORD: ${LOCAL_PASSWORD:-inpay@123}
       PANEL_ORIGINS: http://localhost:3080,http://127.0.0.1:3080
       LINKS_URL: http://payment-links-service:8082
       QUERY_URL: http://transaction-query-service:8091
@@ -90,7 +90,8 @@ services:
     ports:
     - 127.0.0.1:3000:3000
     environment:
-      GF_SECURITY_ADMIN_PASSWORD: ${GRAFANA_PASSWORD:-local-only-change-me}
+      GF_SECURITY_ADMIN_USER: inpay
+      GF_SECURITY_ADMIN_PASSWORD: ${GRAFANA_PASSWORD:-inpay@123}
     volumes:
     - ./infra/local/grafana-datasource.yml:/etc/grafana/provisioning/datasources/default.yaml:ro
     - grafana-data:/var/lib/grafana
@@ -110,7 +111,7 @@ services:
       DB_USER: merchant_service
       DB_PASSWORD: local-only
       KAFKA_BOOTSTRAP_SERVERS: kafka:19092
-      LOCAL_PASSWORD: ${LOCAL_PASSWORD:-local-only-change-me}
+      LOCAL_PASSWORD: ${LOCAL_PASSWORD:-inpay@123}
       SERVER_PORT: '8081'
       OTEL_SERVICE_NAME: merchant-service
       OTEL_EXPORTER_OTLP_ENDPOINT: http://otel-collector:4318
@@ -153,7 +154,7 @@ services:
       DB_USER: payment_links_service
       DB_PASSWORD: local-only
       KAFKA_BOOTSTRAP_SERVERS: kafka:19092
-      LOCAL_PASSWORD: ${LOCAL_PASSWORD:-local-only-change-me}
+      LOCAL_PASSWORD: ${LOCAL_PASSWORD:-inpay@123}
       SERVER_PORT: '8082'
       OTEL_SERVICE_NAME: payment-links-service
       OTEL_EXPORTER_OTLP_ENDPOINT: http://otel-collector:4318
@@ -196,7 +197,7 @@ services:
       DB_USER: checkout_service
       DB_PASSWORD: local-only
       KAFKA_BOOTSTRAP_SERVERS: kafka:19092
-      LOCAL_PASSWORD: ${LOCAL_PASSWORD:-local-only-change-me}
+      LOCAL_PASSWORD: ${LOCAL_PASSWORD:-inpay@123}
       SERVER_PORT: '8083'
       OTEL_SERVICE_NAME: checkout-service
       OTEL_EXPORTER_OTLP_ENDPOINT: http://otel-collector:4318
@@ -239,7 +240,7 @@ services:
       DB_USER: payment_core_service
       DB_PASSWORD: local-only
       KAFKA_BOOTSTRAP_SERVERS: kafka:19092
-      LOCAL_PASSWORD: ${LOCAL_PASSWORD:-local-only-change-me}
+      LOCAL_PASSWORD: ${LOCAL_PASSWORD:-inpay@123}
       SERVER_PORT: '8084'
       OTEL_SERVICE_NAME: payment-core-service
       OTEL_EXPORTER_OTLP_ENDPOINT: http://otel-collector:4318
@@ -282,7 +283,7 @@ services:
       DB_USER: routing_service
       DB_PASSWORD: local-only
       KAFKA_BOOTSTRAP_SERVERS: kafka:19092
-      LOCAL_PASSWORD: ${LOCAL_PASSWORD:-local-only-change-me}
+      LOCAL_PASSWORD: ${LOCAL_PASSWORD:-inpay@123}
       SERVER_PORT: '8085'
       OTEL_SERVICE_NAME: routing-service
       OTEL_EXPORTER_OTLP_ENDPOINT: http://otel-collector:4318
@@ -325,7 +326,7 @@ services:
       DB_USER: token_service
       DB_PASSWORD: local-only
       KAFKA_BOOTSTRAP_SERVERS: kafka:19092
-      LOCAL_PASSWORD: ${LOCAL_PASSWORD:-local-only-change-me}
+      LOCAL_PASSWORD: ${LOCAL_PASSWORD:-inpay@123}
       SERVER_PORT: '8086'
       OTEL_SERVICE_NAME: token-service
       OTEL_EXPORTER_OTLP_ENDPOINT: http://otel-collector:4318
@@ -368,7 +369,7 @@ services:
       DB_USER: fraud_service
       DB_PASSWORD: local-only
       KAFKA_BOOTSTRAP_SERVERS: kafka:19092
-      LOCAL_PASSWORD: ${LOCAL_PASSWORD:-local-only-change-me}
+      LOCAL_PASSWORD: ${LOCAL_PASSWORD:-inpay@123}
       SERVER_PORT: '8087'
       OTEL_SERVICE_NAME: fraud-service
       OTEL_EXPORTER_OTLP_ENDPOINT: http://otel-collector:4318
@@ -399,6 +400,96 @@ services:
     stop_grace_period: 30s
     security_opt:
     - no-new-privileges:true
+  connector-clearsale:
+    build:
+      context: .
+      args:
+        MODULE: connector-clearsale
+      target: spring-service
+    environment:
+      SPRING_PROFILES_ACTIVE: local
+      LOCAL_PASSWORD: ${LOCAL_PASSWORD:-inpay@123}
+      SERVER_PORT: '8128'
+      OTEL_SERVICE_NAME: connector-clearsale
+      OTEL_METRICS_EXPORTER: none
+      OTEL_LOGS_EXPORTER: none
+      JAVA_TOOL_OPTIONS: -XX:MaxRAMPercentage=60 -XX:InitialRAMPercentage=15
+    ports:
+    - 127.0.0.1:8128:8128
+    mem_limit: ${SERVICE_MEMORY_LIMIT:-512m}
+    restart: unless-stopped
+    image: inpay/connector-clearsale:0.2.0
+    healthcheck:
+      test:
+      - CMD-SHELL
+      - java -cp /app/health Healthcheck http://localhost:$$SERVER_PORT/actuator/health
+      interval: 30s
+      timeout: 10s
+      start_period: 120s
+      retries: 10
+    stop_grace_period: 30s
+    security_opt:
+    - no-new-privileges:true
+  connector-serasa-experian:
+    build:
+      context: .
+      args:
+        MODULE: connector-serasa-experian
+      target: spring-service
+    environment:
+      SPRING_PROFILES_ACTIVE: local
+      LOCAL_PASSWORD: ${LOCAL_PASSWORD:-inpay@123}
+      SERVER_PORT: '8129'
+      OTEL_SERVICE_NAME: connector-serasa-experian
+      OTEL_METRICS_EXPORTER: none
+      OTEL_LOGS_EXPORTER: none
+      JAVA_TOOL_OPTIONS: -XX:MaxRAMPercentage=60 -XX:InitialRAMPercentage=15
+    ports:
+    - 127.0.0.1:8129:8129
+    mem_limit: ${SERVICE_MEMORY_LIMIT:-512m}
+    restart: unless-stopped
+    image: inpay/connector-serasa-experian:0.2.0
+    healthcheck:
+      test:
+      - CMD-SHELL
+      - java -cp /app/health Healthcheck http://localhost:$$SERVER_PORT/actuator/health
+      interval: 30s
+      timeout: 10s
+      start_period: 120s
+      retries: 10
+    stop_grace_period: 30s
+    security_opt:
+    - no-new-privileges:true
+  painel-gerencial:
+    build:
+      context: .
+      args:
+        MODULE: painel-gerencial
+      target: spring-service
+    environment:
+      SPRING_PROFILES_ACTIVE: local
+      LOCAL_PASSWORD: ${LOCAL_PASSWORD:-inpay@123}
+      SERVER_PORT: '8130'
+      OTEL_SERVICE_NAME: painel-gerencial
+      OTEL_METRICS_EXPORTER: none
+      OTEL_LOGS_EXPORTER: none
+      JAVA_TOOL_OPTIONS: -XX:MaxRAMPercentage=60 -XX:InitialRAMPercentage=15
+    ports:
+    - 127.0.0.1:8130:8130
+    mem_limit: ${SERVICE_MEMORY_LIMIT:-512m}
+    restart: unless-stopped
+    image: inpay/painel-gerencial:0.2.0
+    healthcheck:
+      test:
+      - CMD-SHELL
+      - java -cp /app/health Healthcheck http://localhost:$$SERVER_PORT/actuator/health
+      interval: 30s
+      timeout: 10s
+      start_period: 120s
+      retries: 10
+    stop_grace_period: 30s
+    security_opt:
+    - no-new-privileges:true
   webhook-ingress-service:
     build:
       context: .
@@ -411,7 +502,7 @@ services:
       DB_USER: webhook_ingress_service
       DB_PASSWORD: local-only
       KAFKA_BOOTSTRAP_SERVERS: kafka:19092
-      LOCAL_PASSWORD: ${LOCAL_PASSWORD:-local-only-change-me}
+      LOCAL_PASSWORD: ${LOCAL_PASSWORD:-inpay@123}
       SERVER_PORT: '8088'
       OTEL_SERVICE_NAME: webhook-ingress-service
       OTEL_EXPORTER_OTLP_ENDPOINT: http://otel-collector:4318
@@ -454,7 +545,7 @@ services:
       DB_USER: reconciliation_service
       DB_PASSWORD: local-only
       KAFKA_BOOTSTRAP_SERVERS: kafka:19092
-      LOCAL_PASSWORD: ${LOCAL_PASSWORD:-local-only-change-me}
+      LOCAL_PASSWORD: ${LOCAL_PASSWORD:-inpay@123}
       SERVER_PORT: '8089'
       OTEL_SERVICE_NAME: reconciliation-service
       OTEL_EXPORTER_OTLP_ENDPOINT: http://otel-collector:4318
@@ -497,7 +588,7 @@ services:
       DB_USER: notification_service
       DB_PASSWORD: local-only
       KAFKA_BOOTSTRAP_SERVERS: kafka:19092
-      LOCAL_PASSWORD: ${LOCAL_PASSWORD:-local-only-change-me}
+      LOCAL_PASSWORD: ${LOCAL_PASSWORD:-inpay@123}
       SERVER_PORT: '8090'
       OTEL_SERVICE_NAME: notification-service
       OTEL_EXPORTER_OTLP_ENDPOINT: http://otel-collector:4318
@@ -540,7 +631,7 @@ services:
       DB_USER: transaction_query_service
       DB_PASSWORD: local-only
       KAFKA_BOOTSTRAP_SERVERS: kafka:19092
-      LOCAL_PASSWORD: ${LOCAL_PASSWORD:-local-only-change-me}
+      LOCAL_PASSWORD: ${LOCAL_PASSWORD:-inpay@123}
       SERVER_PORT: '8091'
       OTEL_SERVICE_NAME: transaction-query-service
       OTEL_EXPORTER_OTLP_ENDPOINT: http://otel-collector:4318
@@ -605,7 +696,7 @@ services:
       DB_USER: connector_cielo
       DB_PASSWORD: local-only
       KAFKA_BOOTSTRAP_SERVERS: kafka:19092
-      LOCAL_PASSWORD: ${LOCAL_PASSWORD:-local-only-change-me}
+      LOCAL_PASSWORD: ${LOCAL_PASSWORD:-inpay@123}
       SERVER_PORT: '8101'
       OTEL_SERVICE_NAME: connector-cielo
       OTEL_EXPORTER_OTLP_ENDPOINT: http://otel-collector:4318
@@ -670,7 +761,7 @@ services:
       DB_USER: connector_rede
       DB_PASSWORD: local-only
       KAFKA_BOOTSTRAP_SERVERS: kafka:19092
-      LOCAL_PASSWORD: ${LOCAL_PASSWORD:-local-only-change-me}
+      LOCAL_PASSWORD: ${LOCAL_PASSWORD:-inpay@123}
       SERVER_PORT: '8102'
       OTEL_SERVICE_NAME: connector-rede
       OTEL_EXPORTER_OTLP_ENDPOINT: http://otel-collector:4318
@@ -735,7 +826,7 @@ services:
       DB_USER: connector_getnet
       DB_PASSWORD: local-only
       KAFKA_BOOTSTRAP_SERVERS: kafka:19092
-      LOCAL_PASSWORD: ${LOCAL_PASSWORD:-local-only-change-me}
+      LOCAL_PASSWORD: ${LOCAL_PASSWORD:-inpay@123}
       SERVER_PORT: '8103'
       OTEL_SERVICE_NAME: connector-getnet
       OTEL_EXPORTER_OTLP_ENDPOINT: http://otel-collector:4318
@@ -800,7 +891,7 @@ services:
       DB_USER: connector_stone
       DB_PASSWORD: local-only
       KAFKA_BOOTSTRAP_SERVERS: kafka:19092
-      LOCAL_PASSWORD: ${LOCAL_PASSWORD:-local-only-change-me}
+      LOCAL_PASSWORD: ${LOCAL_PASSWORD:-inpay@123}
       SERVER_PORT: '8104'
       OTEL_SERVICE_NAME: connector-stone
       OTEL_EXPORTER_OTLP_ENDPOINT: http://otel-collector:4318
@@ -865,7 +956,7 @@ services:
       DB_USER: connector_bin
       DB_PASSWORD: local-only
       KAFKA_BOOTSTRAP_SERVERS: kafka:19092
-      LOCAL_PASSWORD: ${LOCAL_PASSWORD:-local-only-change-me}
+      LOCAL_PASSWORD: ${LOCAL_PASSWORD:-inpay@123}
       SERVER_PORT: '8105'
       OTEL_SERVICE_NAME: connector-bin
       OTEL_EXPORTER_OTLP_ENDPOINT: http://otel-collector:4318
@@ -930,7 +1021,7 @@ services:
       DB_USER: connector_global_payments
       DB_PASSWORD: local-only
       KAFKA_BOOTSTRAP_SERVERS: kafka:19092
-      LOCAL_PASSWORD: ${LOCAL_PASSWORD:-local-only-change-me}
+      LOCAL_PASSWORD: ${LOCAL_PASSWORD:-inpay@123}
       SERVER_PORT: '8106'
       OTEL_SERVICE_NAME: connector-global-payments
       OTEL_EXPORTER_OTLP_ENDPOINT: http://otel-collector:4318
@@ -995,7 +1086,7 @@ services:
       DB_USER: connector_pagbank
       DB_PASSWORD: local-only
       KAFKA_BOOTSTRAP_SERVERS: kafka:19092
-      LOCAL_PASSWORD: ${LOCAL_PASSWORD:-local-only-change-me}
+      LOCAL_PASSWORD: ${LOCAL_PASSWORD:-inpay@123}
       SERVER_PORT: '8107'
       OTEL_SERVICE_NAME: connector-pagbank
       OTEL_EXPORTER_OTLP_ENDPOINT: http://otel-collector:4318
@@ -1060,7 +1151,7 @@ services:
       DB_USER: connector_safrapay
       DB_PASSWORD: local-only
       KAFKA_BOOTSTRAP_SERVERS: kafka:19092
-      LOCAL_PASSWORD: ${LOCAL_PASSWORD:-local-only-change-me}
+      LOCAL_PASSWORD: ${LOCAL_PASSWORD:-inpay@123}
       SERVER_PORT: '8108'
       OTEL_SERVICE_NAME: connector-safrapay
       OTEL_EXPORTER_OTLP_ENDPOINT: http://otel-collector:4318
@@ -1105,7 +1196,7 @@ services:
   observability-init:
     image: busybox:1.37.0
     environment:
-      LOCAL_PASSWORD: ${LOCAL_PASSWORD:-local-only-change-me}
+      LOCAL_PASSWORD: ${LOCAL_PASSWORD:-inpay@123}
     volumes:
     - observability-config:/config
     command:
@@ -1124,7 +1215,7 @@ services:
     - br.com.includelabs.inpay.lambda.webhookforwarder.Handler::handleRequest
     environment:
       INPAY_RUNTIME: local
-      LOCAL_PASSWORD: ${LOCAL_PASSWORD:-local-only-change-me}
+      LOCAL_PASSWORD: ${LOCAL_PASSWORD:-inpay@123}
     ports:
     - 127.0.0.1:9001:8080
     restart: unless-stopped
@@ -1140,7 +1231,7 @@ services:
     - br.com.includelabs.inpay.lambda.reconciliationtrigger.Handler::handleRequest
     environment:
       INPAY_RUNTIME: local
-      LOCAL_PASSWORD: ${LOCAL_PASSWORD:-local-only-change-me}
+      LOCAL_PASSWORD: ${LOCAL_PASSWORD:-inpay@123}
       TARGET_ENDPOINT: http://reconciliation-service:8089/internal/v1/reconciliation/run
       TARGET_SCOPE: reconciliation/run
     ports:
@@ -1161,7 +1252,7 @@ services:
     - br.com.includelabs.inpay.lambda.linkexpirationtrigger.Handler::handleRequest
     environment:
       INPAY_RUNTIME: local
-      LOCAL_PASSWORD: ${LOCAL_PASSWORD:-local-only-change-me}
+      LOCAL_PASSWORD: ${LOCAL_PASSWORD:-inpay@123}
       TARGET_ENDPOINT: http://payment-links-service:8082/internal/v1/links/expire
       TARGET_SCOPE: links/write
     ports:
@@ -1183,7 +1274,7 @@ services:
       DB_USER: marketplace_service
       DB_PASSWORD: local-only
       KAFKA_BOOTSTRAP_SERVERS: kafka:19092
-      LOCAL_PASSWORD: ${LOCAL_PASSWORD:-local-only-change-me}
+      LOCAL_PASSWORD: ${LOCAL_PASSWORD:-inpay@123}
       SERVER_PORT: '8110'
       OTEL_SERVICE_NAME: credits-service
       OTEL_EXPORTER_OTLP_ENDPOINT: http://otel-collector:4318
@@ -1228,7 +1319,7 @@ services:
       DB_USER: accounts_service
       DB_PASSWORD: local-only
       KAFKA_BOOTSTRAP_SERVERS: kafka:19092
-      LOCAL_PASSWORD: ${LOCAL_PASSWORD:-local-only-change-me}
+      LOCAL_PASSWORD: ${LOCAL_PASSWORD:-inpay@123}
       SERVER_PORT: '8111'
       OTEL_SERVICE_NAME: accounts-service
       OTEL_EXPORTER_OTLP_ENDPOINT: http://otel-collector:4318
@@ -1272,7 +1363,7 @@ services:
       DB_USER: commerce_marketplace
       DB_PASSWORD: local-only
       KAFKA_BOOTSTRAP_SERVERS: kafka:19092
-      LOCAL_PASSWORD: ${LOCAL_PASSWORD:-local-only-change-me}
+      LOCAL_PASSWORD: ${LOCAL_PASSWORD:-inpay@123}
       SERVER_PORT: '8112'
       OTEL_SERVICE_NAME: marketplace-service
       OTEL_EXPORTER_OTLP_ENDPOINT: http://otel-collector:4318
@@ -1318,7 +1409,7 @@ services:
       KAFKA_BOOTSTRAP_SERVERS: kafka:19092
       BILLING_SCHEDULER_ENABLED: ${BILLING_SCHEDULER_ENABLED:-false}
       BILLING_CYCLE_BATCH: ${BILLING_CYCLE_BATCH:-100}
-      LOCAL_PASSWORD: ${LOCAL_PASSWORD:-local-only-change-me}
+      LOCAL_PASSWORD: ${LOCAL_PASSWORD:-inpay@123}
       SERVER_PORT: '8113'
       OTEL_SERVICE_NAME: billing-service
       OTEL_EXPORTER_OTLP_ENDPOINT: http://otel-collector:4318

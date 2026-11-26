@@ -37,5 +37,8 @@
         <module>../../services/connector-bradesco</module>
         <module>../../services/connector-caixa</module>
         <module>../../services/connector-banrisul</module>
+        <module>../../services/connector-clearsale</module>
+        <module>../../services/connector-serasa-experian</module>
+        <module>../../services/painel-gerencial</module>
     </modules>
 </project>

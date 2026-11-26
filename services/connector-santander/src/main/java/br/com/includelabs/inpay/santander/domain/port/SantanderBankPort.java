@@ -6,5 +6,6 @@ import java.util.Map;
 
 /** Porta de saída. O domínio não conhece HTTP. */
 public interface SantanderBankPort {
-    SantanderReply send(SantanderOperation operation, String path, Map<String, Object> body, boolean form);
+    SantanderReply send(
+            SantanderOperation operation, String path, Map<String, Object> body, boolean form);
 }

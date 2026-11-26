@@ -41,7 +41,12 @@ public final class RiskPolicy {
      * Resultado explicável, com a versão da política e os motivos que contribuíram para o score.
      */
     public record Assessment(
-            int score, Decision decision, String policyVersion, List<String> reasons) {}
+            int score,
+            Decision decision,
+            String policyVersion,
+            List<String> reasons,
+            String provider,
+            int tokens) {}
 
     /**
      * Soma os fatores de risco e limita o resultado a 100, preservando os motivos da decisão.
@@ -70,7 +75,12 @@ public final class RiskPolicy {
         }
         int boundedScore = Math.min(MAX_SCORE, score);
         return new Assessment(
-                boundedScore, decisionFor(boundedScore), "demo-rules-v1", List.copyOf(reasons));
+                boundedScore,
+                decisionFor(boundedScore),
+                "demo-rules-v1",
+                List.copyOf(reasons),
+                "INPAY_RISK",
+                0);
     }
 
     /** Converte o score em uma decisão usando faixas sem sobreposição. */

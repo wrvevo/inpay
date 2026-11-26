@@ -17,6 +17,7 @@ public class ItauConfiguration {
 
     @Bean
     ExecuteItauOperation executeItauOperation(ItauBankPort port, ItauSettings settings) {
-        return new ExecuteItauOperation(port, settings.enabled(), settings.confirmUnverifiedPaths());
+        return new ExecuteItauOperation(
+                port, settings.enabled(), settings.confirmUnverifiedPaths());
     }
 }

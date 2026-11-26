@@ -81,7 +81,7 @@ public class Handler implements RequestHandler<Map<String, Object>, Map<String, 
      */
     private String authorizationHeader() {
         if (localRuntime) {
-            String credentials = "developer:" + required("LOCAL_PASSWORD");
+            String credentials = "inpay:" + required("LOCAL_PASSWORD");
             return "Basic "
                     + Base64.getEncoder()
                             .encodeToString(credentials.getBytes(StandardCharsets.UTF_8));

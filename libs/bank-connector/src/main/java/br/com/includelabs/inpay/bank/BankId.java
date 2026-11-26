@@ -2,7 +2,12 @@ package br.com.includelabs.inpay.bank;
 
 /** Instituição com conector próprio. A URL padrão não prova homologação nem credencial. */
 public enum BankId {
-    C6("c6", "C6 Bank", "https://developers.c6bank.com.br/apis", "https://baas-api-sandbox.c6bank.info", 8111),
+    C6(
+            "c6",
+            "C6 Bank",
+            "https://developers.c6bank.com.br/apis",
+            "https://baas-api-sandbox.c6bank.info",
+            8111),
     ITAU(
             "itau",
             "Itaú",
@@ -56,7 +61,9 @@ public enum BankId {
         return documentation;
     }
 
-    /** Host de sandbox publicado; substituir pela URL contratada antes de habilitar a chamada real. */
+    /**
+     * Host de sandbox publicado; substituir pela URL contratada antes de habilitar a chamada real.
+     */
     public String defaultSandbox() {
         return defaultSandbox;
     }

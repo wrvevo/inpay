@@ -25,7 +25,8 @@ class SantanderCatalogTest {
                         "billId", "abc123");
         for (SantanderOperation operation : SantanderOperation.values()) {
             products.add(operation.product());
-            SantanderReply reply = useCase.execute(operation.name(), "op-" + operation.name(), "true", ids);
+            SantanderReply reply =
+                    useCase.execute(operation.name(), "op-" + operation.name(), "true", ids);
             assertEquals(200, reply.status(), operation.name());
             assertTrue(reply.mocked());
         }
@@ -41,6 +42,11 @@ class SantanderCatalogTest {
         ExecuteSantanderOperation live = new ExecuteSantanderOperation(null, true, false);
         assertThrows(
                 IllegalArgumentException.class,
-                () -> live.execute("PAYMENT_CREATE", "live-2", "false", Map.of("workspaceId", "abc123")));
+                () ->
+                        live.execute(
+                                "PAYMENT_CREATE",
+                                "live-2",
+                                "false",
+                                Map.of("workspaceId", "abc123")));
     }
 }

@@ -14,7 +14,8 @@ public final class BillingCommands {
             @NotNull UUID tenant,
             @NotBlank @Size(max = 200) String name,
             @NotBlank String plan,
-            @NotBlank @Size(max = 500) String evidence) {}
+            @NotBlank @Size(max = 500) String evidence,
+            String fraudMode) {}
 
     public record Command(@NotNull UUID operationId) {}
 

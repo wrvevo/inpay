@@ -1,0 +1,547 @@
+{
+  "folders": {
+    "GATEWAY": {
+      "description": "Bases dos servicos do gateway"
+    },
+    "DEMO": {
+      "description": "Bases usadas pela loja e pelo simulador locais"
+    },
+    "PAINEL_GERENCIAL": {
+      "description": "Base do painel de homologacao"
+    }
+  },
+  "connections": {
+    "gateway-postgres": {
+      "provider": "postgresql",
+      "driver": "postgres-jdbc",
+      "name": "postgres (admin)",
+      "save-password": true,
+      "folder": "GATEWAY",
+      "configuration": {
+        "host": "127.0.0.1",
+        "port": "5432",
+        "database": "postgres",
+        "url": "jdbc:postgresql://127.0.0.1:5432/postgres",
+        "configurationType": "MANUAL",
+        "type": "dev",
+        "closeIdleConnection": true,
+        "auth-model": "native",
+        "user": "postgres",
+        "password": "local-admin-only"
+      }
+    },
+    "gateway-merchant_service": {
+      "provider": "postgresql",
+      "driver": "postgres-jdbc",
+      "name": "merchant_service",
+      "save-password": true,
+      "folder": "GATEWAY",
+      "configuration": {
+        "host": "127.0.0.1",
+        "port": "5432",
+        "database": "merchant_service",
+        "url": "jdbc:postgresql://127.0.0.1:5432/merchant_service",
+        "configurationType": "MANUAL",
+        "type": "dev",
+        "closeIdleConnection": true,
+        "auth-model": "native",
+        "user": "merchant_service",
+        "password": "local-only"
+      }
+    },
+    "gateway-payment_links_service": {
+      "provider": "postgresql",
+      "driver": "postgres-jdbc",
+      "name": "payment_links_service",
+      "save-password": true,
+      "folder": "GATEWAY",
+      "configuration": {
+        "host": "127.0.0.1",
+        "port": "5432",
+        "database": "payment_links_service",
+        "url": "jdbc:postgresql://127.0.0.1:5432/payment_links_service",
+        "configurationType": "MANUAL",
+        "type": "dev",
+        "closeIdleConnection": true,
+        "auth-model": "native",
+        "user": "payment_links_service",
+        "password": "local-only"
+      }
+    },
+    "gateway-checkout_service": {
+      "provider": "postgresql",
+      "driver": "postgres-jdbc",
+      "name": "checkout_service",
+      "save-password": true,
+      "folder": "GATEWAY",
+      "configuration": {
+        "host": "127.0.0.1",
+        "port": "5432",
+        "database": "checkout_service",
+        "url": "jdbc:postgresql://127.0.0.1:5432/checkout_service",
+        "configurationType": "MANUAL",
+        "type": "dev",
+        "closeIdleConnection": true,
+        "auth-model": "native",
+        "user": "checkout_service",
+        "password": "local-only"
+      }
+    },
+    "gateway-payment_core_service": {
+      "provider": "postgresql",
+      "driver": "postgres-jdbc",
+      "name": "payment_core_service",
+      "save-password": true,
+      "folder": "GATEWAY",
+      "configuration": {
+        "host": "127.0.0.1",
+        "port": "5432",
+        "database": "payment_core_service",
+        "url": "jdbc:postgresql://127.0.0.1:5432/payment_core_service",
+        "configurationType": "MANUAL",
+        "type": "dev",
+        "closeIdleConnection": true,
+        "auth-model": "native",
+        "user": "payment_core_service",
+        "password": "local-only"
+      }
+    },
+    "gateway-routing_service": {
+      "provider": "postgresql",
+      "driver": "postgres-jdbc",
+      "name": "routing_service",
+      "save-password": true,
+      "folder": "GATEWAY",
+      "configuration": {
+        "host": "127.0.0.1",
+        "port": "5432",
+        "database": "routing_service",
+        "url": "jdbc:postgresql://127.0.0.1:5432/routing_service",
+        "configurationType": "MANUAL",
+        "type": "dev",
+        "closeIdleConnection": true,
+        "auth-model": "native",
+        "user": "routing_service",
+        "password": "local-only"
+      }
+    },
+    "gateway-token_service": {
+      "provider": "postgresql",
+      "driver": "postgres-jdbc",
+      "name": "token_service",
+      "save-password": true,
+      "folder": "GATEWAY",
+      "configuration": {
+        "host": "127.0.0.1",
+        "port": "5432",
+        "database": "token_service",
+        "url": "jdbc:postgresql://127.0.0.1:5432/token_service",
+        "configurationType": "MANUAL",
+        "type": "dev",
+        "closeIdleConnection": true,
+        "auth-model": "native",
+        "user": "token_service",
+        "password": "local-only"
+      }
+    },
+    "gateway-fraud_service": {
+      "provider": "postgresql",
+      "driver": "postgres-jdbc",
+      "name": "fraud_service",
+      "save-password": true,
+      "folder": "GATEWAY",
+      "configuration": {
+        "host": "127.0.0.1",
+        "port": "5432",
+        "database": "fraud_service",
+        "url": "jdbc:postgresql://127.0.0.1:5432/fraud_service",
+        "configurationType": "MANUAL",
+        "type": "dev",
+        "closeIdleConnection": true,
+        "auth-model": "native",
+        "user": "fraud_service",
+        "password": "local-only"
+      }
+    },
+    "gateway-webhook_ingress_service": {
+      "provider": "postgresql",
+      "driver": "postgres-jdbc",
+      "name": "webhook_ingress_service",
+      "save-password": true,
+      "folder": "GATEWAY",
+      "configuration": {
+        "host": "127.0.0.1",
+        "port": "5432",
+        "database": "webhook_ingress_service",
+        "url": "jdbc:postgresql://127.0.0.1:5432/webhook_ingress_service",
+        "configurationType": "MANUAL",
+        "type": "dev",
+        "closeIdleConnection": true,
+        "auth-model": "native",
+        "user": "webhook_ingress_service",
+        "password": "local-only"
+      }
+    },
+    "gateway-reconciliation_service": {
+      "provider": "postgresql",
+      "driver": "postgres-jdbc",
+      "name": "reconciliation_service",
+      "save-password": true,
+      "folder": "GATEWAY",
+      "configuration": {
+        "host": "127.0.0.1",
+        "port": "5432",
+        "database": "reconciliation_service",
+        "url": "jdbc:postgresql://127.0.0.1:5432/reconciliation_service",
+        "configurationType": "MANUAL",
+        "type": "dev",
+        "closeIdleConnection": true,
+        "auth-model": "native",
+        "user": "reconciliation_service",
+        "password": "local-only"
+      }
+    },
+    "gateway-notification_service": {
+      "provider": "postgresql",
+      "driver": "postgres-jdbc",
+      "name": "notification_service",
+      "save-password": true,
+      "folder": "GATEWAY",
+      "configuration": {
+        "host": "127.0.0.1",
+        "port": "5432",
+        "database": "notification_service",
+        "url": "jdbc:postgresql://127.0.0.1:5432/notification_service",
+        "configurationType": "MANUAL",
+        "type": "dev",
+        "closeIdleConnection": true,
+        "auth-model": "native",
+        "user": "notification_service",
+        "password": "local-only"
+      }
+    },
+    "gateway-transaction_query_service": {
+      "provider": "postgresql",
+      "driver": "postgres-jdbc",
+      "name": "transaction_query_service",
+      "save-password": true,
+      "folder": "GATEWAY",
+      "configuration": {
+        "host": "127.0.0.1",
+        "port": "5432",
+        "database": "transaction_query_service",
+        "url": "jdbc:postgresql://127.0.0.1:5432/transaction_query_service",
+        "configurationType": "MANUAL",
+        "type": "dev",
+        "closeIdleConnection": true,
+        "auth-model": "native",
+        "user": "transaction_query_service",
+        "password": "local-only"
+      }
+    },
+    "gateway-connector_cielo": {
+      "provider": "postgresql",
+      "driver": "postgres-jdbc",
+      "name": "connector_cielo",
+      "save-password": true,
+      "folder": "GATEWAY",
+      "configuration": {
+        "host": "127.0.0.1",
+        "port": "5432",
+        "database": "connector_cielo",
+        "url": "jdbc:postgresql://127.0.0.1:5432/connector_cielo",
+        "configurationType": "MANUAL",
+        "type": "dev",
+        "closeIdleConnection": true,
+        "auth-model": "native",
+        "user": "connector_cielo",
+        "password": "local-only"
+      }
+    },
+    "gateway-connector_rede": {
+      "provider": "postgresql",
+      "driver": "postgres-jdbc",
+      "name": "connector_rede",
+      "save-password": true,
+      "folder": "GATEWAY",
+      "configuration": {
+        "host": "127.0.0.1",
+        "port": "5432",
+        "database": "connector_rede",
+        "url": "jdbc:postgresql://127.0.0.1:5432/connector_rede",
+        "configurationType": "MANUAL",
+        "type": "dev",
+        "closeIdleConnection": true,
+        "auth-model": "native",
+        "user": "connector_rede",
+        "password": "local-only"
+      }
+    },
+    "gateway-connector_getnet": {
+      "provider": "postgresql",
+      "driver": "postgres-jdbc",
+      "name": "connector_getnet",
+      "save-password": true,
+      "folder": "GATEWAY",
+      "configuration": {
+        "host": "127.0.0.1",
+        "port": "5432",
+        "database": "connector_getnet",
+        "url": "jdbc:postgresql://127.0.0.1:5432/connector_getnet",
+        "configurationType": "MANUAL",
+        "type": "dev",
+        "closeIdleConnection": true,
+        "auth-model": "native",
+        "user": "connector_getnet",
+        "password": "local-only"
+      }
+    },
+    "gateway-connector_stone": {
+      "provider": "postgresql",
+      "driver": "postgres-jdbc",
+      "name": "connector_stone",
+      "save-password": true,
+      "folder": "GATEWAY",
+      "configuration": {
+        "host": "127.0.0.1",
+        "port": "5432",
+        "database": "connector_stone",
+        "url": "jdbc:postgresql://127.0.0.1:5432/connector_stone",
+        "configurationType": "MANUAL",
+        "type": "dev",
+        "closeIdleConnection": true,
+        "auth-model": "native",
+        "user": "connector_stone",
+        "password": "local-only"
+      }
+    },
+    "gateway-connector_bin": {
+      "provider": "postgresql",
+      "driver": "postgres-jdbc",
+      "name": "connector_bin",
+      "save-password": true,
+      "folder": "GATEWAY",
+      "configuration": {
+        "host": "127.0.0.1",
+        "port": "5432",
+        "database": "connector_bin",
+        "url": "jdbc:postgresql://127.0.0.1:5432/connector_bin",
+        "configurationType": "MANUAL",
+        "type": "dev",
+        "closeIdleConnection": true,
+        "auth-model": "native",
+        "user": "connector_bin",
+        "password": "local-only"
+      }
+    },
+    "gateway-connector_global_payments": {
+      "provider": "postgresql",
+      "driver": "postgres-jdbc",
+      "name": "connector_global_payments",
+      "save-password": true,
+      "folder": "GATEWAY",
+      "configuration": {
+        "host": "127.0.0.1",
+        "port": "5432",
+        "database": "connector_global_payments",
+        "url": "jdbc:postgresql://127.0.0.1:5432/connector_global_payments",
+        "configurationType": "MANUAL",
+        "type": "dev",
+        "closeIdleConnection": true,
+        "auth-model": "native",
+        "user": "connector_global_payments",
+        "password": "local-only"
+      }
+    },
+    "gateway-connector_pagbank": {
+      "provider": "postgresql",
+      "driver": "postgres-jdbc",
+      "name": "connector_pagbank",
+      "save-password": true,
+      "folder": "GATEWAY",
+      "configuration": {
+        "host": "127.0.0.1",
+        "port": "5432",
+        "database": "connector_pagbank",
+        "url": "jdbc:postgresql://127.0.0.1:5432/connector_pagbank",
+        "configurationType": "MANUAL",
+        "type": "dev",
+        "closeIdleConnection": true,
+        "auth-model": "native",
+        "user": "connector_pagbank",
+        "password": "local-only"
+      }
+    },
+    "gateway-connector_safrapay": {
+      "provider": "postgresql",
+      "driver": "postgres-jdbc",
+      "name": "connector_safrapay",
+      "save-password": true,
+      "folder": "GATEWAY",
+      "configuration": {
+        "host": "127.0.0.1",
+        "port": "5432",
+        "database": "connector_safrapay",
+        "url": "jdbc:postgresql://127.0.0.1:5432/connector_safrapay",
+        "configurationType": "MANUAL",
+        "type": "dev",
+        "closeIdleConnection": true,
+        "auth-model": "native",
+        "user": "connector_safrapay",
+        "password": "local-only"
+      }
+    },
+    "gateway-marketplace_service": {
+      "provider": "postgresql",
+      "driver": "postgres-jdbc",
+      "name": "marketplace_service",
+      "save-password": true,
+      "folder": "GATEWAY",
+      "configuration": {
+        "host": "127.0.0.1",
+        "port": "5432",
+        "database": "marketplace_service",
+        "url": "jdbc:postgresql://127.0.0.1:5432/marketplace_service",
+        "configurationType": "MANUAL",
+        "type": "dev",
+        "closeIdleConnection": true,
+        "auth-model": "native",
+        "user": "marketplace_service",
+        "password": "local-only"
+      }
+    },
+    "gateway-accounts_service": {
+      "provider": "postgresql",
+      "driver": "postgres-jdbc",
+      "name": "accounts_service",
+      "save-password": true,
+      "folder": "GATEWAY",
+      "configuration": {
+        "host": "127.0.0.1",
+        "port": "5432",
+        "database": "accounts_service",
+        "url": "jdbc:postgresql://127.0.0.1:5432/accounts_service",
+        "configurationType": "MANUAL",
+        "type": "dev",
+        "closeIdleConnection": true,
+        "auth-model": "native",
+        "user": "accounts_service",
+        "password": "local-only"
+      }
+    },
+    "gateway-commerce_marketplace": {
+      "provider": "postgresql",
+      "driver": "postgres-jdbc",
+      "name": "commerce_marketplace",
+      "save-password": true,
+      "folder": "GATEWAY",
+      "configuration": {
+        "host": "127.0.0.1",
+        "port": "5432",
+        "database": "commerce_marketplace",
+        "url": "jdbc:postgresql://127.0.0.1:5432/commerce_marketplace",
+        "configurationType": "MANUAL",
+        "type": "dev",
+        "closeIdleConnection": true,
+        "auth-model": "native",
+        "user": "commerce_marketplace",
+        "password": "local-only"
+      }
+    },
+    "gateway-billing_service": {
+      "provider": "postgresql",
+      "driver": "postgres-jdbc",
+      "name": "billing_service",
+      "save-password": true,
+      "folder": "GATEWAY",
+      "configuration": {
+        "host": "127.0.0.1",
+        "port": "5432",
+        "database": "billing_service",
+        "url": "jdbc:postgresql://127.0.0.1:5432/billing_service",
+        "configurationType": "MANUAL",
+        "type": "dev",
+        "closeIdleConnection": true,
+        "auth-model": "native",
+        "user": "billing_service",
+        "password": "local-only"
+      }
+    },
+    "demo-payment_core_service": {
+      "provider": "postgresql",
+      "driver": "postgres-jdbc",
+      "name": "demo payment_core_service",
+      "save-password": true,
+      "folder": "DEMO",
+      "configuration": {
+        "host": "127.0.0.1",
+        "port": "5432",
+        "database": "payment_core_service",
+        "url": "jdbc:postgresql://127.0.0.1:5432/payment_core_service",
+        "configurationType": "MANUAL",
+        "type": "dev",
+        "closeIdleConnection": true,
+        "auth-model": "native",
+        "user": "payment_core_service",
+        "password": "local-only"
+      }
+    },
+    "demo-fraud_service": {
+      "provider": "postgresql",
+      "driver": "postgres-jdbc",
+      "name": "demo fraud_service",
+      "save-password": true,
+      "folder": "DEMO",
+      "configuration": {
+        "host": "127.0.0.1",
+        "port": "5432",
+        "database": "fraud_service",
+        "url": "jdbc:postgresql://127.0.0.1:5432/fraud_service",
+        "configurationType": "MANUAL",
+        "type": "dev",
+        "closeIdleConnection": true,
+        "auth-model": "native",
+        "user": "fraud_service",
+        "password": "local-only"
+      }
+    },
+    "demo-billing_service": {
+      "provider": "postgresql",
+      "driver": "postgres-jdbc",
+      "name": "demo billing_service",
+      "save-password": true,
+      "folder": "DEMO",
+      "configuration": {
+        "host": "127.0.0.1",
+        "port": "5432",
+        "database": "billing_service",
+        "url": "jdbc:postgresql://127.0.0.1:5432/billing_service",
+        "configurationType": "MANUAL",
+        "type": "dev",
+        "closeIdleConnection": true,
+        "auth-model": "native",
+        "user": "billing_service",
+        "password": "local-only"
+      }
+    },
+    "painel-gerencial": {
+      "provider": "postgresql",
+      "driver": "postgres-jdbc",
+      "name": "painel_gerencial",
+      "save-password": true,
+      "folder": "PAINEL_GERENCIAL",
+      "configuration": {
+        "host": "127.0.0.1",
+        "port": "5432",
+        "database": "painel_gerencial",
+        "url": "jdbc:postgresql://127.0.0.1:5432/painel_gerencial",
+        "configurationType": "MANUAL",
+        "type": "dev",
+        "closeIdleConnection": true,
+        "auth-model": "native",
+        "user": "painel_gerencial",
+        "password": "local-only"
+      }
+    }
+  }
+}

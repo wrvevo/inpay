@@ -14,9 +14,7 @@ import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import tools.jackson.databind.ObjectMapper;
 
-/**
- * Chamada HTTPS externa com orçamento máximo de 100 ms e circuit breaker. Payload não é logado.
- */
+/** Chamada HTTPS externa com orçamento máximo de 100 ms e circuit breaker. Payload não é logado. */
 public final class BankTransport {
     public static final Duration MAX_BUDGET = Duration.ofMillis(100);
 
@@ -53,7 +51,13 @@ public final class BankTransport {
                 uri.getHost());
         BankCircuit.Lease lease = circuit.acquire();
         if (lease == null) {
-            return finish(bank, operation, mocked, started, "open", BankResult.unavailable(bank.slug(), operation.name(), mocked));
+            return finish(
+                    bank,
+                    operation,
+                    mocked,
+                    started,
+                    "open",
+                    BankResult.unavailable(bank.slug(), operation.name(), mocked));
         }
         HttpRequest.Builder request =
                 HttpRequest.newBuilder(uri)

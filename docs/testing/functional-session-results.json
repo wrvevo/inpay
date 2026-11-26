@@ -1,0 +1,562 @@
+[
+  {
+    "name": "disponivel merchant:8081",
+    "ok": false,
+    "detail": "HTTP 0 <urlopen error [WinError 10061] Nenhuma conexão pôde ser feita porque a máquina de destino as recusou ativamente>"
+  },
+  {
+    "name": "disponivel links:8082",
+    "ok": false,
+    "detail": "HTTP 0 <urlopen error [WinError 10061] Nenhuma conexão pôde ser feita porque a máquina de destino as recusou ativamente>"
+  },
+  {
+    "name": "disponivel checkout:8083",
+    "ok": false,
+    "detail": "HTTP 0 <urlopen error [WinError 10061] Nenhuma conexão pôde ser feita porque a máquina de destino as recusou ativamente>"
+  },
+  {
+    "name": "disponivel gateway:8084",
+    "ok": true,
+    "detail": "HTTP 200 {\"groups\":[\"liveness\",\"readiness\"],\"status\":\"UP\"}"
+  },
+  {
+    "name": "disponivel routing:8085",
+    "ok": false,
+    "detail": "HTTP 0 <urlopen error [WinError 10061] Nenhuma conexão pôde ser feita porque a máquina de destino as recusou ativamente>"
+  },
+  {
+    "name": "disponivel token:8086",
+    "ok": false,
+    "detail": "HTTP 0 <urlopen error [WinError 10061] Nenhuma conexão pôde ser feita porque a máquina de destino as recusou ativamente>"
+  },
+  {
+    "name": "disponivel fraud:8087",
+    "ok": false,
+    "detail": "HTTP 0 <urlopen error [WinError 10061] Nenhuma conexão pôde ser feita porque a máquina de destino as recusou ativamente>"
+  },
+  {
+    "name": "disponivel webhook:8088",
+    "ok": false,
+    "detail": "HTTP 0 <urlopen error [WinError 10061] Nenhuma conexão pôde ser feita porque a máquina de destino as recusou ativamente>"
+  },
+  {
+    "name": "disponivel reconciliation:8089",
+    "ok": false,
+    "detail": "HTTP 0 <urlopen error [WinError 10061] Nenhuma conexão pôde ser feita porque a máquina de destino as recusou ativamente>"
+  },
+  {
+    "name": "disponivel notification:8090",
+    "ok": false,
+    "detail": "HTTP 0 <urlopen error [WinError 10061] Nenhuma conexão pôde ser feita porque a máquina de destino as recusou ativamente>"
+  },
+  {
+    "name": "disponivel query:8091",
+    "ok": false,
+    "detail": "HTTP 0 <urlopen error [WinError 10061] Nenhuma conexão pôde ser feita porque a máquina de destino as recusou ativamente>"
+  },
+  {
+    "name": "disponivel mock-server:8098",
+    "ok": true,
+    "detail": "HTTP 200 {\"groups\":[\"liveness\",\"readiness\"],\"status\":\"UP\"}"
+  },
+  {
+    "name": "disponivel wiremock-stubs:8099",
+    "ok": true,
+    "detail": "HTTP 200 {\r\n  \"mappings\" : [ {\r\n    \"id\" : \"658786bf-a2b0-4456-8dcc-e4eed3c971e0\",\r\n    \"request\" : {\r\n      \"urlPathPattern\" : \""
+  },
+  {
+    "name": "disponivel credits:8110",
+    "ok": true,
+    "detail": "HTTP 200 {\"groups\":[\"liveness\",\"readiness\"],\"status\":\"UP\"}"
+  },
+  {
+    "name": "disponivel accounts:8111",
+    "ok": true,
+    "detail": "HTTP 200 {\"groups\":[\"liveness\",\"readiness\"],\"status\":\"UP\"}"
+  },
+  {
+    "name": "disponivel marketplace:8112",
+    "ok": true,
+    "detail": "HTTP 200 {\"groups\":[\"liveness\",\"readiness\"],\"status\":\"UP\"}"
+  },
+  {
+    "name": "disponivel billing:8113",
+    "ok": true,
+    "detail": "HTTP 200 {\"groups\":[\"liveness\",\"readiness\"],\"status\":\"UP\"}"
+  },
+  {
+    "name": "disponivel cielo:8101",
+    "ok": false,
+    "detail": "HTTP 0 <urlopen error [WinError 10061] Nenhuma conexão pôde ser feita porque a máquina de destino as recusou ativamente>"
+  },
+  {
+    "name": "disponivel rede:8102",
+    "ok": false,
+    "detail": "HTTP 0 <urlopen error [WinError 10061] Nenhuma conexão pôde ser feita porque a máquina de destino as recusou ativamente>"
+  },
+  {
+    "name": "disponivel getnet:8103",
+    "ok": false,
+    "detail": "HTTP 0 <urlopen error [WinError 10061] Nenhuma conexão pôde ser feita porque a máquina de destino as recusou ativamente>"
+  },
+  {
+    "name": "disponivel stone:8104",
+    "ok": false,
+    "detail": "HTTP 0 <urlopen error [WinError 10061] Nenhuma conexão pôde ser feita porque a máquina de destino as recusou ativamente>"
+  },
+  {
+    "name": "disponivel bin:8105",
+    "ok": false,
+    "detail": "HTTP 0 <urlopen error [WinError 10061] Nenhuma conexão pôde ser feita porque a máquina de destino as recusou ativamente>"
+  },
+  {
+    "name": "disponivel global-payments:8106",
+    "ok": false,
+    "detail": "HTTP 0 <urlopen error [WinError 10061] Nenhuma conexão pôde ser feita porque a máquina de destino as recusou ativamente>"
+  },
+  {
+    "name": "disponivel pagbank:8107",
+    "ok": false,
+    "detail": "HTTP 0 <urlopen error [WinError 10061] Nenhuma conexão pôde ser feita porque a máquina de destino as recusou ativamente>"
+  },
+  {
+    "name": "disponivel safrapay:8108",
+    "ok": false,
+    "detail": "HTTP 0 <urlopen error [WinError 10061] Nenhuma conexão pôde ser feita porque a máquina de destino as recusou ativamente>"
+  },
+  {
+    "name": "disponivel c6:8121",
+    "ok": true,
+    "detail": "HTTP 200 {\"groups\":[\"liveness\",\"readiness\"],\"status\":\"UP\"}"
+  },
+  {
+    "name": "disponivel itau:8122",
+    "ok": true,
+    "detail": "HTTP 200 {\"groups\":[\"liveness\",\"readiness\"],\"status\":\"UP\"}"
+  },
+  {
+    "name": "disponivel santander:8123",
+    "ok": true,
+    "detail": "HTTP 200 {\"groups\":[\"liveness\",\"readiness\"],\"status\":\"UP\"}"
+  },
+  {
+    "name": "disponivel bb:8124",
+    "ok": true,
+    "detail": "HTTP 200 {\"groups\":[\"liveness\",\"readiness\"],\"status\":\"UP\"}"
+  },
+  {
+    "name": "disponivel bradesco:8125",
+    "ok": true,
+    "detail": "HTTP 200 {\"groups\":[\"liveness\",\"readiness\"],\"status\":\"UP\"}"
+  },
+  {
+    "name": "disponivel caixa:8126",
+    "ok": true,
+    "detail": "HTTP 200 {\"groups\":[\"liveness\",\"readiness\"],\"status\":\"UP\"}"
+  },
+  {
+    "name": "disponivel banrisul:8127",
+    "ok": true,
+    "detail": "HTTP 200 {\"groups\":[\"liveness\",\"readiness\"],\"status\":\"UP\"}"
+  },
+  {
+    "name": "disponivel grafana:3000",
+    "ok": true,
+    "detail": "HTTP 200 <!DOCTYPE html>\n<html lang=\"en-US\">\n  <head>\n    \n    <meta charset=\"utf-8\" />\n    <meta http-equiv=\"X-UA-Compatible\" co"
+  },
+  {
+    "name": "disponivel prometheus:9090",
+    "ok": true,
+    "detail": "HTTP 200 Prometheus Server is Ready.\n"
+  },
+  {
+    "name": "disponivel panel:3080",
+    "ok": true,
+    "detail": "HTTP 200 {\"status\":\"UP\"}"
+  },
+  {
+    "name": "disponivel game-store:8199",
+    "ok": true,
+    "detail": "HTTP 200 <!doctype html><html lang=\"pt-BR\"><head><meta charset=\"utf-8\"><meta name=\"viewport\" content=\"width=device-width, initial"
+  },
+  {
+    "name": "disponivel simulator:8120",
+    "ok": true,
+    "detail": "HTTP 200 {\"simulation\": true}"
+  },
+  {
+    "name": "swagger-gateway",
+    "ok": true,
+    "detail": "HTTP 200 bytes=734"
+  },
+  {
+    "name": "swagger-accounts",
+    "ok": true,
+    "detail": "HTTP 200 bytes=734"
+  },
+  {
+    "name": "swagger-marketplace",
+    "ok": true,
+    "detail": "HTTP 200 bytes=734"
+  },
+  {
+    "name": "swagger-credits",
+    "ok": true,
+    "detail": "HTTP 200 bytes=734"
+  },
+  {
+    "name": "swagger-billing",
+    "ok": true,
+    "detail": "HTTP 200 bytes=734"
+  },
+  {
+    "name": "panel",
+    "ok": false,
+    "detail": "HTTP 404 bytes=21"
+  },
+  {
+    "name": "game-store",
+    "ok": true,
+    "detail": "HTTP 200 bytes=6668"
+  },
+  {
+    "name": "game-store-admin",
+    "ok": true,
+    "detail": "HTTP 200 bytes=1260"
+  },
+  {
+    "name": "grafana",
+    "ok": true,
+    "detail": "HTTP 200 bytes=55739"
+  },
+  {
+    "name": "accounts banks",
+    "ok": true,
+    "detail": "HTTP 200 [{\"id\":\"c6\",\"name\":\"C6 Bank\",\"documentation\":\"https://developers.c6bank.com.br/apis\",\"status\":\"MOCK_READY\",\"enabled\":false,\"implementedOperations\":[\"OAUTH_TOKEN"
+  },
+  {
+    "name": "marketplace recipients",
+    "ok": true,
+    "detail": "HTTP 200 {\"data\":[],\"paging\":{\"page\":1,\"size\":20}}"
+  },
+  {
+    "name": "credits admin",
+    "ok": true,
+    "detail": "HTTP 200 {\"accounts\":[],\"journal\":[],\"adjustments\":[],\"products\":[],\"orders\":[]}"
+  },
+  {
+    "name": "billing invoices",
+    "ok": false,
+    "detail": "HTTP 405 {\"timestamp\":\"2026-11-26T11:44:11.091Z\",\"status\":405,\"error\":\"Method Not Allowed\",\"path\":\"/billing/v1/invoices\"}"
+  },
+  {
+    "name": "gateway providers",
+    "ok": true,
+    "detail": "HTTP 200 {\"routing_enabled\":false,\"data\":[{\"id\":\"banrisul\",\"implemented\":[\"BOLETO_COLLECTION\",\"PIX_TRANSFER\",\"PIX_REFUND\",\"BANK_ACCOUNTS\",\"PIX_COLLECTION\",\"PIX_KEYS\"]},{"
+  },
+  {
+    "name": "catalogo c6",
+    "ok": true,
+    "detail": "HTTP 200 {\"bank\":\"c6\",\"data\":[{\"operation\":\"AUTH_TOKEN\",\"documented\":\"true\",\"product\":\"AUTHENTICATION\",\"method\":\"POST\",\"path\":\"/v1/auth\"},{\"operation"
+  },
+  {
+    "name": "conector mock c6 PIX_COB_POST",
+    "ok": false,
+    "detail": "HTTP 0 timed out"
+  },
+  {
+    "name": "gateway mock c6 PIX_COB_POST",
+    "ok": false,
+    "detail": "HTTP 503 {\"error\":\"PROVIDER_UNAVAILABLE\"}"
+  },
+  {
+    "name": "catalogo itau",
+    "ok": true,
+    "detail": "HTTP 200 {\"data\":[{\"path\":\"\",\"method\":\"POST\",\"product\":\"AUTHENTICATION\",\"documented\":\"true\",\"operation\":\"AUTH_TOKEN\"},{\"path\":\"/cob\",\"method\":\"POST\","
+  },
+  {
+    "name": "conector mock itau PIX_COB_POST",
+    "ok": true,
+    "detail": "HTTP 200 {\"operation\":\"PIX_COB_POST\",\"status\":200,\"uncertain\":false,\"mocked\":true,\"body\":{\"pixCopiaECola\":\"000201mocked-itau\",\"product\":\"PIX_RECEBIMENTOS\",\"status\":\"ATIVA\",\"mocked\":true,\"ba"
+  },
+  {
+    "name": "gateway mock itau PIX_COB_POST",
+    "ok": true,
+    "detail": "HTTP 200 {\"operation\":\"PIX_COB_POST\",\"status\":200,\"uncertain\":false,\"mocked\":true,\"body\":{\"pixCopiaECola\":\"000201mocked-itau\",\"product\":\"PIX_RECEBIMENTOS\",\"status\":\"ATIVA\",\"mocked\":true,\"ba"
+  },
+  {
+    "name": "catalogo santander",
+    "ok": true,
+    "detail": "HTTP 200 {\"data\":[{\"documented\":\"true\",\"product\":\"AUTHENTICATION\",\"method\":\"POST\",\"path\":\"\",\"operation\":\"AUTH_TOKEN\"},{\"documented\":\"true\",\"product\":"
+  },
+  {
+    "name": "conector mock santander PIX_COB_POST",
+    "ok": true,
+    "detail": "HTTP 200 {\"operation\":\"PIX_COB_POST\",\"status\":200,\"uncertain\":false,\"mocked\":true,\"body\":{\"operation\":\"PIX_COB_POST\",\"bank\":\"santander\",\"mocked\":true,\"status\":\"ATIVA\",\"product\":\"PIX\",\"pixCo"
+  },
+  {
+    "name": "gateway mock santander PIX_COB_POST",
+    "ok": true,
+    "detail": "HTTP 200 {\"operation\":\"PIX_COB_POST\",\"status\":200,\"uncertain\":false,\"mocked\":true,\"body\":{\"operation\":\"PIX_COB_POST\",\"bank\":\"santander\",\"mocked\":true,\"status\":\"ATIVA\",\"product\":\"PIX\",\"pixCo"
+  },
+  {
+    "name": "catalogo bb",
+    "ok": true,
+    "detail": "HTTP 200 {\"bank\":\"bb\",\"data\":[{\"method\":\"POST\",\"operation\":\"OAUTH_TOKEN\",\"path\":\"/oauth/token\",\"pixStandard\":\"false\"},{\"method\":\"PUT\",\"operation\":\"PI"
+  },
+  {
+    "name": "conector mock bb PIX_COB_POST",
+    "ok": true,
+    "detail": "HTTP 200 {\"bank\":\"bb\",\"operation\":\"PIX_COB_POST\",\"status\":200,\"uncertain\":false,\"mocked\":true,\"body\":{\"operation\":\"PIX_COB_POST\",\"bank\":\"bb\",\"mocked\":true,\"status\":\"ATIVA\",\"pixCopiaECola\":\""
+  },
+  {
+    "name": "gateway mock bb PIX_COB_POST",
+    "ok": true,
+    "detail": "HTTP 200 {\"bank\":\"bb\",\"operation\":\"PIX_COB_POST\",\"status\":200,\"uncertain\":false,\"mocked\":true,\"body\":{\"operation\":\"PIX_COB_POST\",\"bank\":\"bb\",\"mocked\":true,\"status\":\"ATIVA\",\"pixCopiaECola\":\""
+  },
+  {
+    "name": "catalogo bradesco",
+    "ok": true,
+    "detail": "HTTP 200 {\"data\":[{\"pixStandard\":\"false\",\"path\":\"/oauth/token\",\"operation\":\"OAUTH_TOKEN\",\"method\":\"POST\"},{\"pixStandard\":\"true\",\"path\":\"/pix/v2/cob/{"
+  },
+  {
+    "name": "conector mock bradesco PIX_COB_POST",
+    "ok": true,
+    "detail": "HTTP 200 {\"bank\":\"bradesco\",\"operation\":\"PIX_COB_POST\",\"status\":200,\"uncertain\":false,\"mocked\":true,\"body\":{\"pixCopiaECola\":\"000201mocked\",\"status\":\"ATIVA\",\"mocked\":true,\"bank\":\"bradesco\",\""
+  },
+  {
+    "name": "gateway mock bradesco PIX_COB_POST",
+    "ok": true,
+    "detail": "HTTP 200 {\"bank\":\"bradesco\",\"operation\":\"PIX_COB_POST\",\"status\":200,\"uncertain\":false,\"mocked\":true,\"body\":{\"pixCopiaECola\":\"000201mocked\",\"status\":\"ATIVA\",\"mocked\":true,\"bank\":\"bradesco\",\""
+  },
+  {
+    "name": "catalogo caixa",
+    "ok": true,
+    "detail": "HTTP 200 {\"bank\":\"caixa\",\"data\":[{\"operation\":\"OAUTH_TOKEN\",\"method\":\"POST\",\"pixStandard\":\"false\",\"path\":\"/oauth/token\"},{\"operation\":\"PIX_COB_PUT\",\""
+  },
+  {
+    "name": "conector mock caixa PIX_COB_POST",
+    "ok": true,
+    "detail": "HTTP 200 {\"bank\":\"caixa\",\"operation\":\"PIX_COB_POST\",\"status\":200,\"uncertain\":false,\"mocked\":true,\"body\":{\"pixCopiaECola\":\"000201mocked\",\"status\":\"ATIVA\",\"mocked\":true,\"bank\":\"caixa\",\"operat"
+  },
+  {
+    "name": "gateway mock caixa PIX_COB_POST",
+    "ok": true,
+    "detail": "HTTP 200 {\"bank\":\"caixa\",\"operation\":\"PIX_COB_POST\",\"status\":200,\"uncertain\":false,\"mocked\":true,\"body\":{\"pixCopiaECola\":\"000201mocked\",\"status\":\"ATIVA\",\"mocked\":true,\"bank\":\"caixa\",\"operat"
+  },
+  {
+    "name": "catalogo banrisul",
+    "ok": true,
+    "detail": "HTTP 200 {\"data\":[{\"operation\":\"OAUTH_TOKEN\",\"path\":\"/oauth/token\",\"pixStandard\":\"false\",\"method\":\"POST\"},{\"operation\":\"PIX_COB_PUT\",\"path\":\"/pix/v2/"
+  },
+  {
+    "name": "conector mock banrisul PIX_COB_POST",
+    "ok": true,
+    "detail": "HTTP 200 {\"bank\":\"banrisul\",\"operation\":\"PIX_COB_POST\",\"status\":200,\"uncertain\":false,\"mocked\":true,\"body\":{\"pixCopiaECola\":\"000201mocked\",\"operation\":\"PIX_COB_POST\",\"bank\":\"banrisul\",\"mock"
+  },
+  {
+    "name": "gateway mock banrisul PIX_COB_POST",
+    "ok": true,
+    "detail": "HTTP 200 {\"bank\":\"banrisul\",\"operation\":\"PIX_COB_POST\",\"status\":200,\"uncertain\":false,\"mocked\":true,\"body\":{\"pixCopiaECola\":\"000201mocked\",\"operation\":\"PIX_COB_POST\",\"bank\":\"banrisul\",\"mock"
+  },
+  {
+    "name": "wiremock mappings",
+    "ok": true,
+    "detail": "HTTP 200 ids=280"
+  },
+  {
+    "name": "modulo cielo",
+    "ok": false,
+    "detail": "HTTP 0 <urlopen error [WinError 10061] Nenhuma conexão pôde ser feita porque a máquina de destino as recusou ativamente>"
+  },
+  {
+    "name": "modulo rede",
+    "ok": false,
+    "detail": "HTTP 0 <urlopen error [WinError 10061] Nenhuma conexão pôde ser feita porque a máquina de destino as recusou ativamente>"
+  },
+  {
+    "name": "modulo getnet",
+    "ok": false,
+    "detail": "HTTP 0 <urlopen error [WinError 10061] Nenhuma conexão pôde ser feita porque a máquina de destino as recusou ativamente>"
+  },
+  {
+    "name": "modulo stone",
+    "ok": false,
+    "detail": "HTTP 0 <urlopen error [WinError 10061] Nenhuma conexão pôde ser feita porque a máquina de destino as recusou ativamente>"
+  },
+  {
+    "name": "modulo bin",
+    "ok": false,
+    "detail": "HTTP 0 <urlopen error [WinError 10061] Nenhuma conexão pôde ser feita porque a máquina de destino as recusou ativamente>"
+  },
+  {
+    "name": "modulo global-payments",
+    "ok": false,
+    "detail": "HTTP 0 <urlopen error [WinError 10061] Nenhuma conexão pôde ser feita porque a máquina de destino as recusou ativamente>"
+  },
+  {
+    "name": "modulo pagbank",
+    "ok": false,
+    "detail": "HTTP 0 <urlopen error [WinError 10061] Nenhuma conexão pôde ser feita porque a máquina de destino as recusou ativamente>"
+  },
+  {
+    "name": "modulo safrapay",
+    "ok": false,
+    "detail": "HTTP 0 <urlopen error [WinError 10061] Nenhuma conexão pôde ser feita porque a máquina de destino as recusou ativamente>"
+  },
+  {
+    "name": "loja vitrine",
+    "ok": true,
+    "detail": "HTTP 200"
+  },
+  {
+    "name": "loja meios",
+    "ok": true,
+    "detail": "meios=27"
+  },
+  {
+    "name": "pedido credit_card",
+    "ok": true,
+    "detail": "HTTP 200 trecho=credit_card<br><span class=\"status\">UNKNOWN</span></td><td><form method=\"post\"><"
+  },
+  {
+    "name": "pedido debit_card",
+    "ok": true,
+    "detail": "HTTP 200 trecho=debit_card<br><span class=\"status\">UNKNOWN</span></td><td><form method=\"post\"><i"
+  },
+  {
+    "name": "pedido pix",
+    "ok": true,
+    "detail": "HTTP 200 trecho=pix<br><span class=\"status\">UNKNOWN</span></td><td><form method=\"post\"><input ty"
+  },
+  {
+    "name": "pedido boleto",
+    "ok": true,
+    "detail": "HTTP 200 trecho=boleto<br><span class=\"status\">UNKNOWN</span></td><td><form method=\"post\"><input"
+  },
+  {
+    "name": "pedido transfer",
+    "ok": true,
+    "detail": "HTTP 200 trecho=transfer<br><span class=\"status\">UNKNOWN</span></td><td><form method=\"post\"><inp"
+  },
+  {
+    "name": "pedido cielo",
+    "ok": true,
+    "detail": "HTTP 200 trecho=<!doctype html><html lang=\"pt-BR\"><head><meta charset=\"utf-8\"><meta name=\"viewpo"
+  },
+  {
+    "name": "pedido rede",
+    "ok": true,
+    "detail": "HTTP 200 trecho=<!doctype html><html lang=\"pt-BR\"><head><meta charset=\"utf-8\"><meta name=\"viewpo"
+  },
+  {
+    "name": "pedido getnet",
+    "ok": true,
+    "detail": "HTTP 200 trecho=<!doctype html><html lang=\"pt-BR\"><head><meta charset=\"utf-8\"><meta name=\"viewpo"
+  },
+  {
+    "name": "pedido stone",
+    "ok": true,
+    "detail": "HTTP 200 trecho=<!doctype html><html lang=\"pt-BR\"><head><meta charset=\"utf-8\"><meta name=\"viewpo"
+  },
+  {
+    "name": "pedido bin",
+    "ok": true,
+    "detail": "HTTP 200 trecho=<!doctype html><html lang=\"pt-BR\"><head><meta charset=\"utf-8\"><meta name=\"viewpo"
+  },
+  {
+    "name": "pedido global_payments",
+    "ok": true,
+    "detail": "HTTP 200 trecho=<!doctype html><html lang=\"pt-BR\"><head><meta charset=\"utf-8\"><meta name=\"viewpo"
+  },
+  {
+    "name": "pedido pagbank",
+    "ok": true,
+    "detail": "HTTP 200 trecho=<!doctype html><html lang=\"pt-BR\"><head><meta charset=\"utf-8\"><meta name=\"viewpo"
+  },
+  {
+    "name": "pedido safrapay",
+    "ok": true,
+    "detail": "HTTP 200 trecho=<!doctype html><html lang=\"pt-BR\"><head><meta charset=\"utf-8\"><meta name=\"viewpo"
+  },
+  {
+    "name": "pedido c6_pix",
+    "ok": true,
+    "detail": "HTTP 200 trecho=<!doctype html><html lang=\"pt-BR\"><head><meta charset=\"utf-8\"><meta name=\"viewpo"
+  },
+  {
+    "name": "pedido c6_boleto",
+    "ok": true,
+    "detail": "HTTP 200 trecho=<!doctype html><html lang=\"pt-BR\"><head><meta charset=\"utf-8\"><meta name=\"viewpo"
+  },
+  {
+    "name": "pedido itau_pix",
+    "ok": true,
+    "detail": "HTTP 200 trecho=<!doctype html><html lang=\"pt-BR\"><head><meta charset=\"utf-8\"><meta name=\"viewpo"
+  },
+  {
+    "name": "pedido itau_boleto",
+    "ok": true,
+    "detail": "HTTP 200 trecho=<!doctype html><html lang=\"pt-BR\"><head><meta charset=\"utf-8\"><meta name=\"viewpo"
+  },
+  {
+    "name": "pedido santander_pix",
+    "ok": true,
+    "detail": "HTTP 200 trecho=<!doctype html><html lang=\"pt-BR\"><head><meta charset=\"utf-8\"><meta name=\"viewpo"
+  },
+  {
+    "name": "pedido santander_boleto",
+    "ok": true,
+    "detail": "HTTP 200 trecho=<!doctype html><html lang=\"pt-BR\"><head><meta charset=\"utf-8\"><meta name=\"viewpo"
+  },
+  {
+    "name": "pedido bb_pix",
+    "ok": true,
+    "detail": "HTTP 200 trecho=<!doctype html><html lang=\"pt-BR\"><head><meta charset=\"utf-8\"><meta name=\"viewpo"
+  },
+  {
+    "name": "pedido bb_boleto",
+    "ok": true,
+    "detail": "HTTP 200 trecho=<!doctype html><html lang=\"pt-BR\"><head><meta charset=\"utf-8\"><meta name=\"viewpo"
+  },
+  {
+    "name": "pedido bradesco_pix",
+    "ok": true,
+    "detail": "HTTP 200 trecho=<!doctype html><html lang=\"pt-BR\"><head><meta charset=\"utf-8\"><meta name=\"viewpo"
+  },
+  {
+    "name": "pedido bradesco_boleto",
+    "ok": true,
+    "detail": "HTTP 200 trecho=<!doctype html><html lang=\"pt-BR\"><head><meta charset=\"utf-8\"><meta name=\"viewpo"
+  },
+  {
+    "name": "pedido caixa_pix",
+    "ok": true,
+    "detail": "HTTP 200 trecho=<!doctype html><html lang=\"pt-BR\"><head><meta charset=\"utf-8\"><meta name=\"viewpo"
+  },
+  {
+    "name": "pedido caixa_boleto",
+    "ok": true,
+    "detail": "HTTP 200 trecho=<!doctype html><html lang=\"pt-BR\"><head><meta charset=\"utf-8\"><meta name=\"viewpo"
+  },
+  {
+    "name": "pedido banrisul_pix",
+    "ok": true,
+    "detail": "HTTP 200 trecho=<!doctype html><html lang=\"pt-BR\"><head><meta charset=\"utf-8\"><meta name=\"viewpo"
+  },
+  {
+    "name": "pedido banrisul_boleto",
+    "ok": true,
+    "detail": "HTTP 200 trecho=<!doctype html><html lang=\"pt-BR\"><head><meta charset=\"utf-8\"><meta name=\"viewpo"
+  },
+  {
+    "name": "pedidos com estado de transacao",
+    "ok": false,
+    "detail": "com PAID ou PENDING=0"
+  },
+  {
+    "name": "grafana annotation",
+    "ok": true,
+    "detail": "HTTP 200 {\"id\":1,\"message\":\"Annotation added\"}"
+  }
+]

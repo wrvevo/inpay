@@ -1,0 +1,30 @@
+spring:
+  application:
+    name: painel-gerencial
+  profiles:
+    default: aws
+server:
+  port: 8130
+management:
+  endpoints:
+    web:
+      exposure:
+        include: health,info,prometheus
+  endpoint:
+    health:
+      probes:
+        enabled: true
+      show-details: never
+inpay:
+  local-password: ${LOCAL_PASSWORD:inpay@123}
+  security:
+    issuer: ${COGNITO_ISSUER:}
+    allowed-clients: ${COGNITO_ALLOWED_CLIENTS:}
+    trusted-services: ${COGNITO_TRUSTED_SERVICES:}
+    client-tenants: ${COGNITO_CLIENT_TENANTS:}
+    audience: ${COGNITO_AUDIENCE:}
+springdoc:
+  api-docs:
+    enabled: false
+  swagger-ui:
+    enabled: false

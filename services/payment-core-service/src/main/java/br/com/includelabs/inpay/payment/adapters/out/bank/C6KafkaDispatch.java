@@ -22,7 +22,8 @@ public class C6KafkaDispatch {
         this.kafka = kafka;
     }
 
-    public void publish(String operation, String operationId, String mock, Map<String, Object> payload) {
+    public void publish(
+            String operation, String operationId, String mock, Map<String, Object> payload) {
         try {
             Map<String, Object> command = new LinkedHashMap<>();
             command.put("operation", operation);

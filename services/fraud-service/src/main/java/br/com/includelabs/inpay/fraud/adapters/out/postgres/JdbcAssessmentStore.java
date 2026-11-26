@@ -37,15 +37,17 @@ public class JdbcAssessmentStore implements AssessmentStore {
         UUID id = UUID.randomUUID();
         jdbcTemplate.update(
                 "INSERT INTO"
-                        + " assessments(id,merchant_id,payment_id,score,decision,policy_version,reasons)"
-                        + " VALUES (?,?,?,?,?,?,?)",
+                        + " assessments(id,merchant_id,payment_id,score,decision,policy_version,reasons,provider,tokens)"
+                        + " VALUES (?,?,?,?,?,?,?,?,?)",
                 id,
                 merchantId,
                 paymentId,
                 assessment.score(),
                 assessment.decision().name(),
                 assessment.policyVersion(),
-                String.join(",", assessment.reasons()));
+                String.join(",", assessment.reasons()),
+                assessment.provider(),
+                assessment.tokens());
         return id;
     }
 }

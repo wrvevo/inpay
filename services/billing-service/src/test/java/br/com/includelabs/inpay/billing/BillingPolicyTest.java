@@ -44,4 +44,17 @@ class BillingPolicyTest {
         assertEquals("STOP", BillingPolicy.nextAction("HARD_DECLINE", 0));
         assertEquals("MANUAL_REVIEW", BillingPolicy.nextAction("SOFT_DECLINE", 3));
     }
+
+    @Test
+    void inpayRiskChargesOnlyTokensAboveTheAllowance() {
+        var inside = BillingPolicy.priceFraud("START-2026-11", "INPAY_RISK", 50_000, 1);
+        assertEquals(0, inside.billableTokens());
+        assertEquals(0, inside.merchantChargeCents());
+        assertEquals(150, inside.modelCostCents());
+        var over = BillingPolicy.priceFraud("GROW-2026-11", "inpay-risk", 1_002_000, 1);
+        assertEquals(2_000, over.billableTokens());
+        assertEquals(10, over.merchantChargeCents());
+        var bureau = BillingPolicy.priceFraud("SCALE-2026-11", "serasa-experian", 0, 2);
+        assertEquals(64, bureau.merchantChargeCents());
+    }
 }

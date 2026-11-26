@@ -73,7 +73,7 @@ continua simulado nesse perfil. Fora de local, o legado usa o adaptador externo 
 com valor correspondente ao campo `amount` da InPay.
 
 ```bash
-curl -u developer:local-only-change-me \
+curl -u inpay:inpay@123 \
   -H 'Content-Type: application/json' \
   -H 'X-Merchant-Id: 11111111-1111-1111-1111-111111111111' \
   --data-binary @services/connector-cielo/src/main/resources/provider-examples/authorize.json \

@@ -9,9 +9,12 @@ from http.server import BaseHTTPRequestHandler, ThreadingHTTPServer
 from urllib.parse import urlparse, parse_qs
 
 LOCK = threading.Lock()
-DB = os.getenv('SIMULATOR_DB', '/tmp/inpay-simulator.sqlite')
-PASSWORD = os.environ['LOCAL_PASSWORD']
-AUTH = 'Basic ' + base64.b64encode(('developer:' + PASSWORD).encode()).decode()
+DB = os.getenv(
+    "SIMULATOR_DB",
+    os.path.join(os.environ.get("TEMP", "."), "inpay-simulator.sqlite"),
+)
+PASSWORD = os.environ.get("LOCAL_PASSWORD", "inpay@123")
+AUTH = 'Basic ' + base64.b64encode(('inpay:' + PASSWORD).encode()).decode()
 with sqlite3.connect(DB) as connection:
     connection.execute('CREATE TABLE IF NOT EXISTS payments(id TEXT PRIMARY KEY, operation TEXT UNIQUE, payload TEXT, amount INTEGER, status INTEGER, method TEXT)')
 

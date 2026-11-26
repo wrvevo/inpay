@@ -30,7 +30,10 @@ public final class BankConnector {
     }
 
     public BankResult execute(
-            String operationName, String operationId, String mockHeader, Map<String, Object> payload) {
+            String operationName,
+            String operationId,
+            String mockHeader,
+            Map<String, Object> payload) {
         BankOperation operation = BankOperation.fromName(operationName);
         MockMode mode = MockMode.parse(mockHeader, settings.mockEnabled());
         Map<String, Object> safePayload = payload == null ? Map.of() : payload;
@@ -58,7 +61,8 @@ public final class BankConnector {
                 journalKey = key(operation, operationId);
             }
             URI uri = target(mode, prepared.path());
-            String body = prepared.body().isEmpty() ? "" : mapper.writeValueAsString(prepared.body());
+            String body =
+                    prepared.body().isEmpty() ? "" : mapper.writeValueAsString(prepared.body());
             BankResult result =
                     transport.send(settings.bank(), operation, mode == MockMode.MOCK, uri, body);
             if (journalKey != null) {
@@ -108,7 +112,8 @@ public final class BankConnector {
         return operations;
     }
 
-    private BankResult reserve(BankOperation operation, String operationId, Map<String, Object> payload) {
+    private BankResult reserve(
+            BankOperation operation, String operationId, Map<String, Object> payload) {
         if (operationId == null || !operationId.matches("[A-Za-z0-9_-]{1,80}")) {
             throw new IllegalArgumentException("operationId is required");
         }
@@ -136,7 +141,9 @@ public final class BankConnector {
                     "Operation is mocked until the contracted bank path is confirmed");
         }
         URI live = URI.create(settings.liveBaseUrl());
-        if (!"https".equals(live.getScheme()) || live.getHost() == null || live.getUserInfo() != null) {
+        if (!"https".equals(live.getScheme())
+                || live.getHost() == null
+                || live.getUserInfo() != null) {
             throw new IllegalStateException("Live bank URL must be HTTPS");
         }
     }
@@ -144,7 +151,9 @@ public final class BankConnector {
     private URI target(MockMode mode, String path) {
         String base = mode == MockMode.MOCK ? settings.mockBaseUrl() : settings.liveBaseUrl();
         URI root = URI.create(base);
-        if (mode == MockMode.MOCK && !"http".equals(root.getScheme()) && !"https".equals(root.getScheme())) {
+        if (mode == MockMode.MOCK
+                && !"http".equals(root.getScheme())
+                && !"https".equals(root.getScheme())) {
             throw new IllegalStateException("Mock base URL is invalid");
         }
         String prefix = mode == MockMode.MOCK ? "/" + settings.id() : "";
@@ -212,7 +221,9 @@ public final class BankConnector {
         try {
             String canonical = operation.name() + "|" + mapper.writeValueAsString(payload);
             return HexFormat.of()
-                    .formatHex(MessageDigest.getInstance("SHA-256").digest(canonical.getBytes(StandardCharsets.UTF_8)));
+                    .formatHex(
+                            MessageDigest.getInstance("SHA-256")
+                                    .digest(canonical.getBytes(StandardCharsets.UTF_8)));
         } catch (Exception exception) {
             throw new IllegalArgumentException("Cannot fingerprint request");
         }

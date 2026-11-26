@@ -25,7 +25,10 @@ public record BankSettings(
         if (mockBaseUrl == null || mockBaseUrl.isBlank()) {
             throw new IllegalArgumentException("Mock base URL is required");
         }
-        if (failureThreshold < 1 || openDuration == null || openDuration.isZero() || openDuration.isNegative()) {
+        if (failureThreshold < 1
+                || openDuration == null
+                || openDuration.isZero()
+                || openDuration.isNegative()) {
             throw new IllegalArgumentException("Invalid circuit settings");
         }
     }

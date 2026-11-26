@@ -16,7 +16,9 @@ public class SantanderConfiguration {
     }
 
     @Bean
-    ExecuteSantanderOperation executeSantanderOperation(SantanderBankPort port, SantanderSettings settings) {
-        return new ExecuteSantanderOperation(port, settings.enabled(), settings.confirmUnverifiedPaths());
+    ExecuteSantanderOperation executeSantanderOperation(
+            SantanderBankPort port, SantanderSettings settings) {
+        return new ExecuteSantanderOperation(
+                port, settings.enabled(), settings.confirmUnverifiedPaths());
     }
 }

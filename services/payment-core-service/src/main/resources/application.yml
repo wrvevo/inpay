@@ -45,6 +45,9 @@ inpay:
     connector-url: ${INPAY_JOURNEY_CONNECTOR_URL:}
     authorization: ${INPAY_JOURNEY_AUTHORIZATION:}
     sandbox-fixtures: ${INPAY_JOURNEY_SANDBOX_FIXTURES:false}
+  fraud:
+    mode: ${INPAY_FRAUD_MODE:INPAY_RISK}
+    url: ${FRAUD_URL:http://127.0.0.1:8087}
   security:
     issuer: ${COGNITO_ISSUER:}
     allowed-clients: ${COGNITO_ALLOWED_CLIENTS:}

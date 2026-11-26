@@ -1,8 +1,8 @@
 package br.com.includelabs.inpay.santander.domain;
 
 /**
- * Pix segue o guia de recebimentos do portal (base /api/v1). Cobrança segue o guia collection
- * bill management v2. Pagamentos ficam em mock até o path contratado ser confirmado.
+ * Pix segue o guia de recebimentos do portal (base /api/v1). Cobrança segue o guia collection bill
+ * management v2. Pagamentos ficam em mock até o path contratado ser confirmado.
  */
 public enum SantanderOperation {
     AUTH_TOKEN(SantanderProduct.AUTHENTICATION, "POST", "", true),
@@ -35,9 +35,15 @@ public enum SantanderOperation {
     WORKSPACE_GET(SantanderProduct.BILLING, "GET", "/workspaces/{workspaceId}", true),
     WORKSPACE_UPDATE(SantanderProduct.BILLING, "PATCH", "/workspaces/{workspaceId}", true),
     WORKSPACE_DELETE(SantanderProduct.BILLING, "DELETE", "/workspaces/{workspaceId}", true),
-    BANK_SLIP_CREATE(SantanderProduct.BILLING, "POST", "/workspaces/{workspaceId}/bank_slips", true),
-    BANK_SLIP_UPDATE(SantanderProduct.BILLING, "PATCH", "/workspaces/{workspaceId}/bank_slips", true),
-    BANK_SLIP_GET(SantanderProduct.BILLING, "GET", "/workspaces/{workspaceId}/bank_slips/{bankSlipId}", true),
+    BANK_SLIP_CREATE(
+            SantanderProduct.BILLING, "POST", "/workspaces/{workspaceId}/bank_slips", true),
+    BANK_SLIP_UPDATE(
+            SantanderProduct.BILLING, "PATCH", "/workspaces/{workspaceId}/bank_slips", true),
+    BANK_SLIP_GET(
+            SantanderProduct.BILLING,
+            "GET",
+            "/workspaces/{workspaceId}/bank_slips/{bankSlipId}",
+            true),
     BILL_LIST(SantanderProduct.BILLING, "GET", "/bills", true),
     BILL_GET(SantanderProduct.BILLING, "GET", "/bills/{billId}", true),
     PAYMENT_WORKSPACE_CREATE(SantanderProduct.PAYMENTS, "POST", "/workspaces", false),

@@ -8,8 +8,10 @@ import org.springframework.boot.context.properties.bind.DefaultValue;
 @ConfigurationProperties("inpay.itau")
 public record ItauSettings(
         @DefaultValue("https://devportal.itau.com.br/api/jwt") String tokenUrl,
-        @DefaultValue("https://devportal.itau.com.br/sandboxapi/pix_recebimentos_ext_v2/v2") String pixBaseUrl,
-        @DefaultValue("https://devportal.itau.com.br/sandboxapi/cash_management_ext_v2/v2") String boletoBaseUrl,
+        @DefaultValue("https://devportal.itau.com.br/sandboxapi/pix_recebimentos_ext_v2/v2")
+                String pixBaseUrl,
+        @DefaultValue("https://devportal.itau.com.br/sandboxapi/cash_management_ext_v2/v2")
+                String boletoBaseUrl,
         @DefaultValue("https://devportal.itau.com.br/sandboxapi/sispag/v1") String sispagBaseUrl,
         @DefaultValue("") String clientId,
         @DefaultValue("") String clientSecret,

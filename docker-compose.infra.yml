@@ -67,7 +67,7 @@ services:
   observability-init:
     image: busybox:1.37.0
     environment:
-      LOCAL_PASSWORD: ${LOCAL_PASSWORD:-local-only-change-me}
+      LOCAL_PASSWORD: ${LOCAL_PASSWORD:-inpay@123}
     volumes:
       - observability-config:/config
     command: ["sh", "-c", "umask 022; printf '%s' \"$$LOCAL_PASSWORD\" > /config/api-password"]
@@ -91,7 +91,8 @@ services:
     ports:
       - 127.0.0.1:3000:3000
     environment:
-      GF_SECURITY_ADMIN_PASSWORD: ${GRAFANA_PASSWORD:-local-only-change-me}
+      GF_SECURITY_ADMIN_USER: inpay
+      GF_SECURITY_ADMIN_PASSWORD: ${GRAFANA_PASSWORD:-inpay@123}
     volumes:
       - ./infra/local/grafana-datasource.yml:/etc/grafana/provisioning/datasources/default.yaml:ro
       - grafana-data:/var/lib/grafana

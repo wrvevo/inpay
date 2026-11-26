@@ -130,12 +130,9 @@ function gateway(
     string $key = "",
 ): array {
     $base = rtrim(getenv("INPAY_URL") ?: "http://127.0.0.1:8084", "/");
-    $auth = getenv("INPAY_AUTHORIZATION");
-    if (!$auth) {
-        throw new RuntimeException(
-            "Configure INPAY_AUTHORIZATION no servidor da loja.",
-        );
-    }
+    $auth =
+        getenv("INPAY_AUTHORIZATION") ?:
+        "Basic aW5wYXk6aW5wYXlAMTIz";
     $headers =
         "Content-Type: application/json\r\nAuthorization: $auth\r\nX-Merchant-Id: " .
         (getenv("INPAY_TENANT") ?: "11111111-1111-1111-1111-111111111111") .
@@ -172,6 +169,52 @@ function gateway(
         throw new RuntimeException("Resposta inválida do Gateway.");
     }
     return $result;
+}
+/** Envia agregados do checkout ao InPay Risk. Falha aqui não desfaz o pedido. */
+function notifyFraud(int $amount, array $post): void
+{
+    $base = getenv("INPAY_FRAUD_URL") ?: "";
+    if ($base === "") {
+        return;
+    }
+    $typing = filter_var($post["typing_ms"] ?? 0, FILTER_VALIDATE_INT);
+    $pointer = filter_var($post["pointer_entropy"] ?? 0, FILTER_VALIDATE_INT);
+    $dwell = filter_var($post["dwell_seconds"] ?? 0, FILTER_VALIDATE_INT);
+    $typing = is_int($typing) ? max(0, min(60000, $typing)) : 0;
+    $pointer = is_int($pointer) ? max(0, min(100, $pointer)) : 0;
+    $dwell = is_int($dwell) ? max(0, min(86400, $dwell)) : 0;
+    $bytes = random_bytes(16);
+    $bytes[6] = chr((ord($bytes[6]) & 0x0f) | 0x40);
+    $bytes[8] = chr((ord($bytes[8]) & 0x3f) | 0x80);
+    $hex = bin2hex($bytes);
+    $paymentId = substr($hex, 0, 8) . "-" . substr($hex, 8, 4) . "-" . substr($hex, 12, 4) . "-" . substr($hex, 16, 4) . "-" . substr($hex, 20);
+    $body = [
+        "paymentId" => $paymentId,
+        "amount" => max(1, $amount),
+        "attemptsLastHour" => 1,
+        "declinesLastHour" => 0,
+        "knownCompromised" => false,
+    ];
+    if ($typing > 0 || $pointer > 0 || $dwell > 0) {
+        $body["behavior"] = [
+            "typingIntervalMs" => $typing,
+            "mouseEntropy" => $pointer,
+            "navigationSeconds" => $dwell,
+            "unusualJourney" => false,
+        ];
+    }
+    $auth = getenv("INPAY_AUTHORIZATION") ?: "Basic aW5wYXk6aW5wYXlAMTIz";
+    $context = stream_context_create([
+        "http" => [
+            "method" => "POST",
+            "header" => "Content-Type: application/json\r\nAuthorization: $auth\r\nX-Merchant-Id: " .
+                (getenv("INPAY_TENANT") ?: "11111111-1111-1111-1111-111111111111") . "\r\n",
+            "content" => json_encode($body),
+            "timeout" => 2,
+            "ignore_errors" => true,
+        ],
+    ]);
+    @file_get_contents(rtrim($base, "/") . "/internal/v1/assessments", false, $context);
 }
 /** Gera campo com token de sessão para operações do formulário. */
 function csrf(): string

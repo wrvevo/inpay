@@ -54,7 +54,7 @@ Cada serviço disponibiliza documentação em sua própria porta:
 - `/v3/api-docs`: contrato OpenAPI JSON;
 - `/v3/api-docs.yaml`: contrato OpenAPI YAML.
 
-No perfil `local`, a documentação é pública na máquina local. Para executar operações pelo botão **Authorize**, use HTTP Basic: usuário `developer`, senha `local-only-change-me` ou o valor configurado em LOCAL_PASSWORD. Acesso à documentação não libera as APIs de negócio. O tenant local é `11111111-1111-1111-1111-111111111111`.
+No perfil `local`, a documentação é pública na máquina local. Para executar operações pelo botão **Authorize**, use HTTP Basic: usuário `inpay`, senha `inpay@123` ou o valor configurado em LOCAL_PASSWORD. O usuário `developer` permanece apenas como alias técnico dos testes. Acesso à documentação não libera as APIs de negócio. O tenant local é `11111111-1111-1111-1111-111111111111`.
 
 No perfil AWS, documentação e Swagger ficam desabilitados por padrão. Se forem habilitados explicitamente, as rotas de documentação exigem o escopo `operations/read`, além da proteção de rede. Não inserir client secret Cognito no navegador: as APIs recebem access tokens obtidos no backend.
 
@@ -70,7 +70,9 @@ Grafana: **http://localhost:3000**, usuário `admin`, senha local definida por G
 | payment-core-service | 8084 | POST/GET persistentes, idempotência concorrente e outbox; máquina de estados testada. Saga/capture/refund/void HTTP retornam 501. |
 | routing-service | 8085 | Política pura testada (bindings e UNKNOWN); cadastro e endpoint de seleção ainda pendentes. |
 | token-service | 8086 | Alias aleatório e revogação apenas local. Não coleta PAN/CVV nem cria token de adquirente real. |
-| fraud-service | 8087 | Motor nativo determinístico e assessment persistente. Sinais recebidos por API interna; extração/velocidade/revisão ainda pendentes. |
+| fraud-service | 8087 | InPay Risk: comportamento, dispositivo, cadastro, score e aprendizado por chargeback, com medição de tokens. ClearSale e Serasa Experian seguem o modo selecionado no gateway, em stub. |
+| connector-clearsale | 8128 | Stub ClearSale com X-Mock. Chamada real desligada. |
+| connector-serasa-experian | 8129 | Stub Serasa Experian com X-Mock. Consulta real desligada. |
 | webhook-ingress-service | 8088 | Ports e domínio; validação de callbacks e normalização ainda pendentes. |
 | reconciliation-service | 8089 | Ports e domínio; job retorna 501 até implementar importação/consulta e comparação. |
 | notification-service | 8090 | Domínio/port e assinatura HMAC; entrega/retry/SSRF/DLQ ainda pendentes. |

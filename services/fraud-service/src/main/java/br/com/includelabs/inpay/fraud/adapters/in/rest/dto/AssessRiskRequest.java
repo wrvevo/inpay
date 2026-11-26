@@ -31,4 +31,28 @@ public record AssessRiskRequest(
                                 "Indica comprometimento conhecido; não deve ser inferido apenas"
                                         + " pela ausência de dados.",
                         example = "false")
-                boolean knownCompromised) {}
+                boolean knownCompromised,
+        @Schema(description = "Agregados de digitação, ponteiro e permanência. Opcional.")
+                Behavior behavior,
+        @Schema(description = "Dispositivo e rede já resumidos. Opcional.") Device device,
+        @Schema(description = "Cruzamento cadastral sem PAN. Opcional.") Identity identity) {
+    public record Behavior(
+            int typingIntervalMs,
+            int mouseEntropy,
+            int navigationSeconds,
+            boolean unusualJourney) {}
+
+    public record Device(
+            String deviceKey,
+            String country,
+            String homeCountry,
+            boolean vpnOrProxy,
+            int seenAtOtherMerchants) {}
+
+    public record Identity(
+            String cpf,
+            String emailDomain,
+            boolean deliveryMatchesBilling,
+            int cardholderMatch,
+            int priorPurchases) {}
+}

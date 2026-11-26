@@ -22,7 +22,8 @@ public final class ExecuteSantanderOperation {
     private final boolean confirmUnverified;
     private final ConcurrentHashMap<String, SantanderReply> journal = new ConcurrentHashMap<>();
 
-    public ExecuteSantanderOperation(SantanderBankPort bank, boolean liveEnabled, boolean confirmUnverified) {
+    public ExecuteSantanderOperation(
+            SantanderBankPort bank, boolean liveEnabled, boolean confirmUnverified) {
         this.bank = bank;
         this.liveEnabled = liveEnabled;
         this.confirmUnverified = confirmUnverified;
@@ -44,9 +45,15 @@ public final class ExecuteSantanderOperation {
     }
 
     public SantanderReply execute(
-            String operationName, String operationId, String mockHeader, Map<String, Object> payload) {
+            String operationName,
+            String operationId,
+            String mockHeader,
+            Map<String, Object> payload) {
         SantanderOperation operation = SantanderOperation.fromName(operationName);
-        boolean mock = mockHeader != null && !mockHeader.isBlank() && Boolean.parseBoolean(mockHeader.trim());
+        boolean mock =
+                mockHeader != null
+                        && !mockHeader.isBlank()
+                        && Boolean.parseBoolean(mockHeader.trim());
         if (mockHeader != null
                 && !mockHeader.isBlank()
                 && !"true".equalsIgnoreCase(mockHeader.trim())
@@ -67,10 +74,15 @@ public final class ExecuteSantanderOperation {
                 }
             }
             SantanderReply reply = mock ? mock(operation, payload) : live(operation, payload);
-            if (operation.hasBody() && operation != SantanderOperation.AUTH_TOKEN && operationId != null) {
+            if (operation.hasBody()
+                    && operation != SantanderOperation.AUTH_TOKEN
+                    && operationId != null) {
                 journal.put(operation.name() + "|" + operationId, reply);
             }
-            LOG.info("Santander operation finished operation={} status={}", operation.name(), reply.status());
+            LOG.info(
+                    "Santander operation finished operation={} status={}",
+                    operation.name(),
+                    reply.status());
             return reply;
         } catch (RuntimeException exception) {
             LOG.error("Santander operation failed operation={}", operation.name(), exception);
@@ -83,7 +95,8 @@ public final class ExecuteSantanderOperation {
             throw new IllegalStateException("Santander connector is disabled; send X-Mock: true");
         }
         if (!operation.documented() && !confirmUnverified) {
-            throw new IllegalArgumentException("Operation waits for the contracted Santander OpenAPI path");
+            throw new IllegalArgumentException(
+                    "Operation waits for the contracted Santander OpenAPI path");
         }
         SantanderRequestPlan.Planned planned = SantanderRequestPlan.plan(operation, payload);
         return bank.send(operation, planned.path(), planned.body(), planned.form());

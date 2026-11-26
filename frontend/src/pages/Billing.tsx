@@ -40,18 +40,33 @@ const plans = [
     name: "Start",
     monthlyCents: 0,
     successfulOperationCents: 49,
+    includedTokens: 50000,
+    modelCentsPerThousand: 3,
+    chargeCentsPerThousand: 9,
+    clearsaleCents: 35,
+    serasaCents: 49,
   },
   {
     id: "GROW-2026-11",
     name: "Growth",
     monthlyCents: 14900,
     successfulOperationCents: 35,
+    includedTokens: 1000000,
+    modelCentsPerThousand: 3,
+    chargeCentsPerThousand: 5,
+    clearsaleCents: 28,
+    serasaCents: 39,
   },
   {
     id: "SCALE-2026-11",
     name: "Scale",
     monthlyCents: 49900,
     successfulOperationCents: 25,
+    includedTokens: 5000000,
+    modelCentsPerThousand: 3,
+    chargeCentsPerThousand: 4,
+    clearsaleCents: 22,
+    serasaCents: 32,
   },
 ];
 const labels: Record<string, string> = {
@@ -239,6 +254,7 @@ export default function Billing({ session }: { session: Session }) {
           name: text("name"),
           plan: text("plan"),
           evidence: text("evidence"),
+          fraudMode: text("fraudMode") || "INPAY_RISK",
         });
       if (modal === "invoice" || modal === "subscription") {
         const amount = toCents(text("amount"));
@@ -533,9 +549,11 @@ export default function Billing({ session }: { session: Session }) {
       ) : tab === "Planos" ? (
         <>
           <Notice>
-            Proposta comercial InPay. Tarifas de adquirência, antifraude,
-            mensagens e impostos são contratadas separadamente. A mensalidade do
-            plano não é cobrada automaticamente por esta tela.
+            Proposta comercial InPay. Tarifas de adquirência, mensagens e impostos
+            seguem à parte. O InPay Risk entra na franquia de tokens do plano; o
+            excedente usa o custo de referência do modelo mais a margem do plano.
+            ClearSale e Serasa Experian são cobrados por análise. A mensalidade não
+            é lançada automaticamente por esta tela.
           </Notice>
           <div className="billing-plans">
             {plans.map((plan, i) => (
@@ -560,7 +578,19 @@ export default function Billing({ session }: { session: Session }) {
                   <li>Gestão de cobranças e custos</li>
                   <li>APIs e conciliação operacional</li>
                   <li>Boleto: tarifa somente ao pagar</li>
-                  <li>Condições sujeitas ao contrato</li>
+                  <li>
+                    InPay Risk: {plan.includedTokens.toLocaleString("pt-BR")}{" "}
+                    tokens incluídos; excedente{" "}
+                    {money(plan.chargeCentsPerThousand)} / mil
+                  </li>
+                  <li>
+                    Custo de modelo de referência:{" "}
+                    {money(plan.modelCentsPerThousand)} / mil tokens
+                  </li>
+                  <li>
+                    ClearSale {money(plan.clearsaleCents)} e Serasa Experian{" "}
+                    {money(plan.serasaCents)} por análise
+                  </li>
                 </ul>
                 <span className="billing-plan-state">Proposta · {plan.id}</span>
               </article>
@@ -720,6 +750,14 @@ export default function Billing({ session }: { session: Session }) {
                         {p.name}
                       </option>
                     ))}
+                  </select>
+                </label>
+                <label>
+                  Antifraude nativo
+                  <select name="fraudMode" defaultValue="INPAY_RISK">
+                    <option value="INPAY_RISK">InPay Risk (tokens de IA)</option>
+                    <option value="CLEARSALE">ClearSale</option>
+                    <option value="SERASA_EXPERIAN">Serasa Experian</option>
                   </select>
                 </label>
                 <label>

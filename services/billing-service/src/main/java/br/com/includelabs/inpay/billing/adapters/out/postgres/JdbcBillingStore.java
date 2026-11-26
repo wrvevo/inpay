@@ -32,6 +32,10 @@ public class JdbcBillingStore
     /** Registra solicitação de homologação; nenhuma conta bancária é aberta. */
     public Map<String, Object> register(String actor, Merchant body) {
         BillingPolicy.plan(body.plan());
+        String fraudMode =
+                body.fraudMode() == null || body.fraudMode().isBlank()
+                        ? "INPAY_RISK"
+                        : br.com.includelabs.inpay.contracts.FraudMode.canonical(body.fraudMode());
         return command(
                 "merchant",
                 body.operationId(),
@@ -40,14 +44,15 @@ public class JdbcBillingStore
                 () -> {
                     UUID id = UUID.randomUUID();
                     jdbc.update(
-                            "INSERT INTO billing_merchants(id,tenant,name,plan,status,requested_by,evidence) VALUES(?,?,?,?,'PENDING',?,?)",
+                            "INSERT INTO billing_merchants(id,tenant,name,plan,status,requested_by,evidence,fraud_mode) VALUES(?,?,?,?,'PENDING',?,?,?)",
                             id,
                             body.tenant(),
                             body.name(),
                             body.plan(),
                             actor,
-                            body.evidence());
-                    return Map.of("id", id, "status", "PENDING");
+                            body.evidence(),
+                            fraudMode);
+                    return Map.of("id", id, "status", "PENDING", "fraudMode", fraudMode);
                 });
     }
 
@@ -334,7 +339,9 @@ public class JdbcBillingStore
                 "size",
                 size,
                 "plans",
-                BillingPolicy.plans());
+                BillingPolicy.plans(),
+                "riskOffers",
+                BillingPolicy.riskOffers());
     }
 
     /** Paginação com tabelas fixas; nenhum nome SQL vem diretamente do cliente. */

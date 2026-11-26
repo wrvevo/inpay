@@ -43,27 +43,34 @@ public final class SantanderHttpAdapter implements SantanderBankPort {
 
     public SantanderHttpAdapter(SantanderSettings settings) {
         this.settings = settings;
-        this.client = HttpClient.newBuilder().connectTimeout(BUDGET).sslContext(ssl(settings)).build();
+        this.client =
+                HttpClient.newBuilder().connectTimeout(BUDGET).sslContext(ssl(settings)).build();
     }
 
     @Override
-    public SantanderReply send(SantanderOperation operation, String path, Map<String, Object> body, boolean form) {
+    public SantanderReply send(
+            SantanderOperation operation, String path, Map<String, Object> body, boolean form) {
         if (failures >= 5) {
             LOG.warn("Santander circuit open operation={}", operation.name());
-            return new SantanderReply(operation.name(), 503, true, false, Map.of("error", "CIRCUIT_OPEN"));
+            return new SantanderReply(
+                    operation.name(), 503, true, false, Map.of("error", "CIRCUIT_OPEN"));
         }
         try {
             String url = settings.baseUrl(operation.product()).replaceAll("/+$", "") + path;
             String access = operation == SantanderOperation.AUTH_TOKEN ? "" : accessToken();
             String payload =
-                    form ? String.valueOf(body.getOrDefault("form", "")) : mapper.writeValueAsString(body);
+                    form
+                            ? String.valueOf(body.getOrDefault("form", ""))
+                            : mapper.writeValueAsString(body);
             HttpRequest.Builder request =
                     HttpRequest.newBuilder(URI.create(url))
                             .timeout(BUDGET)
                             .header("Accept", "application/json")
                             .header(
                                     "Content-Type",
-                                    form ? "application/x-www-form-urlencoded" : "application/json");
+                                    form
+                                            ? "application/x-www-form-urlencoded"
+                                            : "application/json");
             if (!access.isBlank()) {
                 request.header("Authorization", "Bearer " + access);
             }
@@ -76,23 +83,34 @@ public final class SantanderHttpAdapter implements SantanderBankPort {
                     "Santander external call started operation={} host={}",
                     operation.name(),
                     URI.create(url).getHost());
-            HttpResponse<byte[]> response = client.send(request.build(), HttpResponse.BodyHandlers.ofByteArray());
+            HttpResponse<byte[]> response =
+                    client.send(request.build(), HttpResponse.BodyHandlers.ofByteArray());
             boolean failure = response.statusCode() >= 500 || response.statusCode() == 429;
             failures = failure ? failures + 1 : 0;
             LOG.info(
                     "Santander external call finished operation={} status={}",
                     operation.name(),
                     response.statusCode());
-            return new SantanderReply(operation.name(), response.statusCode(), failure, false, decode(response.body()));
+            return new SantanderReply(
+                    operation.name(),
+                    response.statusCode(),
+                    failure,
+                    false,
+                    decode(response.body()));
         } catch (InterruptedException exception) {
             Thread.currentThread().interrupt();
             failures++;
-            LOG.error("Santander external call interrupted operation={}", operation.name(), exception);
-            return new SantanderReply(operation.name(), 503, true, false, Map.of("error", "INTERRUPTED"));
+            LOG.error(
+                    "Santander external call interrupted operation={}",
+                    operation.name(),
+                    exception);
+            return new SantanderReply(
+                    operation.name(), 503, true, false, Map.of("error", "INTERRUPTED"));
         } catch (Exception exception) {
             failures++;
             LOG.error("Santander external call failed operation={}", operation.name(), exception);
-            return new SantanderReply(operation.name(), 503, true, false, Map.of("error", "PROVIDER_UNAVAILABLE"));
+            return new SantanderReply(
+                    operation.name(), 503, true, false, Map.of("error", "PROVIDER_UNAVAILABLE"));
         }
     }
 
@@ -140,12 +158,14 @@ public final class SantanderHttpAdapter implements SantanderBankPort {
             Certificate certificate =
                     CertificateFactory.getInstance("X.509")
                             .generateCertificate(
-                                    new ByteArrayInputStream(Files.readAllBytes(Path.of(settings.certificate()))));
+                                    new ByteArrayInputStream(
+                                            Files.readAllBytes(Path.of(settings.certificate()))));
             PrivateKey key = privateKey(Files.readString(Path.of(settings.privateKey())));
             KeyStore store = KeyStore.getInstance("PKCS12");
             store.load(null, null);
             store.setKeyEntry("santander", key, new char[0], new Certificate[] {certificate});
-            KeyManagerFactory keys = KeyManagerFactory.getInstance(KeyManagerFactory.getDefaultAlgorithm());
+            KeyManagerFactory keys =
+                    KeyManagerFactory.getInstance(KeyManagerFactory.getDefaultAlgorithm());
             keys.init(store, new char[0]);
             SSLContext context = SSLContext.getInstance("TLS");
             context.init(keys.getKeyManagers(), null, null);

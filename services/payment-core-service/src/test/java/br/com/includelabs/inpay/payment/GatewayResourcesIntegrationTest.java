@@ -95,7 +95,8 @@ class GatewayResourcesIntegrationTest {
                                 "--inpay.bank-gateway.urls.c6=http://127.0.0.1:"
                                         + bankConnector.port(),
                                 "--inpay.bank-gateway.urls.itau=http://127.0.0.1:" + itauPort,
-                                "--inpay.bank-gateway.urls.santander=http://127.0.0.1:" + santanderPort,
+                                "--inpay.bank-gateway.urls.santander=http://127.0.0.1:"
+                                        + santanderPort,
                                 "--spring.kafka.listener.auto-startup=false",
                                 "--inpay.outbox.delay=3600000",
                                 "--logging.level.root=WARN",
@@ -217,9 +218,7 @@ class GatewayResourcesIntegrationTest {
         assertEquals(200, journey.statusCode(), journey.body());
         assertEquals(
                 json.readTree(journey.body()).get("id"),
-                json.readTree(
-                                get("/gateway/v1/journeys/by-key/journey-pix-1").body())
-                        .get("id"));
+                json.readTree(get("/gateway/v1/journeys/by-key/journey-pix-1").body()).get("id"));
         HttpResponse<String> bank = null;
         for (int attempt = 0; attempt < 20; attempt++) {
             bank =
@@ -270,7 +269,9 @@ class GatewayResourcesIntegrationTest {
                                     .header("X-Mock", "true")
                                     .header("Idempotency-Key", "itau-pix-1")
                                     .header("Content-Type", "application/json")
-                                    .POST(HttpRequest.BodyPublishers.ofString("{\"txid\":\"abc123\"}"))
+                                    .POST(
+                                            HttpRequest.BodyPublishers.ofString(
+                                                    "{\"txid\":\"abc123\"}"))
                                     .build(),
                             HttpResponse.BodyHandlers.ofString());
             status = bank.statusCode();
@@ -296,7 +297,9 @@ class GatewayResourcesIntegrationTest {
                                     .header("X-Mock", "true")
                                     .header("Idempotency-Key", "santander-pix-1")
                                     .header("Content-Type", "application/json")
-                                    .POST(HttpRequest.BodyPublishers.ofString("{\"txid\":\"abc123\"}"))
+                                    .POST(
+                                            HttpRequest.BodyPublishers.ofString(
+                                                    "{\"txid\":\"abc123\"}"))
                                     .build(),
                             HttpResponse.BodyHandlers.ofString());
             status = bank.statusCode();

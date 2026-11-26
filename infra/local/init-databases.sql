@@ -46,3 +46,5 @@ CREATE DATABASE commerce_marketplace OWNER commerce_marketplace;
 
 CREATE USER billing_service WITH PASSWORD 'local-only';
 CREATE DATABASE billing_service OWNER billing_service;
+CREATE USER painel_gerencial WITH PASSWORD 'local-only';
+CREATE DATABASE painel_gerencial OWNER painel_gerencial;

@@ -103,6 +103,41 @@ const rules = [
     "http://127.0.0.1:8087",
     () => "/internal/v1/assessments",
   ],
+  [
+    "GET",
+    /^\/api\/fraud\/mode$/,
+    "FRAUD_URL",
+    "http://127.0.0.1:8087",
+    () => "/internal/v1/fraud-mode",
+  ],
+  [
+    "POST",
+    /^\/api\/fraud\/mode$/,
+    "FRAUD_URL",
+    "http://127.0.0.1:8087",
+    () => "/internal/v1/fraud-mode",
+  ],
+  [
+    "POST",
+    /^\/api\/painel\/([a-z0-9/-]+)$/,
+    "PAINEL_URL",
+    "http://127.0.0.1:8130",
+    (path) => `/${path}`,
+  ],
+  [
+    "PUT",
+    /^\/api\/painel\/([a-z0-9/-]+)$/,
+    "PAINEL_URL",
+    "http://127.0.0.1:8130",
+    (path) => `/${path}`,
+  ],
+  [
+    "GET",
+    /^\/api\/painel\/([a-z0-9/-]+)$/,
+    "PAINEL_URL",
+    "http://127.0.0.1:8130",
+    (path) => `/${path}`,
+  ],
 ];
 
 /** A fixed route catalog prevents callers from choosing upstream hosts or arbitrary API paths. */
@@ -133,7 +168,7 @@ export function upstreamAuthorization(headers, env = process.env) {
     return headers.authorization;
   }
   if (env.PANEL_AUTH_MODE === "local" && env.LOCAL_PASSWORD) {
-    return `Basic ${Buffer.from(`developer:${env.LOCAL_PASSWORD}`).toString("base64")}`;
+    return `Basic ${Buffer.from(`inpay:${env.LOCAL_PASSWORD}`).toString("base64")}`;
   }
   return null;
 }

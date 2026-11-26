@@ -43,16 +43,27 @@ public final class ExecuteItauOperation {
         return rows;
     }
 
-    public ItauReply execute(String operationName, String operationId, String mockHeader, Map<String, Object> payload) {
+    public ItauReply execute(
+            String operationName,
+            String operationId,
+            String mockHeader,
+            Map<String, Object> payload) {
         ItauOperation operation = ItauOperation.fromName(operationName);
-        boolean mock = mockHeader != null && !mockHeader.isBlank() && Boolean.parseBoolean(mockHeader.trim());
+        boolean mock =
+                mockHeader != null
+                        && !mockHeader.isBlank()
+                        && Boolean.parseBoolean(mockHeader.trim());
         if (mockHeader != null
                 && !mockHeader.isBlank()
                 && !"true".equalsIgnoreCase(mockHeader.trim())
                 && !"false".equalsIgnoreCase(mockHeader.trim())) {
             throw new IllegalArgumentException("X-Mock must be true or false");
         }
-        LOG.info("Itau operation started operation={} product={} mock={}", operation.name(), operation.product(), mock);
+        LOG.info(
+                "Itau operation started operation={} product={} mock={}",
+                operation.name(),
+                operation.product(),
+                mock);
         try {
             if (operation.hasBody() && operation != ItauOperation.AUTH_TOKEN) {
                 ItauReply replay = replay(operation, operationId);
@@ -62,10 +73,15 @@ public final class ExecuteItauOperation {
                 }
             }
             ItauReply reply = mock ? mock(operation, payload) : live(operation, payload);
-            if (operation.hasBody() && operation != ItauOperation.AUTH_TOKEN && operationId != null) {
+            if (operation.hasBody()
+                    && operation != ItauOperation.AUTH_TOKEN
+                    && operationId != null) {
                 journal.put(operation.name() + "|" + operationId, reply);
             }
-            LOG.info("Itau operation finished operation={} status={}", operation.name(), reply.status());
+            LOG.info(
+                    "Itau operation finished operation={} status={}",
+                    operation.name(),
+                    reply.status());
             return reply;
         } catch (RuntimeException exception) {
             LOG.error("Itau operation failed operation={}", operation.name(), exception);
@@ -78,7 +94,8 @@ public final class ExecuteItauOperation {
             throw new IllegalStateException("Itau connector is disabled; send X-Mock: true");
         }
         if (!operation.documented() && !confirmUnverified) {
-            throw new IllegalArgumentException("Operation waits for the contracted Itau OpenAPI path");
+            throw new IllegalArgumentException(
+                    "Operation waits for the contracted Itau OpenAPI path");
         }
         ItauRequestPlan.Planned planned = ItauRequestPlan.plan(operation, payload);
         return bank.send(operation, planned.path(), planned.body(), planned.form());
@@ -90,7 +107,9 @@ public final class ExecuteItauOperation {
         body.put("bank", "itau");
         body.put("product", operation.product().name());
         body.put("operation", operation.name());
-        body.put("status", operation.product() == ItauProduct.PIX_RECEBIMENTOS ? "ATIVA" : "CREATED");
+        body.put(
+                "status",
+                operation.product() == ItauProduct.PIX_RECEBIMENTOS ? "ATIVA" : "CREATED");
         if (operation.product() == ItauProduct.PIX_RECEBIMENTOS) {
             body.put("pixCopiaECola", "000201mocked-itau");
         }

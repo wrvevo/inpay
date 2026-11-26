@@ -34,7 +34,9 @@ public class BankOperationsGatewayController {
     private final ObjectProvider<C6KafkaDispatch> kafka;
 
     public BankOperationsGatewayController(
-            BankGatewayClient client, TenantContext tenants, ObjectProvider<C6KafkaDispatch> kafka) {
+            BankGatewayClient client,
+            TenantContext tenants,
+            ObjectProvider<C6KafkaDispatch> kafka) {
         this.client = client;
         this.tenants = tenants;
         this.kafka = kafka;
@@ -52,7 +54,8 @@ public class BankOperationsGatewayController {
             @Parameter(
                             name = "X-Mock",
                             in = ParameterIn.HEADER,
-                            description = "true usa o stub de simulação do conector; false ou vazio chama o provedor.",
+                            description =
+                                    "true usa o stub de simulação do conector; false ou vazio chama o provedor.",
                             example = "true")
                     @RequestHeader(value = "X-Mock", required = false)
                     String mock,
@@ -69,11 +72,13 @@ public class BankOperationsGatewayController {
                 return ResponseEntity.status(503).body("{\"error\":\"C6_KAFKA_DISABLED\"}");
             }
             publisher.publish(operation, key, mock, payload);
-            return ResponseEntity.accepted().body("{\"status\":\"QUEUED\",\"operation\":\"" + operation + "\"}");
+            return ResponseEntity.accepted()
+                    .body("{\"status\":\"QUEUED\",\"operation\":\"" + operation + "\"}");
         }
         LOG.info("Gateway bank API started bank={} operation={}", bank, operation);
         try {
-            BankGatewayClient.Downstream downstream = client.execute(bank, operation, mock, key, payload);
+            BankGatewayClient.Downstream downstream =
+                    client.execute(bank, operation, mock, key, payload);
             LOG.info(
                     "Gateway bank API finished bank={} operation={} status={}",
                     bank,

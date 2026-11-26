@@ -44,7 +44,8 @@ class BankConnectorTest {
     @Test
     void everyOperationHasAStubFile() throws Exception {
         long stubs =
-                java.nio.file.Files.list(java.nio.file.Path.of("src/main/resources/wiremock/mappings"))
+                java.nio.file.Files.list(
+                                java.nio.file.Path.of("src/main/resources/wiremock/mappings"))
                         .filter(path -> path.toString().endsWith(".json"))
                         .count();
         assertEquals((long) BankId.values().length * BankOperation.values().length, stubs);
@@ -57,7 +58,8 @@ class BankConnectorTest {
             for (BankOperation operation : BankOperation.values()) {
                 Map<String, Object> payload = payload(operation);
                 String operationId = operation.hasBody() ? "op-" + operation.name() : null;
-                BankResult result = connector.execute(operation.name(), operationId, "true", payload);
+                BankResult result =
+                        connector.execute(operation.name(), operationId, "true", payload);
                 assertEquals(200, result.status(), bank.slug() + " " + operation.name());
                 assertEquals(Boolean.TRUE, result.body().get("mocked"));
                 assertEquals(bank.slug(), result.body().get("bank"));
@@ -75,7 +77,9 @@ class BankConnectorTest {
         IllegalStateException disabled =
                 assertThrows(
                         IllegalStateException.class,
-                        () -> connector.execute("PIX_COB_GET", null, null, Map.of("txid", "abc123")));
+                        () ->
+                                connector.execute(
+                                        "PIX_COB_GET", null, null, Map.of("txid", "abc123")));
         assertTrue(disabled.getMessage().contains("disabled"));
         assertThrows(
                 IllegalStateException.class,
@@ -95,7 +99,12 @@ class BankConnectorTest {
         assertEquals(first, second);
         assertThrows(
                 IllegalStateException.class,
-                () -> connector.execute("PIX_COB_PUT", "same-key", "true", Map.of("txid", "abc123", "valor", "11.00")));
+                () ->
+                        connector.execute(
+                                "PIX_COB_PUT",
+                                "same-key",
+                                "true",
+                                Map.of("txid", "abc123", "valor", "11.00")));
         assertThrows(
                 IllegalArgumentException.class,
                 () -> connector.execute("PIX_COB_PUT", null, "true", payload));
@@ -137,7 +146,8 @@ class BankConnectorTest {
                         true,
                         5,
                         Duration.ofSeconds(30));
-        BankConnector connector = new BankConnector(live, new BankTransport(live, new SimpleMeterRegistry()));
+        BankConnector connector =
+                new BankConnector(live, new BankTransport(live, new SimpleMeterRegistry()));
         long started = System.nanoTime();
         BankResult result = connector.execute("BOLETO_GET", null, "false", Map.of("id", "abc123"));
         long elapsedMs = (System.nanoTime() - started) / 1_000_000;
@@ -151,7 +161,11 @@ class BankConnectorTest {
         server.stubFor(
                 WireMock.get(WireMock.urlPathEqualTo("/bradesco/contas/v1/saldo"))
                         .atPriority(1)
-                        .willReturn(WireMock.aResponse().withFixedDelay(400).withStatus(200).withBody("{}")));
+                        .willReturn(
+                                WireMock.aResponse()
+                                        .withFixedDelay(400)
+                                        .withStatus(200)
+                                        .withBody("{}")));
         BankSettings settings =
                 new BankSettings(
                         "bradesco",
@@ -162,7 +176,8 @@ class BankConnectorTest {
                         false,
                         1,
                         Duration.ofSeconds(30));
-        BankConnector connector = new BankConnector(settings, new BankTransport(settings, new SimpleMeterRegistry()));
+        BankConnector connector =
+                new BankConnector(settings, new BankTransport(settings, new SimpleMeterRegistry()));
         long started = System.nanoTime();
         BankResult timedOut = connector.execute("BALANCE_GET", null, "true", Map.of());
         BankResult opened = connector.execute("BALANCE_GET", null, "true", Map.of());
@@ -187,7 +202,8 @@ class BankConnectorTest {
                                         .withHeader("Content-Type", "application/json")
                                         .withBody("[{\"status\":\"DOWN\"}]")));
         BankConnector connector = connector(BankId.CAIXA, false, true);
-        BankResult statement = connector.execute("STATEMENT_GET", null, "true", Map.of("inicio", "2026-01-01"));
+        BankResult statement =
+                connector.execute("STATEMENT_GET", null, "true", Map.of("inicio", "2026-01-01"));
         BankResult pix = connector.execute("PIX_LIST", null, "true", Map.of());
         assertTrue(statement.body().isEmpty());
         assertEquals(503, pix.status());
@@ -211,12 +227,30 @@ class BankConnectorTest {
         assertThrows(
                 IllegalArgumentException.class,
                 () -> connector.execute("PIX_COB_POST", "broken-body", "true", bad));
-        assertThrows(IllegalArgumentException.class, () -> new BankSettings("nope", false, true, null, "http://127.0.0.1", false, 1, Duration.ofSeconds(1)));
         assertThrows(
                 IllegalArgumentException.class,
                 () ->
                         new BankSettings(
-                                "c6", false, true, null, "http://127.0.0.1", false, 0, Duration.ofSeconds(1)));
+                                "nope",
+                                false,
+                                true,
+                                null,
+                                "http://127.0.0.1",
+                                false,
+                                1,
+                                Duration.ofSeconds(1)));
+        assertThrows(
+                IllegalArgumentException.class,
+                () ->
+                        new BankSettings(
+                                "c6",
+                                false,
+                                true,
+                                null,
+                                "http://127.0.0.1",
+                                false,
+                                0,
+                                Duration.ofSeconds(1)));
     }
 
     @Test
@@ -233,25 +267,51 @@ class BankConnectorTest {
         assertNull(circuit.acquire());
         circuit.complete(probe, true);
         assertNotNull(circuit.acquire());
-        assertThrows(IllegalArgumentException.class, () -> new BankCircuit(0, Duration.ofSeconds(1)));
+        assertThrows(
+                IllegalArgumentException.class, () -> new BankCircuit(0, Duration.ofSeconds(1)));
     }
 
     @Test
     void requestLogAndErrorsDoNotEchoSecrets() {
         BankRequestLog log = new BankRequestLog();
-        MockHttpServletRequest request = new MockHttpServletRequest("POST", "/internal/v1/bank/operations/PIX_COB_PUT");
+        MockHttpServletRequest request =
+                new MockHttpServletRequest("POST", "/internal/v1/bank/operations/PIX_COB_PUT");
         MockHttpServletResponse response = new MockHttpServletResponse();
         assertTrue(log.preHandle(request, response, this));
         log.afterCompletion(request, response, this, null);
         log.afterCompletion(request, response, this, new IllegalStateException("failed"));
         BankErrors errors = new BankErrors();
-        assertEquals(422, errors.invalid(new IllegalArgumentException("Invalid path parameter")).getStatusCode().value());
-        assertEquals(503, errors.conflict(new IllegalStateException("Bank connector is disabled")).getStatusCode().value());
-        assertEquals(409, errors.conflict(new IllegalStateException("operationId was reused")).getStatusCode().value());
-        assertEquals(403, errors.denied(new org.springframework.security.access.AccessDeniedException("no")).getStatusCode().value());
+        assertEquals(
+                422,
+                errors.invalid(new IllegalArgumentException("Invalid path parameter"))
+                        .getStatusCode()
+                        .value());
+        assertEquals(
+                503,
+                errors.conflict(new IllegalStateException("Bank connector is disabled"))
+                        .getStatusCode()
+                        .value());
+        assertEquals(
+                409,
+                errors.conflict(new IllegalStateException("operationId was reused"))
+                        .getStatusCode()
+                        .value());
+        assertEquals(
+                403,
+                errors.denied(new org.springframework.security.access.AccessDeniedException("no"))
+                        .getStatusCode()
+                        .value());
         assertEquals(503, errors.unexpected(new Exception("secret-body")).getStatusCode().value());
-        assertEquals("Bank connector failed", errors.unexpected(new Exception("secret-body")).getBody().get("error"));
-        assertEquals("c6", new BankSecurity(connector(BankId.C6, false, true) == null ? null : settings(BankId.C6)).scopeId());
+        assertEquals(
+                "Bank connector failed",
+                errors.unexpected(new Exception("secret-body")).getBody().get("error"));
+        assertEquals(
+                "c6",
+                new BankSecurity(
+                                connector(BankId.C6, false, true) == null
+                                        ? null
+                                        : settings(BankId.C6))
+                        .scopeId());
     }
 
     private static BankSettings settings(BankId bank) {
@@ -279,7 +339,8 @@ class BankConnectorTest {
                         Duration.ofSeconds(30));
         BankTransport transport = new BankTransport(settings);
         java.net.URI warmup =
-                java.net.URI.create(settings.mockBaseUrl() + "/" + bank.slug() + "/pix/v2/cob/abc123");
+                java.net.URI.create(
+                        settings.mockBaseUrl() + "/" + bank.slug() + "/pix/v2/cob/abc123");
         for (int attempt = 0; attempt < 4; attempt++) {
             transport.send(bank, BankOperation.PIX_COB_GET, true, warmup, "");
         }

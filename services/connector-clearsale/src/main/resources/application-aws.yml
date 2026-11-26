@@ -1,0 +1,4 @@
+inpay:
+  security:
+    issuer: ${COGNITO_ISSUER:}
+    allowed-clients: ${COGNITO_ALLOWED_CLIENTS:}

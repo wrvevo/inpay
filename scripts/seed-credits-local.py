@@ -11,7 +11,7 @@ base = os.environ.get('MARKETPLACE_LOCAL_URL', 'http://127.0.0.1:8110')
 parsed = urllib.parse.urlparse(base)
 if parsed.scheme != 'http' or parsed.hostname not in ('127.0.0.1', 'localhost') or parsed.username or parsed.query:
     raise SystemExit('Use exclusivamente o serviço local em loopback')
-password = os.environ.get('LOCAL_PASSWORD', 'local-only-change-me')
+password = os.environ.get('LOCAL_PASSWORD', 'inpay@123')
 
 def key(name):
     return str(uuid.uuid5(uuid.NAMESPACE_URL, 'inpay-marketplace-local-v1/' + name))

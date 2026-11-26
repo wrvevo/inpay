@@ -115,7 +115,7 @@ identidades fixas locais. Abra **Créditos e saldos** ou **Meu crédito e compra
 - `reviewer`: administração e aprovação; deve aprovar pedidos de outro usuário.
 - `customer`: apenas o portal do titular.
 
-Senha: `LOCAL_PASSWORD`, padrão exclusivamente local `local-only-change-me`. O BFF usa developer
+Senha: `LOCAL_PASSWORD`, padrão exclusivamente local `inpay@123`. O BFF usa developer
 nas rotas administrativas e customer em `/me` somente no perfil local; nunca substitui um bearer
 informado. Para aprovar como reviewer no ambiente local, use Swagger/HTTP Basic. O BFF não assume
 uma segunda identidade para burlar a dupla aprovação. O seed utiliza as duas identidades de teste

@@ -27,7 +27,8 @@ class ConnectorHttpTest {
 
     @Test
     void listsOperationsAndKeepsTheAcquirerDisabled() throws Exception {
-        String auth = "Basic " + Base64.getEncoder().encodeToString("developer:test-only".getBytes());
+        String auth =
+                "Basic " + Base64.getEncoder().encodeToString("developer:test-only".getBytes());
         HttpClient client = HttpClient.newHttpClient();
         HttpResponse<String> catalog =
                 client.send(

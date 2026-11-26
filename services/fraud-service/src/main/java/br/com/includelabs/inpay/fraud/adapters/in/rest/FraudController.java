@@ -3,6 +3,7 @@ package br.com.includelabs.inpay.fraud.adapters.in.rest;
 import br.com.includelabs.inpay.fraud.adapters.in.rest.dto.AssessRiskRequest;
 import br.com.includelabs.inpay.fraud.application.AssessRisk;
 import br.com.includelabs.inpay.fraud.domain.RiskPolicy;
+import br.com.includelabs.inpay.fraud.domain.RiskSignals;
 import br.com.includelabs.inpay.security.TenantContext;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
@@ -104,6 +105,44 @@ public class FraudController {
                         request.amount(),
                         request.attemptsLastHour(),
                         request.declinesLastHour(),
-                        request.knownCompromised()));
+                        request.knownCompromised()),
+                behavior(request.behavior()),
+                device(request.device()),
+                identity(request.identity()));
+    }
+
+    private static RiskSignals.Behavior behavior(AssessRiskRequest.Behavior value) {
+        if (value == null) {
+            return null;
+        }
+        return new RiskSignals.Behavior(
+                value.typingIntervalMs(),
+                value.mouseEntropy(),
+                value.navigationSeconds(),
+                value.unusualJourney());
+    }
+
+    private static RiskSignals.Device device(AssessRiskRequest.Device value) {
+        if (value == null) {
+            return null;
+        }
+        return new RiskSignals.Device(
+                value.deviceKey(),
+                value.country(),
+                value.homeCountry(),
+                value.vpnOrProxy(),
+                value.seenAtOtherMerchants());
+    }
+
+    private static RiskSignals.Identity identity(AssessRiskRequest.Identity value) {
+        if (value == null) {
+            return null;
+        }
+        return new RiskSignals.Identity(
+                value.cpf(),
+                value.emailDomain(),
+                value.deliveryMatchesBilling(),
+                value.cardholderMatch(),
+                value.priorPurchases());
     }
 }

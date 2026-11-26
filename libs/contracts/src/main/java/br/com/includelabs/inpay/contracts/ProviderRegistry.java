@@ -12,7 +12,8 @@ public final class ProviderRegistry {
         SPLIT,
         BANK_ACCOUNTS,
         PIX_TRANSFER,
-        PIX_KEYS
+        PIX_KEYS,
+        FRAUD_DECISION
     }
 
     public record Provider(String id, Set<Capability> implemented) {
@@ -95,6 +96,9 @@ public final class ProviderRegistry {
         for (String id :
                 List.of("c6", "itau", "santander", "bb", "bradesco", "caixa", "banrisul")) {
             providers.add(new Provider(id, banking));
+        }
+        for (String id : List.of("inpay-risk", "clearsale", "serasa-experian")) {
+            providers.add(new Provider(id, Set.of(Capability.FRAUD_DECISION)));
         }
         return new ProviderRegistry(providers);
     }

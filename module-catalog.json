@@ -133,5 +133,20 @@
     "banrisul",
     8117,
     "connectors-banrisul"
+  ],
+  "connector-clearsale": [
+    "clearsale",
+    8128,
+    "connectors-clearsale"
+  ],
+  "connector-serasa-experian": [
+    "serasa-experian",
+    8129,
+    "connectors-serasa-experian"
+  ],
+  "painel-gerencial": [
+    "painel",
+    8130,
+    "painel"
   ]
 }
