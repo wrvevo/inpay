@@ -21,9 +21,22 @@ class MockServerApplicationTest {
             assertResponse(client, server, "/c6/pix/v2/cob/synthetic", "PUT", 200, "PIX_COB_PUT");
             assertResponse(client, server, "/intents/c6/BOLEPIX_CREATE", "POST", 200, "mocked");
             assertResponse(client, server, "/intents/itau/SISPAG_PIX_POST", "POST", 200, "mocked");
-            assertResponse(client, server, "/intents/clearsale/ASSESSMENT_ACCEPT", "POST", 200, "ACCEPT");
-            assertResponse(client, server, "/intents/serasa-experian/DOCUMENT_PENDING", "POST", 422, "DOCUMENT_PENDING");
-            assertResponse(client, server, "/intents/clearsale/PROVIDER_UNAVAILABLE", "POST", 503, "PROVIDER_UNAVAILABLE");
+            assertResponse(
+                    client, server, "/intents/clearsale/ASSESSMENT_ACCEPT", "POST", 200, "ACCEPT");
+            assertResponse(
+                    client,
+                    server,
+                    "/intents/serasa-experian/DOCUMENT_PENDING",
+                    "POST",
+                    422,
+                    "DOCUMENT_PENDING");
+            assertResponse(
+                    client,
+                    server,
+                    "/intents/clearsale/PROVIDER_UNAVAILABLE",
+                    "POST",
+                    503,
+                    "PROVIDER_UNAVAILABLE");
             assertResponse(client, server, "/intents/itau/UNDECLARED", "POST", 404, "");
         } finally {
             server.stop();
