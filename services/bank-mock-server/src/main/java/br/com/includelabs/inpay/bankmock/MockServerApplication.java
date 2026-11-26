@@ -32,7 +32,8 @@ public class MockServerApplication {
             for (var mapping : mappings) {
                 try (var stream = mapping.getInputStream()) {
                     server.addStubMapping(
-                            StubMapping.buildFrom(new String(stream.readAllBytes(), StandardCharsets.UTF_8)));
+                            StubMapping.buildFrom(
+                                    new String(stream.readAllBytes(), StandardCharsets.UTF_8)));
                 }
             }
             try (var reader =
