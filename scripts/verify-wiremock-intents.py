@@ -47,7 +47,7 @@ def main():
     native = {}
     for bank, cap in (("c6", "C6"), ("itau", "Itau"), ("santander", "Santander")):
         source = ROOT / f"services/connector-{bank}/src/main/java/{PACKAGE}/{bank}/domain/{cap}Operation.java"
-        operations = re.findall(r"^\s+([A-Z][A-Z0-9_]+)\(" + cap + r"Product\.", source.read_text(), re.M)
+        operations = re.findall(r"^\s+([A-Z][A-Z0-9_]+)\(\s*" + cap + r"Product\.", source.read_text(), re.M)
         assert operations, bank
         native[bank] = operations
         for operation in operations:
