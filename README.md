@@ -1,5 +1,9 @@
 # InPay — gateway de pagamentos modular
 
+- [Acessos DEV, STG, PRD demo e DBeaver](infra/dbeaver/README.md)
+- [Manual dos módulos](docs/MANUAL_MODULOS.md)
+- [Homologação C6](docs/C6_SANDBOX.md)
+
 Java 21 · Spring Boot 4.1.2 · PostgreSQL · Kafka · Cognito · arquitetura hexagonal
 
 O projeto foi refatorado para facilitar leitura e manutenção por desenvolvedores plenos: indentação de quatro espaços em Java, blocos explícitos, nomes descritivos nos fluxos principais, DTOs separados, JavaDoc e Swagger gerado pelos controllers.
