@@ -8,7 +8,7 @@ spring:
     username: ${DB_USER}
     password: ${DB_PASSWORD}
     hikari:
-      maximum-pool-size: 5
+      maximum-pool-size: ${DB_POOL_MAX_SIZE:5}
   flyway:
     locations: classpath:db/migration
   kafka:
@@ -28,7 +28,7 @@ spring:
     listener:
       ack-mode: record
 server:
-  port: 8089
+  port: ${SERVER_PORT:8089}
 management:
   endpoints:
     web:
@@ -40,6 +40,10 @@ management:
         enabled: true
       show-details: never
 inpay:
+  reconciliation:
+    provider: ${RECONCILIATION_PROVIDER:statement}
+    business-zone: ${RECONCILIATION_BUSINESS_ZONE:America/Sao_Paulo}
+    lookback-days: ${RECONCILIATION_LOOKBACK_DAYS:1}
   security:
     issuer: ${COGNITO_ISSUER:}
     allowed-clients: ${COGNITO_ALLOWED_CLIENTS:}
@@ -47,7 +51,7 @@ inpay:
     client-tenants: ${COGNITO_CLIENT_TENANTS:}
     audience: ${COGNITO_AUDIENCE:}
   outbox:
-    delay: 2000
+    delay: ${OUTBOX_DELAY_MS:2000}
 
 springdoc:
   api-docs:

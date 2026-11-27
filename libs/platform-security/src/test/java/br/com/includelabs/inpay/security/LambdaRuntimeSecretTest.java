@@ -23,6 +23,23 @@ class LambdaRuntimeSecretTest {
         assertThrows(IllegalStateException.class, () -> settings.apply("WRONG_TYPE"));
         assertThrows(
                 IllegalStateException.class,
-                () -> LambdaRuntimeSecret.moduleSettings(response, "missing"));
+                () -> LambdaRuntimeSecret.moduleSettings(response, "missing").apply("SCOPE"));
+    }
+
+    @Test
+    void readsFlatSettingsAndRejectsAnExplicitlyUnsetValue() {
+        String response =
+                JsonMapper.builder()
+                        .build()
+                        .writeValueAsString(
+                                Map.of(
+                                        "SecretString",
+                                        """
+                                {"links.SCOPE":"links/write","links.CLIENT_SECRET":null,
+                                 "links":{"CLIENT_SECRET":"old"},"other.CLIENT_SECRET":"other"}
+                                """));
+        var settings = LambdaRuntimeSecret.moduleSettings(response, "links");
+        assertEquals("links/write", settings.apply("SCOPE"));
+        assertThrows(IllegalStateException.class, () -> settings.apply("CLIENT_SECRET"));
     }
 }

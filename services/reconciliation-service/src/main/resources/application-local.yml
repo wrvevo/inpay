@@ -7,7 +7,7 @@ spring:
     bootstrap-servers: ${KAFKA_BOOTSTRAP_SERVERS:localhost:9092}
 inpay:
   local-password: ${LOCAL_PASSWORD:inpay@123}
-  local-merchant: 11111111-1111-1111-1111-111111111111
+  local-merchant: ${LOCAL_MERCHANT:11111111-1111-1111-1111-111111111111}
 
 springdoc:
   api-docs:

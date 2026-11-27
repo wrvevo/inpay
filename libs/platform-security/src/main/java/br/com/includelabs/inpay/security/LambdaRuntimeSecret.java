@@ -65,15 +65,18 @@ public final class LambdaRuntimeSecret {
         JsonNode settings;
         try {
             String payload = MAPPER.readTree(responseBody).path("SecretString").asText();
-            settings = MAPPER.readTree(payload).path(module);
+            settings = MAPPER.readTree(payload);
         } catch (tools.jackson.core.JacksonException exception) {
             throw new IllegalStateException("Runtime secret contains invalid JSON");
         }
         if (!settings.isObject()) {
-            throw new IllegalStateException("Missing runtime settings for " + module);
+            throw new IllegalStateException("Runtime secret must contain a JSON object");
         }
         return name -> {
-            JsonNode setting = settings.path(name);
+            JsonNode setting = settings.get(module + "." + name);
+            if (setting == null) {
+                setting = settings.path(module).path(name);
+            }
             return required(name, setting.isString() ? setting.asText() : null);
         };
     }
