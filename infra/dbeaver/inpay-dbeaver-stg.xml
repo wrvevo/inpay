@@ -1,0 +1,26 @@
+<connections>
+  <connection name="InPay STG - merchant_service" url="jdbc:postgresql://inpay-stg.example.invalid:5432/merchant_service?sslmode=verify-full" />
+  <connection name="InPay STG - payment_links_service" url="jdbc:postgresql://inpay-stg.example.invalid:5432/payment_links_service?sslmode=verify-full" />
+  <connection name="InPay STG - checkout_service" url="jdbc:postgresql://inpay-stg.example.invalid:5432/checkout_service?sslmode=verify-full" />
+  <connection name="InPay STG - payment_core_service" url="jdbc:postgresql://inpay-stg.example.invalid:5432/payment_core_service?sslmode=verify-full" />
+  <connection name="InPay STG - routing_service" url="jdbc:postgresql://inpay-stg.example.invalid:5432/routing_service?sslmode=verify-full" />
+  <connection name="InPay STG - token_service" url="jdbc:postgresql://inpay-stg.example.invalid:5432/token_service?sslmode=verify-full" />
+  <connection name="InPay STG - fraud_service" url="jdbc:postgresql://inpay-stg.example.invalid:5432/fraud_service?sslmode=verify-full" />
+  <connection name="InPay STG - webhook_ingress_service" url="jdbc:postgresql://inpay-stg.example.invalid:5432/webhook_ingress_service?sslmode=verify-full" />
+  <connection name="InPay STG - reconciliation_service" url="jdbc:postgresql://inpay-stg.example.invalid:5432/reconciliation_service?sslmode=verify-full" />
+  <connection name="InPay STG - notification_service" url="jdbc:postgresql://inpay-stg.example.invalid:5432/notification_service?sslmode=verify-full" />
+  <connection name="InPay STG - transaction_query_service" url="jdbc:postgresql://inpay-stg.example.invalid:5432/transaction_query_service?sslmode=verify-full" />
+  <connection name="InPay STG - connector_cielo" url="jdbc:postgresql://inpay-stg.example.invalid:5432/connector_cielo?sslmode=verify-full" />
+  <connection name="InPay STG - connector_rede" url="jdbc:postgresql://inpay-stg.example.invalid:5432/connector_rede?sslmode=verify-full" />
+  <connection name="InPay STG - connector_getnet" url="jdbc:postgresql://inpay-stg.example.invalid:5432/connector_getnet?sslmode=verify-full" />
+  <connection name="InPay STG - connector_stone" url="jdbc:postgresql://inpay-stg.example.invalid:5432/connector_stone?sslmode=verify-full" />
+  <connection name="InPay STG - connector_bin" url="jdbc:postgresql://inpay-stg.example.invalid:5432/connector_bin?sslmode=verify-full" />
+  <connection name="InPay STG - connector_global_payments" url="jdbc:postgresql://inpay-stg.example.invalid:5432/connector_global_payments?sslmode=verify-full" />
+  <connection name="InPay STG - connector_pagbank" url="jdbc:postgresql://inpay-stg.example.invalid:5432/connector_pagbank?sslmode=verify-full" />
+  <connection name="InPay STG - connector_safrapay" url="jdbc:postgresql://inpay-stg.example.invalid:5432/connector_safrapay?sslmode=verify-full" />
+  <connection name="InPay STG - marketplace_service" url="jdbc:postgresql://inpay-stg.example.invalid:5432/marketplace_service?sslmode=verify-full" />
+  <connection name="InPay STG - accounts_service" url="jdbc:postgresql://inpay-stg.example.invalid:5432/accounts_service?sslmode=verify-full" />
+  <connection name="InPay STG - commerce_marketplace" url="jdbc:postgresql://inpay-stg.example.invalid:5432/commerce_marketplace?sslmode=verify-full" />
+  <connection name="InPay STG - billing_service" url="jdbc:postgresql://inpay-stg.example.invalid:5432/billing_service?sslmode=verify-full" />
+  <connection name="InPay STG - painel_gerencial" url="jdbc:postgresql://inpay-stg.example.invalid:5432/painel_gerencial?sslmode=verify-full" />
+</connections>

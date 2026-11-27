@@ -1,0 +1,116 @@
+{
+  "AWSTemplateFormatVersion": "2010-09-09",
+  "Description": "Static InPay demo hosting for DEV, STG and PRD demo in Ohio. Synthetic data only.",
+  "Metadata": {
+    "AWSToolsMetrics": {
+      "AWSAgentToolkit": "aws-cloudformation@3"
+    }
+  },
+  "Resources": {
+    "Hosting": {
+      "Type": "AWS::Amplify::App",
+      "Metadata": {
+        "com.aws.cloudformation.Context": {
+          "why": "Serve the static InPay demo over HTTPS.",
+          "must": "Do not attach payment services or enable automatic builds."
+        }
+      },
+      "Properties": {
+        "Name": "inpay-demo",
+        "Platform": "WEB",
+        "CustomHeaders": "customHeaders:\n  - pattern: '**'\n    headers:\n      - key: Content-Security-Policy\n        value: \"default-src 'self'; connect-src 'none'; script-src 'self'; style-src 'self' 'unsafe-inline'; img-src 'self' data: blob:; font-src 'self' data:; object-src 'none'; base-uri 'none'; frame-ancestors 'none'; form-action 'none'\"\n      - key: X-Content-Type-Options\n        value: nosniff\n      - key: Referrer-Policy\n        value: no-referrer\n",
+        "Tags": [
+          {
+            "Key": "Project",
+            "Value": "InPay"
+          },
+          {
+            "Key": "Purpose",
+            "Value": "Demo"
+          }
+        ]
+      }
+    },
+    "Dev": {
+      "Type": "AWS::Amplify::Branch",
+      "Metadata": {
+        "com.aws.cloudformation.Context": {
+          "why": "Provide an independent deployment target.",
+          "must": "Publish the static demo only."
+        }
+      },
+      "Properties": {
+        "AppId": {
+          "Fn::GetAtt": [
+            "Hosting",
+            "AppId"
+          ]
+        },
+        "BranchName": "dev",
+        "Stage": "DEVELOPMENT",
+        "EnableAutoBuild": false,
+        "EnablePullRequestPreview": false
+      }
+    },
+    "Stg": {
+      "Type": "AWS::Amplify::Branch",
+      "Metadata": {
+        "com.aws.cloudformation.Context": {
+          "why": "Provide an independent deployment target.",
+          "must": "Publish the static demo only."
+        }
+      },
+      "Properties": {
+        "AppId": {
+          "Fn::GetAtt": [
+            "Hosting",
+            "AppId"
+          ]
+        },
+        "BranchName": "stg",
+        "Stage": "BETA",
+        "EnableAutoBuild": false,
+        "EnablePullRequestPreview": false
+      }
+    },
+    "PrdDemo": {
+      "Type": "AWS::Amplify::Branch",
+      "Metadata": {
+        "com.aws.cloudformation.Context": {
+          "why": "Provide an independent deployment target.",
+          "must": "Publish the static demo only."
+        }
+      },
+      "Properties": {
+        "AppId": {
+          "Fn::GetAtt": [
+            "Hosting",
+            "AppId"
+          ]
+        },
+        "BranchName": "prd-demo",
+        "Stage": "PRODUCTION",
+        "EnableAutoBuild": false,
+        "EnablePullRequestPreview": false
+      }
+    }
+  },
+  "Outputs": {
+    "AppId": {
+      "Value": {
+        "Fn::GetAtt": [
+          "Hosting",
+          "AppId"
+        ]
+      }
+    },
+    "DefaultDomain": {
+      "Value": {
+        "Fn::GetAtt": [
+          "Hosting",
+          "DefaultDomain"
+        ]
+      }
+    }
+  }
+}
