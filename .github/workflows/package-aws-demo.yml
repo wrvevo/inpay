@@ -63,7 +63,6 @@ jobs:
         with:
           role-to-assume: arn:aws:iam::842041546640:role/inpay-amplify-deploy-${{ steps.target.outputs.branch }}
           aws-region: us-east-2
-          allowed-account-ids: '842041546640'
       - name: Publish and verify the commit on Amplify
         env:
           AMPLIFY_APP: d2ycazp3c24sbc
@@ -72,6 +71,7 @@ jobs:
         shell: bash
         run: |
           set -euo pipefail
+          test "$(aws sts get-caller-identity --query Account --output text)" = "842041546640"
           deployment=$(aws amplify create-deployment --app-id "$AMPLIFY_APP" --branch-name "$AMPLIFY_BRANCH")
           job_id=$(jq -er '.jobId' <<<"$deployment")
           upload_url=$(jq -er '.zipUploadUrl' <<<"$deployment")

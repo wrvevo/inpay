@@ -9,6 +9,18 @@ import tools.jackson.databind.json.JsonMapper;
 
 class LambdaRuntimeSecretTest {
     @Test
+    void readsDedicatedModuleSecret() {
+        String response =
+                JsonMapper.builder()
+                        .build()
+                        .writeValueAsString(
+                                Map.of("SecretString", "{\"TARGET_SCOPE\":\"links/write\"}"));
+        var settings = LambdaRuntimeSecret.moduleSettings(response, "link-expiration-trigger");
+        assertEquals("links/write", settings.apply("TARGET_SCOPE"));
+        assertThrows(IllegalStateException.class, () -> settings.apply("CLIENT_SECRET"));
+    }
+
+    @Test
     void readsOnlyTheSelectedModuleAndRequiresStringValues() {
         var mapper = JsonMapper.builder().build();
         String secret =

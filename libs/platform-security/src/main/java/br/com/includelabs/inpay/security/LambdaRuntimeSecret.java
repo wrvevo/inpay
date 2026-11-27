@@ -75,6 +75,9 @@ public final class LambdaRuntimeSecret {
         return name -> {
             JsonNode setting = settings.get(module + "." + name);
             if (setting == null) {
+                setting = settings.get(name);
+            }
+            if (setting == null) {
                 setting = settings.path(module).path(name);
             }
             return required(name, setting.isString() ? setting.asText() : null);
