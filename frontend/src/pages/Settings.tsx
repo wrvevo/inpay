@@ -161,30 +161,23 @@ export function Developers() {
           </section>
           <section className="card">
             <h2>Referências da integração</h2>
-            <a
-              className="resource"
-              target="_blank"
-              rel="noreferrer"
-              href="http://localhost:8084/swagger-ui/index.html"
-            >
-              Swagger do Gateway <ExternalLink size={16} />
-            </a>
-            <a
-              className="resource"
-              target="_blank"
-              rel="noreferrer"
-              href="http://localhost:8099/"
-            >
-              Loja Magento demo <ExternalLink size={16} />
-            </a>
-            <a
-              className="resource"
-              target="_blank"
-              rel="noreferrer"
-              href="http://localhost:8099/admin"
-            >
-              Painel da loja <ExternalLink size={16} />
-            </a>
+            {[
+              ["Swagger do Gateway", import.meta.env.VITE_GATEWAY_SWAGGER_URL, "http://localhost:8084/swagger-ui/index.html"],
+              ["Loja Magento demo", import.meta.env.VITE_DEMO_STORE_URL, "http://localhost:8099/"],
+              ["Painel da loja", import.meta.env.VITE_DEMO_STORE_ADMIN_URL, "http://localhost:8099/admin"],
+            ].map(([label, configured, local]) => {
+              const isLocal = ["localhost", "127.0.0.1", "[::1]"].includes(location.hostname);
+              const href = isLocal ? configured || local : configured;
+              return href ? (
+                <a key={label} className="resource" target="_blank" rel="noreferrer" href={href}>
+                  {label} <ExternalLink size={16} />
+                </a>
+              ) : (
+                <div key={label} className="resource">
+                  {label} <small>Indisponível neste ambiente</small>
+                </div>
+              );
+            })}
             <a
               className="resource"
               target="_blank"

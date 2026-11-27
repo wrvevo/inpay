@@ -8,9 +8,14 @@ import {
   Download,
   FileJson,
 } from "lucide-react";
-import providers from "../data/providers.json";
+import cardProviders from "../data/providers.json";
+import bankProviders from "../data/bank-providers.json";
 import { Badge, Heading, Modal, Notice } from "../components/UI";
 import { download } from "../api";
+const providers = [
+  ...cardProviders.map((provider) => ({ ...provider, bank: false })),
+  ...bankProviders.map((provider) => ({ ...provider, bank: true, production: {}, example: null })),
+];
 type Provider = (typeof providers)[number];
 
 /** Provider drafts contain public settings and secret placeholders, never actual credentials. */
@@ -47,7 +52,7 @@ export default function Methods() {
     const prefix = selected.id.toUpperCase().replaceAll("-", "_");
     const lines = [
       `# InPay / ${selected.name}: rascunho ${environment}; revise antes de implantar.`,
-      `${prefix}_ENABLED=false`,
+      `${selected.bank && !["c6", "itau"].includes(selected.id) ? "BANK" : prefix}_ENABLED=false`,
       ...selected.fields.map(
         (f) =>
           `${f.key}=${f.secret ? "<PREENCHER_NO_GERENCIADOR_DE_SEGREDOS>" : (values[f.key] ?? "")}`,
@@ -92,7 +97,7 @@ export default function Methods() {
       <div className="section-head">
         <div>
           <h2>Adquirentes e provedores</h2>
-          <p>8 connectors · contratos e credenciais independentes</p>
+          <p>{providers.length} connectors · contratos e credenciais independentes</p>
         </div>
         <Badge>Configuração assistida</Badge>
       </div>
@@ -122,6 +127,11 @@ export default function Methods() {
           </article>
         ))}
       </div>
+      <section className="card">
+        <h2>Provedores de risco</h2>
+        <a className="resource" href="#clearsale">Configurar ClearSale <ArrowUpRight size={15} /></a>
+        <a className="resource" href="#serasa">Configurar Serasa Experian <ArrowUpRight size={15} /></a>
+      </section>
       {selected && (
         <Modal
           title={`Configurar ${selected.name}`}
@@ -136,9 +146,9 @@ export default function Methods() {
                 onChange={(e) => choose(selected, e.target.value)}
               >
                 <option value="sandbox">Sandbox / homologação</option>
-                <option value="production">
+                {!selected.bank && <option value="production">
                   Produção — requer homologação
-                </option>
+                </option>}
               </select>
             </label>
             <div className="form-grid">
@@ -198,7 +208,7 @@ export default function Methods() {
               </p>
             )}
             <div className="actions">
-              <button
+              {selected.example && <button
                 type="button"
                 onClick={() =>
                   download(
@@ -210,7 +220,7 @@ export default function Methods() {
               >
                 <FileJson size={16} />
                 Exemplo de autorização
-              </button>
+              </button>}
               <button className="primary">
                 <Download size={16} />
                 Exportar template
