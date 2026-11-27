@@ -1,5 +1,9 @@
 # InPay — gateway de pagamentos modular
 
+- [Acessos DEV, STG, PRD demo e DBeaver](infra/dbeaver/README.md)
+- [Manual dos módulos](docs/MANUAL_MODULOS.md)
+- [Homologação C6](docs/C6_SANDBOX.md)
+
 Java 21 · Spring Boot 4.1.2 · PostgreSQL · Kafka · Cognito · arquitetura hexagonal
 
 O projeto foi refatorado para facilitar leitura e manutenção por desenvolvedores plenos: indentação de quatro espaços em Java, blocos explícitos, nomes descritivos nos fluxos principais, DTOs separados, JavaDoc e Swagger gerado pelos controllers.
@@ -74,7 +78,7 @@ Grafana: **http://localhost:3000**, usuário `admin`, senha local definida por G
 | connector-clearsale | 8128 | Stub ClearSale com X-Mock. Chamada real desligada. |
 | connector-serasa-experian | 8129 | Stub Serasa Experian com X-Mock. Consulta real desligada. |
 | webhook-ingress-service | 8088 | Ports e domínio; validação de callbacks e normalização ainda pendentes. |
-| reconciliation-service | 8089 | Ports e domínio; job retorna 501 até implementar importação/consulta e comparação. |
+| reconciliation-service | 8089 | Compara registros esperados e liquidados importados, registra o resultado por lojista, provedor e data comercial. |
 | notification-service | 8090 | Domínio/port e assinatura HMAC; entrega/retry/SSRF/DLQ ainda pendentes. |
 | transaction-query-service | 8091 | Projeção PaymentCreated via Kafka, inbox deduplicada e GET por tenant. Demais eventos ainda pendentes. |
 | connector-cielo | 8101 | 20 operações REST da coleção oficial, journal PostgreSQL e Swagger. Ciclo de crédito validado em sandbox; recorrência exercitada; tokenização pendente no estabelecimento. |

@@ -1,7 +1,10 @@
 package br.com.includelabs.inpay.reconciliation.bootstrap;
 
+import br.com.includelabs.inpay.reconciliation.application.ReconciliationCaseUseCase;
+import br.com.includelabs.inpay.reconciliation.domain.port.SettlementPort;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
+import org.springframework.context.annotation.Bean;
 import org.springframework.scheduling.annotation.EnableScheduling;
 
 /**
@@ -17,6 +20,10 @@ import org.springframework.scheduling.annotation.EnableScheduling;
             "br.com.includelabs.inpay.openapi"
         })
 public class Application {
+    @Bean
+    ReconciliationCaseUseCase reconciliationCaseUseCase(SettlementPort port) {
+        return new ReconciliationCaseUseCase(port);
+    }
 
     /**
      * Inicializa o serviço Spring Boot com as configurações do ambiente ativo.

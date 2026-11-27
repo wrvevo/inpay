@@ -76,6 +76,9 @@ function productFor(page: string) {
   return products.find((product) => product.groups.some((group) => group.items.some(([id]) => id === page)));
 }
 const validPages = navigation.flatMap((g) => g.items.map((i) => String(i[0])));
+function normalizeSearch(value: string) {
+  return value.normalize("NFD").replace(/\p{Diacritic}/gu, "").toLowerCase().trim();
+}
 const MENU_OF: Record<string, string> = {
   overview: "overview",
   transactions: "transactions",
@@ -157,6 +160,9 @@ export default function App() {
   const visibleNavigation = [...(activeProduct?.groups || []), ...sharedNavigation]
     .map((group) => ({ ...group, items: group.items.filter(([id]) => canAccess(String(id))) }))
     .filter((group) => group.items.length);
+  const searchQuery = normalizeSearch(search);
+  const searchResults = navigation.flatMap((group) => group.items)
+    .filter(([id, label]) => canAccess(String(id)) && normalizeSearch(String(label)).includes(searchQuery));
   function navigate(next: string) {
     if (!validPages.includes(next) || !canAccess(next)) return;
     const target = productFor(next);
@@ -230,7 +236,10 @@ export default function App() {
   }
   return (
     <>
-      <a className="skip-link" href="#main-content">
+      <a className="skip-link" href="#main-content" onClick={(event) => {
+        event.preventDefault();
+        document.getElementById("main-content")?.focus();
+      }}>
         Pular para conteúdo
       </a>
       {menu && (
@@ -240,7 +249,12 @@ export default function App() {
           onClick={() => setMenu(false)}
         />
       )}
-      <aside className={menu ? "sidebar open" : "sidebar"}>
+      <aside id="panel-sidebar" className={menu ? "sidebar open" : "sidebar"} onKeyDown={(event) => {
+        if (event.key === "Escape") {
+          setMenu(false);
+          document.getElementById("panel-menu-toggle")?.focus();
+        }
+      }}>
         <a className="brand" href="#overview" aria-label="InPay início" onClick={(event) => { event.preventDefault(); if (activeProduct) switchProduct(activeProduct.id); }}>
           <span className="brand-symbol">in</span>InPay
           <span className="brand-dot">.</span>
@@ -271,7 +285,6 @@ export default function App() {
                   >
                     <Glyph size={18} />
                     <span>{String(label)}</span>
-                    {id === "links" && <small>NOVO</small>}
                   </button>
                 );
               })}
@@ -303,8 +316,11 @@ export default function App() {
         <header className="topbar">
           <div className="breadcrumbs">
             <button
+              id="panel-menu-toggle"
               className="icon-button mobile-menu"
               aria-label="Abrir menu"
+              aria-expanded={menu}
+              aria-controls="panel-sidebar"
               onClick={() => setMenu(true)}
             >
               <Menu />
@@ -336,20 +352,23 @@ export default function App() {
                 placeholder="Buscar no painel"
                 value={search}
                 onChange={(e) => setSearch(e.target.value)}
+                onKeyDown={(event) => {
+                  if (event.key === "Escape") setSearch("");
+                  if (event.key === "Enter" && searchQuery && searchResults.length > 0) {
+                    navigate(String(searchResults[0][0]));
+                  }
+                }}
               />
-              {search && (
+              {searchQuery && (
                 <div className="search-results">
-                  {visibleNavigation
-                    .flatMap((g) => g.items)
-                    .filter((i) =>
-                      String(i[1]).toLowerCase().includes(search.toLowerCase()),
-                    )
-                    .map((i) => (
+                  {searchResults.length === 0 && <p role="status">Nenhuma página encontrada.</p>}
+                  {searchResults.map((i) => (
                       <button
                         key={String(i[0])}
                         onClick={() => navigate(String(i[0]))}
                       >
                         {String(i[1])}
+                        {productFor(String(i[0])) && <small>{productFor(String(i[0]))?.label}</small>}
                       </button>
                     ))}
                 </div>
