@@ -1,0 +1,186 @@
+[
+  {
+    "id": "c6",
+    "name": "C6 Bank",
+    "product": "BaaS Sandbox",
+    "auth": "OAuth2 e mTLS",
+    "docs": "https://developers.c6bank.com.br/apis",
+    "note": "Template de homologação. A ativação depende do contrato confirmado e das credenciais configuradas no servidor.",
+    "fields": [
+      {
+        "property": "base-url",
+        "key": "C6_BASE_URL",
+        "value": "https://baas-api-sandbox.c6bank.info",
+        "secret": false
+      },
+      {
+        "property": "client-id",
+        "key": "C6_CLIENT_ID",
+        "value": "",
+        "secret": false
+      },
+      {
+        "property": "client-secret",
+        "key": "C6_CLIENT_SECRET",
+        "value": "",
+        "secret": true
+      },
+      {
+        "property": "certificate-path",
+        "key": "C6_CERT_PATH",
+        "value": "",
+        "secret": false
+      },
+      {
+        "property": "private-key-path",
+        "key": "C6_KEY_PATH",
+        "value": "",
+        "secret": true
+      },
+      {
+        "property": "pix-key",
+        "key": "C6_PIX_KEY",
+        "value": "",
+        "secret": true
+      }
+    ]
+  },
+  {
+    "id": "itau",
+    "name": "Itaú",
+    "product": "APIs bancárias Sandbox",
+    "auth": "OAuth2 e mTLS",
+    "docs": "https://devportal.itau.com.br/",
+    "note": "Template de homologação. A ativação depende do contrato confirmado e das credenciais configuradas no servidor.",
+    "fields": [
+      {
+        "property": "token-url",
+        "key": "ITAU_TOKEN_URL",
+        "value": "https://devportal.itau.com.br/api/jwt",
+        "secret": false
+      },
+      {
+        "property": "pix-base-url",
+        "key": "ITAU_PIX_BASE_URL",
+        "value": "https://devportal.itau.com.br/sandboxapi/pix_recebimentos_ext_v2/v2",
+        "secret": false
+      },
+      {
+        "property": "boleto-base-url",
+        "key": "ITAU_BOLETO_BASE_URL",
+        "value": "https://devportal.itau.com.br/sandboxapi/cash_management_ext_v2/v2",
+        "secret": false
+      },
+      {
+        "property": "sispag-base-url",
+        "key": "ITAU_SISPAG_BASE_URL",
+        "value": "https://devportal.itau.com.br/sandboxapi/sispag/v1",
+        "secret": false
+      },
+      {
+        "property": "client-id",
+        "key": "ITAU_CLIENT_ID",
+        "value": "",
+        "secret": false
+      },
+      {
+        "property": "client-secret",
+        "key": "ITAU_CLIENT_SECRET",
+        "value": "",
+        "secret": true
+      },
+      {
+        "property": "certificate-path",
+        "key": "ITAU_CERT_PATH",
+        "value": "",
+        "secret": false
+      },
+      {
+        "property": "private-key-path",
+        "key": "ITAU_KEY_PATH",
+        "value": "",
+        "secret": true
+      }
+    ]
+  },
+  {
+    "id": "santander",
+    "name": "Santander",
+    "product": "Conector bancário",
+    "auth": "Contrato bancário a validar",
+    "docs": "https://developer.santander.com.br/",
+    "note": "Template de homologação. A ativação depende do contrato confirmado e das credenciais configuradas no servidor.",
+    "fields": [
+      {
+        "property": "live-base-url",
+        "key": "BANK_LIVE_BASE_URL",
+        "value": "",
+        "secret": false
+      }
+    ]
+  },
+  {
+    "id": "bb",
+    "name": "Banco do Brasil",
+    "product": "Conector bancário",
+    "auth": "Contrato bancário a validar",
+    "docs": "https://developers.bb.com.br/",
+    "note": "Template de homologação. A ativação depende do contrato confirmado e das credenciais configuradas no servidor.",
+    "fields": [
+      {
+        "property": "live-base-url",
+        "key": "BANK_LIVE_BASE_URL",
+        "value": "",
+        "secret": false
+      }
+    ]
+  },
+  {
+    "id": "bradesco",
+    "name": "Bradesco",
+    "product": "Conector bancário",
+    "auth": "Contrato bancário a validar",
+    "docs": "https://developers.bradesco.com.br/",
+    "note": "Template de homologação. A ativação depende do contrato confirmado e das credenciais configuradas no servidor.",
+    "fields": [
+      {
+        "property": "live-base-url",
+        "key": "BANK_LIVE_BASE_URL",
+        "value": "",
+        "secret": false
+      }
+    ]
+  },
+  {
+    "id": "caixa",
+    "name": "Caixa",
+    "product": "Conector bancário",
+    "auth": "Contrato bancário a validar",
+    "docs": "https://github.com/wrvevo/inpay/tree/develop/services/connector-caixa",
+    "note": "Template de homologação. A ativação depende do contrato confirmado e das credenciais configuradas no servidor.",
+    "fields": [
+      {
+        "property": "live-base-url",
+        "key": "BANK_LIVE_BASE_URL",
+        "value": "",
+        "secret": false
+      }
+    ]
+  },
+  {
+    "id": "banrisul",
+    "name": "Banrisul",
+    "product": "Conector bancário",
+    "auth": "Contrato bancário a validar",
+    "docs": "https://github.com/wrvevo/inpay/tree/develop/services/connector-banrisul",
+    "note": "Template de homologação. A ativação depende do contrato confirmado e das credenciais configuradas no servidor.",
+    "fields": [
+      {
+        "property": "live-base-url",
+        "key": "BANK_LIVE_BASE_URL",
+        "value": "",
+        "secret": false
+      }
+    ]
+  }
+]
