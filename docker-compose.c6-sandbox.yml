@@ -1,0 +1,20 @@
+# Use with docker-compose.banks.yml on an isolated homologation host.
+services:
+  connector-c6:
+    environment:
+      C6_ENABLED: "true"
+      C6_BASE_URL: https://baas-api-sandbox.c6bank.info
+      C6_CLIENT_ID: ${C6_CLIENT_ID:?Set the C6 sandbox OAuth client ID}
+      C6_CLIENT_SECRET: ${C6_CLIENT_SECRET:?Set the C6 sandbox OAuth client secret}
+      C6_PIX_KEY: ${C6_PIX_KEY:-}
+      C6_CERT_PATH: /run/secrets/c6_certificate
+      C6_KEY_PATH: /run/secrets/c6_private_key
+    secrets:
+      - c6_certificate
+      - c6_private_key
+
+secrets:
+  c6_certificate:
+    file: ${C6_CERT_FILE:?Set the path to the sandbox certificate}
+  c6_private_key:
+    file: ${C6_PKCS8_KEY_FILE:?Set the path to the sandbox PKCS8 private key}

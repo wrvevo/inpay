@@ -1,0 +1,98 @@
+name: Publish AWS demo
+on:
+  push:
+    branches: [develop, staging, main]
+  workflow_dispatch:
+permissions:
+  contents: read
+concurrency:
+  group: aws-demo-${{ github.ref }}
+  cancel-in-progress: false
+jobs:
+  package:
+    if: github.ref_name == 'develop' || github.ref_name == 'staging' || github.ref_name == 'main'
+    runs-on: ubuntu-24.04
+    timeout-minutes: 10
+    defaults:
+      run:
+        working-directory: frontend
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '24'
+          cache: npm
+          cache-dependency-path: frontend/package-lock.json
+      - run: npm ci
+      - run: npm test
+      - run: npm run build
+      - name: Package the static site
+        run: |
+          printf '{"commit":"%s"}\n' "$GITHUB_SHA" > dist/deployment.json
+          cd dist
+          zip -qr ../inpay-demo.zip .
+      - uses: actions/upload-artifact@v4
+        with:
+          name: inpay-demo-${{ github.ref_name }}-${{ github.sha }}
+          path: frontend/inpay-demo.zip
+          if-no-files-found: error
+          retention-days: 7
+  deploy:
+    needs: package
+    runs-on: ubuntu-24.04
+    timeout-minutes: 15
+    permissions:
+      contents: read
+      id-token: write
+    steps:
+      - name: Select the Amplify environment
+        id: target
+        shell: bash
+        run: |
+          case "$GITHUB_REF_NAME" in
+            develop) branch=dev ;;
+            staging) branch=stg ;;
+            main) branch=prd-demo ;;
+            *) exit 1 ;;
+          esac
+          echo "branch=$branch" >> "$GITHUB_OUTPUT"
+      - uses: actions/download-artifact@v4
+        with:
+          name: inpay-demo-${{ github.ref_name }}-${{ github.sha }}
+      - uses: aws-actions/configure-aws-credentials@v4
+        with:
+          role-to-assume: arn:aws:iam::842041546640:role/inpay-amplify-deploy-${{ steps.target.outputs.branch }}
+          aws-region: us-east-2
+          allowed-account-ids: '842041546640'
+      - name: Publish and verify the commit on Amplify
+        env:
+          AMPLIFY_APP: d2ycazp3c24sbc
+          AMPLIFY_BRANCH: ${{ steps.target.outputs.branch }}
+          AWS_PAGER: ''
+        shell: bash
+        run: |
+          set -euo pipefail
+          deployment=$(aws amplify create-deployment --app-id "$AMPLIFY_APP" --branch-name "$AMPLIFY_BRANCH")
+          job_id=$(jq -er '.jobId' <<<"$deployment")
+          upload_url=$(jq -er '.zipUploadUrl' <<<"$deployment")
+          echo "::add-mask::$upload_url"
+          curl --fail --silent --show-error --retry 2 --upload-file inpay-demo.zip "$upload_url"
+          aws amplify start-deployment --app-id "$AMPLIFY_APP" --branch-name "$AMPLIFY_BRANCH" --job-id "$job_id" >/dev/null
+          for attempt in {1..55}; do
+            status=$(aws amplify get-job --app-id "$AMPLIFY_APP" --branch-name "$AMPLIFY_BRANCH" --job-id "$job_id" --query job.summary.status --output text)
+            case "$status" in
+              SUCCEED) break ;;
+              FAILED|CANCELLED) echo "Amplify job $job_id: $status"; exit 1 ;;
+            esac
+            sleep 10
+          done
+          test "$status" = SUCCEED
+          endpoint="https://$AMPLIFY_BRANCH.$AMPLIFY_APP.amplifyapp.com/deployment.json"
+          for attempt in {1..12}; do
+            if curl --fail --silent --show-error "$endpoint?commit=$GITHUB_SHA" | jq -e --arg sha "$GITHUB_SHA" '.commit == $sha' >/dev/null; then
+              echo "Published $GITHUB_SHA to $AMPLIFY_BRANCH"
+              exit 0
+            fi
+            sleep 5
+          done
+          exit 1
