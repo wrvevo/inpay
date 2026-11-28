@@ -6,6 +6,11 @@ on:
         description: "Caminho do módulo, por exemplo services/payment-core-service"
         required: true
         type: string
+      container:
+        description: "Empacotar imagem OCI local (serviços/Lambdas)"
+        required: false
+        type: boolean
+        default: false
 permissions:
   contents: read
 jobs:
@@ -36,6 +41,23 @@ jobs:
           printf '%s\n' "$GITHUB_SHA" > component-dist/source-commit.txt
           printf '%s\n' "$COMPONENT" > component-dist/component.txt
           (cd component-dist && sha256sum ./*.jar > SHA256SUMS)
+      - name: Build individual container without publishing
+        if: inputs.container
+        env:
+          COMPONENT: ${{ inputs.component }}
+        shell: bash
+        run: |
+          set -euo pipefail
+          case "$COMPONENT" in
+            services/*) target=spring-service ;;
+            lambdas/*) target=lambda ;;
+            *) echo "Bibliotecas produzem JAR, não imagem executável"; exit 1 ;;
+          esac
+          module=${COMPONENT##*/}
+          tag="inpay-local:$module-$GITHUB_SHA"
+          docker build --target "$target" --build-arg MODULE="$module" --build-arg BUILD_PROJECT="$COMPONENT" -t "$tag" .
+          docker save "$tag" | gzip > component-dist/container.tar.gz
+          (cd component-dist && sha256sum container.tar.gz >> SHA256SUMS)
       - uses: actions/upload-artifact@v4
         with:
           name: component-${{ github.sha }}-${{ github.run_id }}

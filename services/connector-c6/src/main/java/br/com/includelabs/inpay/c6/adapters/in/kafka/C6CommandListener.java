@@ -13,7 +13,7 @@ import tools.jackson.databind.ObjectMapper;
 
 /** Comando assíncrono publicado pelo gateway. A execução é a mesma do REST. */
 @Component
-@Profile("local")
+@Profile("local & !aws")
 @ConditionalOnProperty(prefix = "inpay.c6", name = "kafka-enabled", havingValue = "true")
 public class C6CommandListener {
     static final String TOPIC = "inpay.c6.commands.v1";

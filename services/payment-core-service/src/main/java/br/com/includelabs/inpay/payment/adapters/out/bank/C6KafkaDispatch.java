@@ -13,7 +13,7 @@ import tools.jackson.databind.ObjectMapper;
 
 /** Publica o comando C6 para o conector executar e responder em inpay.c6.results.v1. */
 @Component
-@Profile("local")
+@Profile("local & !aws")
 @ConditionalOnProperty(prefix = "inpay.c6", name = "gateway-kafka", havingValue = "true")
 public class C6KafkaDispatch {
     public static final String TOPIC = "inpay.c6.commands.v1";

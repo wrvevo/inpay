@@ -14,17 +14,17 @@ public class SantanderErrors {
 
     @ExceptionHandler(IllegalArgumentException.class)
     ResponseEntity<Map<String, String>> invalid(IllegalArgumentException exception) {
-        LOG.error("Santander request rejected", exception);
-        return ResponseEntity.unprocessableEntity().body(Map.of("error", exception.getMessage()));
+        LOG.error("Santander request rejected");
+        return ResponseEntity.unprocessableEntity().body(Map.of("error", "Bank request rejected"));
     }
 
     @ExceptionHandler(IllegalStateException.class)
     ResponseEntity<Map<String, String>> unavailable(IllegalStateException exception) {
-        LOG.error("Santander connector unavailable", exception);
+        LOG.error("Santander connector unavailable");
         HttpStatus status =
                 exception.getMessage() != null && exception.getMessage().contains("disabled")
                         ? HttpStatus.SERVICE_UNAVAILABLE
                         : HttpStatus.CONFLICT;
-        return ResponseEntity.status(status).body(Map.of("error", exception.getMessage()));
+        return ResponseEntity.status(status).body(Map.of("error", "Bank request rejected"));
     }
 }

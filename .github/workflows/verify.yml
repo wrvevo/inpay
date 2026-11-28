@@ -1,5 +1,8 @@
 name: verify
-on: [push, pull_request]
+on:
+  push:
+    branches: [develop, staging, main]
+  pull_request:
 permissions:
   contents: read
 concurrency:
@@ -16,6 +19,7 @@ jobs:
           java-version: '21'
           cache: maven
       - run: python3 scripts/verify-wiremock-intents.py
+      - run: python3 scripts/verify-module-boundaries.py
       - name: Check formatting (report all changes)
         run: mvn -B spotless:apply && git diff --exit-code --no-color
       - name: Verify Java modules

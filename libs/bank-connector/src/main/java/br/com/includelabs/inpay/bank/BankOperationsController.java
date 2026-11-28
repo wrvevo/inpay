@@ -1,6 +1,7 @@
 package br.com.includelabs.inpay.bank;
 
 import java.util.Map;
+import org.springframework.context.annotation.Profile;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -12,6 +13,7 @@ import org.springframework.web.bind.annotation.RestController;
 
 /** API interna do conector. X-Mock true encaminha ao mock server; false chama o banco. */
 @RestController
+@Profile("local & !aws")
 @RequestMapping("/internal/v1/bank")
 public class BankOperationsController {
     private final BankSettings settings;

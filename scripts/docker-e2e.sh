@@ -49,6 +49,7 @@ wait_http http://127.0.0.1:8199/__admin/mappings
 for p in {8131..8137} 8128 8129; do wait_http "http://127.0.0.1:$p/actuator/health"; done
 python3 scripts/verify-wiremock-intents.py --running
 "${C[@]}" stop "${banks[@]}" "${risk[@]}"
+python3 scripts/docker-payment-load.py
 # Inicia quatro adquirentes por vez, todos com o WireMock central.
 "${C[@]}" up -d --no-build --wait --wait-timeout 240 "${cards[@]:0:4}"
 python3 scripts/verify-wiremock-intents.py --cards --card-start 0 --card-end 4

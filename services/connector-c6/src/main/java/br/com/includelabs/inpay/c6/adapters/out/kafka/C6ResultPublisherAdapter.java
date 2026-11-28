@@ -15,7 +15,7 @@ import tools.jackson.databind.ObjectMapper;
 
 /** Resultado durável para o gateway. O corpo nativo do banco não entra no evento. */
 @Component
-@Profile("local")
+@Profile("local & !aws")
 @ConditionalOnProperty(prefix = "inpay.c6", name = "kafka-enabled", havingValue = "true")
 public class C6ResultPublisherAdapter implements C6ResultPublisher {
     static final String TOPIC = "inpay.c6.results.v1";
@@ -32,6 +32,9 @@ public class C6ResultPublisherAdapter implements C6ResultPublisher {
     /** Publica o resultado normalizado da operação no tópico configurado. */
     @Override
     public void publish(C6Operation operation, String operationId, C6Reply reply) {
+        if (!reply.mocked()) {
+            return;
+        }
         try {
             Map<String, Object> event = new LinkedHashMap<>();
             event.put("bank", "c6");
