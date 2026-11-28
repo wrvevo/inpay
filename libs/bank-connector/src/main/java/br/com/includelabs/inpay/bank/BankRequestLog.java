@@ -5,6 +5,7 @@ import jakarta.servlet.http.HttpServletResponse;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.springframework.web.servlet.HandlerInterceptor;
+import org.springframework.web.servlet.HandlerMapping;
 
 /** Log de borda HTTP, sem cabeçalho de autorização e sem corpo. */
 public final class BankRequestLog implements HandlerInterceptor {
@@ -16,7 +17,7 @@ public final class BankRequestLog implements HandlerInterceptor {
         LOG.info(
                 "HTTP bank request started method={} path={}",
                 request.getMethod(),
-                request.getRequestURI());
+                route(request));
         return true;
     }
 
@@ -30,14 +31,19 @@ public final class BankRequestLog implements HandlerInterceptor {
             LOG.info(
                     "HTTP bank request completed method={} path={} status={}",
                     request.getMethod(),
-                    request.getRequestURI(),
+                    route(request),
                     response.getStatus());
             return;
         }
         LOG.error(
                 "HTTP bank request failed method={} path={}",
                 request.getMethod(),
-                request.getRequestURI(),
-                exception);
+                route(request));
+    }
+
+    /** Registra somente a rota declarada; parâmetros e URI fornecida pelo cliente ficam de fora. */
+    private static String route(HttpServletRequest request) {
+        Object pattern = request.getAttribute(HandlerMapping.BEST_MATCHING_PATTERN_ATTRIBUTE);
+        return pattern == null ? "unmapped" : pattern.toString();
     }
 }

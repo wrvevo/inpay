@@ -21,7 +21,7 @@ inpay:
       caixa: ${INPAY_BANK_GATEWAY_URLS_CAIXA:http://127.0.0.1:8116}
       banrisul: ${INPAY_BANK_GATEWAY_URLS_BANRISUL:http://127.0.0.1:8117}
   c6:
-    gateway-kafka: ${C6_GATEWAY_KAFKA:true}
+    gateway-kafka: ${C6_GATEWAY_KAFKA:false}
 
 springdoc:
   api-docs:

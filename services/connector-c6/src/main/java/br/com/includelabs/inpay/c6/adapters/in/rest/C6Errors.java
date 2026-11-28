@@ -14,17 +14,17 @@ public class C6Errors {
 
     @ExceptionHandler(IllegalArgumentException.class)
     ResponseEntity<Map<String, String>> invalid(IllegalArgumentException exception) {
-        LOG.error("C6 request rejected", exception);
-        return ResponseEntity.unprocessableEntity().body(Map.of("error", exception.getMessage()));
+        LOG.error("C6 request rejected");
+        return ResponseEntity.unprocessableEntity().body(Map.of("error", "Bank request rejected"));
     }
 
     @ExceptionHandler(IllegalStateException.class)
     ResponseEntity<Map<String, String>> unavailable(IllegalStateException exception) {
-        LOG.error("C6 connector unavailable", exception);
+        LOG.error("C6 connector unavailable");
         HttpStatus status =
                 exception.getMessage() != null && exception.getMessage().contains("disabled")
                         ? HttpStatus.SERVICE_UNAVAILABLE
                         : HttpStatus.CONFLICT;
-        return ResponseEntity.status(status).body(Map.of("error", exception.getMessage()));
+        return ResponseEntity.status(status).body(Map.of("error", "Bank request rejected"));
     }
 }

@@ -11,6 +11,7 @@ import java.util.Map;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.springframework.beans.factory.ObjectProvider;
+import org.springframework.core.env.Environment;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -32,14 +33,17 @@ public class BankOperationsGatewayController {
     private final BankGatewayClient client;
     private final TenantContext tenants;
     private final ObjectProvider<C6KafkaDispatch> kafka;
+    private final Environment environment;
 
     public BankOperationsGatewayController(
             BankGatewayClient client,
             TenantContext tenants,
-            ObjectProvider<C6KafkaDispatch> kafka) {
+            ObjectProvider<C6KafkaDispatch> kafka,
+            Environment environment) {
         this.client = client;
         this.tenants = tenants;
         this.kafka = kafka;
+        this.environment = environment;
     }
 
     @PostMapping("/{bank}/{operation}")
@@ -65,6 +69,10 @@ public class BankOperationsGatewayController {
             @PathVariable String operation,
             @RequestBody(required = false) Map<String, Object> payload) {
         tenants.resolve(tenant);
+        // A API genérica ainda não aplica credenciais M2M e afiliação por lojista.
+        if (!environment.matchesProfiles("local") || environment.matchesProfiles("aws")) {
+            return ResponseEntity.status(503).body("{\"error\":\"BANK_LAB_ONLY\"}");
+        }
         if ("c6".equalsIgnoreCase(bank) && "kafka".equalsIgnoreCase(dispatch)) {
             C6KafkaDispatch publisher = kafka.getIfAvailable();
             if (publisher == null) {
@@ -86,7 +94,7 @@ public class BankOperationsGatewayController {
                     downstream.status());
             return ResponseEntity.status(downstream.status()).body(downstream.body());
         } catch (RuntimeException exception) {
-            LOG.error("Gateway bank API failed bank={} operation={}", bank, operation, exception);
+            LOG.error("Gateway bank API failed");
             throw exception;
         }
     }

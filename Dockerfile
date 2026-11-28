@@ -2,8 +2,16 @@
 FROM maven:3.9.11-eclipse-temurin-21 AS build
 WORKDIR /build
 COPY . .
-RUN --mount=type=cache,target=/root/.m2 mvn -B -DskipTests package
-RUN --mount=type=cache,target=/root/.m2 mvn -B -N org.apache.maven.plugins:maven-dependency-plugin:3.8.1:copy \
+ARG BUILD_PROJECT=""
+# Reutiliza o cache de dependências sem downloads concorrentes entre builds.
+RUN --mount=type=cache,target=/root/.m2,sharing=locked \
+    set -eu; \
+    if [ -n "$BUILD_PROJECT" ]; then \
+        mvn -B -pl "$BUILD_PROJECT" -am -DskipTests package; \
+    else \
+        mvn -B -DskipTests package; \
+    fi
+RUN --mount=type=cache,target=/root/.m2,sharing=locked mvn -B -N org.apache.maven.plugins:maven-dependency-plugin:3.8.1:copy \
     -Dartifact=io.opentelemetry.javaagent:opentelemetry-javaagent:2.22.0 \
     -DoutputDirectory=/otel
 RUN javac -d /health infra/docker/Healthcheck.java

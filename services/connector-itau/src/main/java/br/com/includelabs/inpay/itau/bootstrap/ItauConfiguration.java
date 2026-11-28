@@ -6,6 +6,7 @@ import br.com.includelabs.inpay.itau.domain.port.ItauBankPort;
 import org.springframework.boot.context.properties.EnableConfigurationProperties;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.core.env.Environment;
 
 @Configuration
 @EnableConfigurationProperties(ItauSettings.class)
@@ -16,8 +17,8 @@ public class ItauConfiguration {
     }
 
     @Bean
-    ExecuteItauOperation executeItauOperation(ItauBankPort port, ItauSettings settings) {
+    ExecuteItauOperation executeItauOperation(ItauBankPort port, ItauSettings settings, Environment environment) {
         return new ExecuteItauOperation(
-                port, settings.enabled(), settings.confirmUnverifiedPaths());
+                port, settings.enabled() && environment.matchesProfiles("local & !aws"), settings.confirmUnverifiedPaths());
     }
 }

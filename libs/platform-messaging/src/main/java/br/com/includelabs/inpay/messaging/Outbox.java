@@ -1,6 +1,7 @@
 package br.com.includelabs.inpay.messaging;
 
 import br.com.includelabs.inpay.contracts.InPayEvent;
+import br.com.includelabs.inpay.contracts.IntegrationDataPolicy;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.stereotype.Component;
 import org.springframework.transaction.support.TransactionSynchronizationManager;
@@ -41,6 +42,7 @@ public class Outbox {
         if (!TransactionSynchronizationManager.isActualTransactionActive()) {
             throw new IllegalStateException("Outbox requires business transaction");
         }
+        IntegrationDataPolicy.validate(event.data());
         jdbcTemplate.update(
                 "INSERT INTO outbox(event_id,topic,partition_key,payload) VALUES (?,?,?,?)",
                 event.eventId(),

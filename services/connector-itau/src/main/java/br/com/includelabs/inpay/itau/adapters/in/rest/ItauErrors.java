@@ -14,17 +14,17 @@ public class ItauErrors {
 
     @ExceptionHandler(IllegalArgumentException.class)
     ResponseEntity<Map<String, String>> invalid(IllegalArgumentException exception) {
-        LOG.error("Itau request rejected", exception);
-        return ResponseEntity.unprocessableEntity().body(Map.of("error", exception.getMessage()));
+        LOG.error("Itau request rejected");
+        return ResponseEntity.unprocessableEntity().body(Map.of("error", "Bank request rejected"));
     }
 
     @ExceptionHandler(IllegalStateException.class)
     ResponseEntity<Map<String, String>> unavailable(IllegalStateException exception) {
-        LOG.error("Itau connector unavailable", exception);
+        LOG.error("Itau connector unavailable");
         HttpStatus status =
                 exception.getMessage() != null && exception.getMessage().contains("disabled")
                         ? HttpStatus.SERVICE_UNAVAILABLE
                         : HttpStatus.CONFLICT;
-        return ResponseEntity.status(status).body(Map.of("error", exception.getMessage()));
+        return ResponseEntity.status(status).body(Map.of("error", "Bank request rejected"));
     }
 }

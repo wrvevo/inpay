@@ -3,6 +3,7 @@ package br.com.includelabs.inpay.c6.adapters.in.rest;
 import br.com.includelabs.inpay.c6.application.ExecuteC6Operation;
 import br.com.includelabs.inpay.c6.domain.C6Reply;
 import java.util.Map;
+import org.springframework.context.annotation.Profile;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -13,6 +14,7 @@ import org.springframework.web.bind.annotation.RestController;
 
 /** REST interno do conector e o contrato antigo usado pelo gateway. */
 @RestController
+@Profile("local & !aws")
 public class C6OperationsController {
     private final ExecuteC6Operation useCase;
 

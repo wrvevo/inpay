@@ -9,11 +9,13 @@ import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.kafka.core.KafkaTemplate;
+import org.springframework.context.annotation.Profile;
 import org.springframework.stereotype.Component;
 import tools.jackson.databind.ObjectMapper;
 
 /** Resultado durável para o gateway. O corpo nativo do banco não entra no evento. */
 @Component
+@Profile("local & !aws")
 @ConditionalOnProperty(prefix = "inpay.c6", name = "kafka-enabled", havingValue = "true")
 public class C6ResultPublisherAdapter implements C6ResultPublisher {
     static final String TOPIC = "inpay.c6.results.v1";
@@ -30,6 +32,9 @@ public class C6ResultPublisherAdapter implements C6ResultPublisher {
     /** Publica o resultado normalizado da operação no tópico configurado. */
     @Override
     public void publish(C6Operation operation, String operationId, C6Reply reply) {
+        if (!reply.mocked()) {
+            return;
+        }
         try {
             Map<String, Object> event = new LinkedHashMap<>();
             event.put("bank", "c6");
@@ -42,11 +47,16 @@ public class C6ResultPublisherAdapter implements C6ResultPublisher {
             kafka.send(
                     TOPIC,
                     operationId == null ? operation.name() : operationId,
-                    mapper.writeValueAsString(event));
+                    mapper.writeValueAsString(event))
+                    .get(5, java.util.concurrent.TimeUnit.SECONDS);
             LOG.info(
                     "C6 result published operation={} status={}", operation.name(), reply.status());
+        } catch (InterruptedException exception) {
+            Thread.currentThread().interrupt();
+            throw new IllegalStateException("C6 sandbox publication interrupted");
         } catch (Exception exception) {
-            LOG.error("C6 result publication failed operation={}", operation.name(), exception);
+            LOG.error("C6 result publication not confirmed");
+            throw new IllegalStateException("C6 sandbox publication failed");
         }
     }
 }

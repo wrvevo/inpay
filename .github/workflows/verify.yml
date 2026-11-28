@@ -1,5 +1,10 @@
 name: verify
-on: [push, pull_request]
+on:
+  push:
+    branches: [develop, staging, main]
+  pull_request:
+permissions:
+  contents: read
 concurrency:
   group: verify-${{ github.event.pull_request.number || github.ref }}
   cancel-in-progress: true
@@ -14,11 +19,27 @@ jobs:
           java-version: '21'
           cache: maven
       - run: python3 scripts/verify-wiremock-intents.py
+      - run: python3 scripts/verify-module-boundaries.py
       - name: Check formatting (report all changes)
         run: mvn -B spotless:apply && git diff --exit-code --no-color
       - name: Verify Java modules
         if: always()
         run: mvn -B spotless:check verify
+
+  postgres-integration:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 25
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          persist-credentials: false
+      - uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: '21'
+          cache: maven
+      - name: Verifica idempotência e recuperação de eventos no PostgreSQL
+        run: mvn -B -pl services/payment-core-service -am -Pintegration verify
 
   frontend:
     runs-on: ubuntu-24.04

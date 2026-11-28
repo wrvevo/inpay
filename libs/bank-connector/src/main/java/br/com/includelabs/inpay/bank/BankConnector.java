@@ -43,14 +43,15 @@ public final class BankConnector {
                 operation.name(),
                 mode == MockMode.MOCK,
                 operationId != null && !operationId.isBlank());
+        String journalKey = null;
+        boolean dispatched = false;
         try {
             Prepared prepared = prepare(operation, safePayload);
             if (mode == MockMode.LIVE) {
                 assertLiveAllowed(operation);
             }
-            String journalKey = null;
             if (operation.hasBody()) {
-                BankResult replayed = reserve(operation, operationId, safePayload);
+                BankResult replayed = reserve(operation, operationId, safePayload, mode);
                 if (replayed != null) {
                     LOG.info(
                             "Bank operation replayed bank={} operation={}",
@@ -58,11 +59,12 @@ public final class BankConnector {
                             operation.name());
                     return replayed;
                 }
-                journalKey = key(operation, operationId);
+                journalKey = key(operation, operationId, mode);
             }
             URI uri = target(mode, prepared.path());
             String body =
                     prepared.body().isEmpty() ? "" : mapper.writeValueAsString(prepared.body());
+            dispatched = true;
             BankResult result =
                     transport.send(settings.bank(), operation, mode == MockMode.MOCK, uri, body);
             if (journalKey != null) {
@@ -76,20 +78,22 @@ public final class BankConnector {
                     result.uncertain());
             return result;
         } catch (RuntimeException exception) {
-            release(operation, operationId);
+            if (!dispatched) {
+                release(journalKey);
+            }
             LOG.error(
                     "Bank operation failed bank={} operation={}",
                     settings.id(),
-                    operation.name(),
-                    exception);
+                    operation.name());
             throw exception;
         } catch (Exception exception) {
-            release(operation, operationId);
+            if (!dispatched) {
+                release(journalKey);
+            }
             LOG.error(
                     "Bank operation failed bank={} operation={}",
                     settings.id(),
-                    operation.name(),
-                    exception);
+                    operation.name());
             throw new IllegalStateException("Cannot encode bank request");
         }
     }
@@ -113,16 +117,16 @@ public final class BankConnector {
     }
 
     private BankResult reserve(
-            BankOperation operation, String operationId, Map<String, Object> payload) {
+            BankOperation operation, String operationId, Map<String, Object> payload, MockMode mode) {
         if (operationId == null || !operationId.matches("[A-Za-z0-9_-]{1,80}")) {
             throw new IllegalArgumentException("operationId is required");
         }
         String finger = fingerprint(operation, payload);
-        if (journal.size() >= JOURNAL_LIMIT && !journal.containsKey(key(operation, operationId))) {
+        if (journal.size() >= JOURNAL_LIMIT && !journal.containsKey(key(operation, operationId, mode))) {
             throw new IllegalStateException("Bank journal is full");
         }
         Journaled previous =
-                journal.putIfAbsent(key(operation, operationId), new Journaled(finger, null));
+                journal.putIfAbsent(key(operation, operationId, mode), new Journaled(finger, null));
         if (previous != null) {
             if (!previous.fingerprint().equals(finger) || previous.result() == null) {
                 throw new IllegalStateException("operationId was reused with a different command");
@@ -203,18 +207,17 @@ public final class BankConnector {
         return URLEncoder.encode(value, StandardCharsets.UTF_8);
     }
 
-    private void release(BankOperation operation, String operationId) {
-        if (operationId == null || !operation.hasBody()) {
-            return;
-        }
-        Journaled current = journal.get(key(operation, operationId));
-        if (current != null && current.result() == null) {
-            journal.remove(key(operation, operationId));
+    /** Libera apenas a reserva desta tentativa quando ainda não houve despacho. */
+    private void release(String journalKey) {
+        if (journalKey != null) {
+            journal.computeIfPresent(
+                    journalKey, (key, current) -> current.result() == null ? null : current);
         }
     }
 
-    private String key(BankOperation operation, String operationId) {
-        return settings.id() + "|" + operation.name() + "|" + operationId;
+    /** Separa as chaves de laboratório das chamadas reais. */
+    private String key(BankOperation operation, String operationId, MockMode mode) {
+        return settings.id() + "|" + operation.name() + "|" + mode + "|" + operationId;
     }
 
     private String fingerprint(BankOperation operation, Map<String, Object> payload) {
