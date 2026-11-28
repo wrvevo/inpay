@@ -3,6 +3,7 @@ package br.com.includelabs.inpay.payment.adapters.out.postgres;
 import static org.junit.jupiter.api.Assertions.*;
 
 import br.com.includelabs.inpay.messaging.Outbox;
+import br.com.includelabs.inpay.messaging.OutboxPublisher;
 import br.com.includelabs.inpay.payment.application.SubmitPayment;
 import br.com.includelabs.inpay.payment.domain.Payment;
 import io.zonky.test.db.postgres.embedded.EmbeddedPostgres;
@@ -12,6 +13,8 @@ import java.util.*;
 import java.util.concurrent.*;
 import org.junit.jupiter.api.*;
 import org.springframework.jdbc.core.JdbcTemplate;
+import org.springframework.kafka.core.KafkaTemplate;
+import org.springframework.transaction.support.TransactionSynchronizationManager;
 import org.springframework.jdbc.datasource.DataSourceTransactionManager;
 import org.springframework.transaction.support.TransactionTemplate;
 import tools.jackson.databind.json.JsonMapper;
@@ -32,7 +35,7 @@ class PostgresIdempotencyIT {
         var ds = pg.getPostgresDatabase();
         jdbc = new JdbcTemplate(ds);
         tx = new TransactionTemplate(new DataSourceTransactionManager(ds));
-        for (String migration : List.of("V1__messaging.sql", "V2__payment.sql")) {
+        for (String migration : List.of("V1__messaging.sql", "V2__payment.sql", "V5__outbox_lease.sql")) {
             try (InputStream in =
                     PostgresIdempotencyIT.class.getResourceAsStream("/db/migration/" + migration)) {
                 for (String sql :
@@ -123,5 +126,65 @@ class PostgresIdempotencyIT {
                                 }));
         assertEquals(0, jdbc.queryForObject("SELECT count(*) FROM payments", Integer.class));
         assertEquals(0, jdbc.queryForObject("SELECT count(*) FROM outbox", Integer.class));
+    }
+
+    /** Confirma que o envio Kafka acontece fora da transação e mantém a ordem por chave. */
+    @Test
+    @SuppressWarnings("unchecked")
+    void outboxPublishesOutsideTransactionAndLeasesHeadOfEachKey() {
+        UUID first = UUID.randomUUID();
+        UUID second = UUID.randomUUID();
+        jdbc.update(
+                "INSERT INTO outbox(event_id,topic,partition_key,payload,created_at)"
+                        + " VALUES (?, 'payments', 'same-key', '{}', now() - interval '1 second')",
+                first);
+        jdbc.update(
+                "INSERT INTO outbox(event_id,topic,partition_key,payload)"
+                        + " VALUES (?, 'payments', 'same-key', '{}')",
+                second);
+        KafkaTemplate<String, String> kafka = org.mockito.Mockito.mock(KafkaTemplate.class);
+        org.mockito.Mockito.when(kafka.send("payments", "same-key", "{}"))
+                .thenAnswer(
+                        call -> {
+                            assertFalse(TransactionSynchronizationManager.isActualTransactionActive());
+                            return CompletableFuture.completedFuture(null);
+                        });
+        OutboxPublisher publisher = new OutboxPublisher(jdbc, kafka, tx);
+        publisher.publish();
+        assertEquals(1, jdbc.queryForObject(
+                "SELECT count(*) FROM outbox WHERE published_at IS NOT NULL AND event_id=?",
+                Integer.class, first));
+        assertEquals(0, jdbc.queryForObject(
+                "SELECT count(*) FROM outbox WHERE published_at IS NOT NULL AND event_id=?",
+                Integer.class, second));
+        publisher.publish();
+        assertEquals(2, jdbc.queryForObject(
+                "SELECT count(*) FROM outbox WHERE published_at IS NOT NULL", Integer.class));
+    }
+
+    /** Uma confirmação perdida mantém o evento recuperável e não avança a mesma chave. */
+    @Test
+    @SuppressWarnings("unchecked")
+    void outboxRetriesExpiredLeaseWithoutMarkingUnconfirmedEvent() {
+        UUID id = UUID.randomUUID();
+        jdbc.update(
+                "INSERT INTO outbox(event_id,topic,partition_key,payload)"
+                        + " VALUES (?, 'payments', 'key', '{}')",
+                id);
+        KafkaTemplate<String, String> kafka = org.mockito.Mockito.mock(KafkaTemplate.class);
+        org.mockito.Mockito.when(kafka.send("payments", "key", "{}"))
+                .thenReturn(CompletableFuture.failedFuture(new IllegalStateException("test")))
+                .thenReturn(CompletableFuture.completedFuture(null));
+        OutboxPublisher publisher = new OutboxPublisher(jdbc, kafka, tx);
+        publisher.publish();
+        assertEquals(0, jdbc.queryForObject(
+                "SELECT count(*) FROM outbox WHERE published_at IS NOT NULL", Integer.class));
+        publisher.publish();
+        org.mockito.Mockito.verify(kafka, org.mockito.Mockito.times(1))
+                .send("payments", "key", "{}");
+        jdbc.update("UPDATE outbox SET lease_until=now() - interval '1 second' WHERE event_id=?", id);
+        publisher.publish();
+        assertEquals(1, jdbc.queryForObject(
+                "SELECT count(*) FROM outbox WHERE published_at IS NOT NULL", Integer.class));
     }
 }

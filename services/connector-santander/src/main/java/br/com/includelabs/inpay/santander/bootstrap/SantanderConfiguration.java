@@ -6,6 +6,7 @@ import br.com.includelabs.inpay.santander.domain.port.SantanderBankPort;
 import org.springframework.boot.context.properties.EnableConfigurationProperties;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.core.env.Environment;
 
 @Configuration
 @EnableConfigurationProperties(SantanderSettings.class)
@@ -17,8 +18,8 @@ public class SantanderConfiguration {
 
     @Bean
     ExecuteSantanderOperation executeSantanderOperation(
-            SantanderBankPort port, SantanderSettings settings) {
+            SantanderBankPort port, SantanderSettings settings, Environment environment) {
         return new ExecuteSantanderOperation(
-                port, settings.enabled(), settings.confirmUnverifiedPaths());
+                port, settings.enabled() && environment.matchesProfiles("local & !aws"), settings.confirmUnverifiedPaths());
     }
 }

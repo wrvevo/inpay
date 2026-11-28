@@ -8,6 +8,7 @@ import org.springframework.boot.autoconfigure.condition.ConditionalOnMissingBean
 import org.springframework.boot.context.properties.EnableConfigurationProperties;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.core.env.Environment;
 
 @Configuration
 @EnableConfigurationProperties(C6Settings.class)
@@ -28,8 +29,8 @@ public class C6Configuration {
     /** Compõe o caso de uso com as portas e parâmetros configurados. */
     @Bean
     ExecuteC6Operation executeC6Operation(
-            C6BankPort port, C6ResultPublisher results, C6Settings settings) {
+            C6BankPort port, C6ResultPublisher results, C6Settings settings, Environment environment) {
         return new ExecuteC6Operation(
-                port, results, settings.enabled(), settings.confirmUnverifiedPaths());
+                port, results, settings.enabled() && environment.matchesProfiles("local & !aws"), settings.confirmUnverifiedPaths());
     }
 }

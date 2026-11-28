@@ -1,0 +1,44 @@
+name: Build individual InPay component
+on:
+  workflow_dispatch:
+    inputs:
+      component:
+        description: "Caminho do módulo, por exemplo services/payment-core-service"
+        required: true
+        type: string
+permissions:
+  contents: read
+jobs:
+  component:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 30
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          persist-credentials: false
+      - uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: '21'
+          cache: maven
+      - name: Validate component and build only its Maven dependency graph
+        shell: bash
+        env:
+          COMPONENT: ${{ inputs.component }}
+        run: |
+          set -euo pipefail
+          [[ "$COMPONENT" =~ ^(services|lambdas|libs)/[a-z0-9-]+$ ]]
+          test -f "$COMPONENT/pom.xml"
+          mvn -B -pl "$COMPONENT" -am spotless:check verify
+          mkdir -p component-dist
+          find "$COMPONENT/target" -maxdepth 1 -type f -name '*.jar' -exec cp '{}' component-dist/ ';'
+          test -n "$(find component-dist -type f -name '*.jar' -print -quit)"
+          printf '%s\n' "$GITHUB_SHA" > component-dist/source-commit.txt
+          printf '%s\n' "$COMPONENT" > component-dist/component.txt
+          (cd component-dist && sha256sum ./*.jar > SHA256SUMS)
+      - uses: actions/upload-artifact@v4
+        with:
+          name: component-${{ github.sha }}-${{ github.run_id }}
+          path: component-dist/
+          if-no-files-found: error
+          retention-days: 7
